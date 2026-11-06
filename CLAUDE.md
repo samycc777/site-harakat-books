@@ -1,15 +1,15 @@
 # site-harakat-books
 
-Public static site «كتب مشكولة»: Salafi books with full harakat, grouped by author, each with a PDF download. One RTL Arabic page, light mode only, Droid Arabic Naskh self-hosted. Add no text of our own (no taglines, intros, footer); only site title, author headings, book titles, «تحميل PDF», page count. Never mention or link Zaid's sites.
+Public static site «كتب مشكولة»: Salafi books with full harakat, grouped by author, each with a PDF download. One RTL Arabic page, light mode only, Droid Arabic Naskh self-hosted. Add no text of our own (no taglines, intros, footer); only site title, author headings and quick-jump links, search box («ابحث عن كتاب», «لا توجد نتائج»), book titles, «تحميل PDF», page count, «المصدر» link. Never mention or link Zaid's sites.
 
 ## Where things live
-- `books.json` — published list: `authors` (display order, with «الشيخ») and `books` (slug, title, author, pdf file name in media-harakat-books/pdf/).
-- `scripts/sync.py` — copies the listed PDFs from `~/dev/media-harakat-books/pdf/` (read-only) to `public/pdf/<slug>.pdf` and regenerates `public/index.html` (needs `pypdf`).
+- `books.json` — published list: `authors` (display order, with «الشيخ») and `books` (slug, title, author, pdf file name in media-harakat-books/pdf/, optional `source` = list of original URLs).
+- `scripts/sync.py` — copies the listed PDFs from `~/dev/media-harakat-books/pdf/` (read-only) to `public/pdf/<slug>.pdf` and regenerates `public/index.html` (needs `pypdf`). Every book needs a source link: `source` in books.json, else the URLs in media-harakat-books `books/<slug>/src/sources.tsv` (rabee.net books); sync.py stops if neither.
 - `public/` — the deployed folder (index.html, fonts/, pdf/). Don't edit index.html by hand; edit sync.py.
 
 ## Add a book
 1. Only finished books (PDF built in media-harakat-books). Not in progress: عون الباري, التفسير الميسر, المختصر في التفسير.
-2. Add an entry to `books.json` (title = first line of the book's `meta.txt`; new author = add to `authors` too).
+2. Add an entry to `books.json` (title = first line of the book's `meta.txt`; new author = add to `authors` too; `source` = where the original came from, if the book has no `src/sources.tsv`).
 3. `python3 scripts/sync.py`, check `public/index.html`, commit, push.
 
 ## Deploy

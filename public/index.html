@@ -19,6 +19,18 @@ ul{list-style:none;margin:0;padding:0}
 .book{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;border-bottom:1px solid #e3dac6}
 h3{margin:0;font-size:1.3rem;font-weight:700;line-height:2}
 .meta{color:#6b6556;font-size:1.05rem}
+.src{color:#5a4420}
+.src:hover,.src:focus{color:#3f2f13}
+nav.authors{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:0 0 1rem}
+nav.authors a{border:1px solid #c9b88f;border-radius:2rem;padding:.2rem .9rem;color:#5a4420;text-decoration:none;font-size:1.05rem;background:#fff}
+nav.authors a:hover,nav.authors a:focus{background:#f1e8d4}
+nav.authors span{color:#6b6556}
+.bar{position:sticky;top:0;z-index:5;background:#fbf8f1;padding:.6rem 0;border-bottom:1px solid #e3dac6}
+.bar input{width:100%;font:inherit;font-size:1.15rem;padding:.4rem .9rem;border:1px solid #c9b88f;border-radius:.5rem;background:#fff;color:inherit}
+.bar input:focus{outline:2px solid #8a6d3b;outline-offset:0}
+section{scroll-margin-top:4.5rem}
+#none{text-align:center;color:#6b6556;margin:2rem 0}
+[hidden]{display:none!important}
 .btn{flex:none;background:#5a4420;color:#fff;text-decoration:none;padding:.5rem 1.2rem;border-radius:.5rem;font-weight:700;font-size:1.1rem;line-height:1.8}
 .btn:hover,.btn:focus{background:#3f2f13}
 @media(max-width:560px){
@@ -32,105 +44,122 @@ h3{margin:0;font-size:1.3rem;font-weight:700;line-height:2}
 <body>
 <main>
   <h1>كتب مشكولة</h1>
-  <section>
+  <nav class="authors"><a href="#a1">الشيخ ربيع بن هادي المدخلي <span>(١٩)</span></a><a href="#a2">الشيخ محمد ناصر الدين الألباني <span>(١)</span></a><a href="#a3">الشيخ بلال السالمي <span>(١)</span></a></nav>
+  <div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>
+  <section id="a1">
     <h2>الشيخ ربيع بن هادي المدخلي</h2>
     <ul>
     <li class="book">
-      <div class="info"><h3>الْخَطَرُ الْإِيرَانِيُّ الرَّافِضِيُّ عَلَى الْإِسْلَامِ وَالْمُسْلِمِينَ</h3><span class="meta">٧ صفحة</span></div>
+      <div class="info"><h3>الْخَطَرُ الْإِيرَانِيُّ الرَّافِضِيُّ عَلَى الْإِسْلَامِ وَالْمُسْلِمِينَ</h3><span class="meta">٧ صفحة · <a class="src" href="https://rabee.net/%d8%a7%d9%84%d8%ae%d8%b7%d8%b1-%d8%a7%d9%84%d8%a5%d9%8a%d8%b1%d8%a7%d9%86%d9%8a-%d8%a7%d9%84%d8%b1%d8%a7%d9%81%d8%b6%d9%8a-%d8%b9%d9%84%d9%89-%d8%a7%d9%84%d8%a5%d8%b3%d9%84%d8%a7%d9%85-%d9%88%d8%a7/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-al-khatar-al-irani.pdf" download="الْخَطَرُ الْإِيرَانِيُّ الرَّافِضِيُّ عَلَى الْإِسْلَامِ وَالْمُسْلِمِينَ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>الْخِيَانَاتُ وَالْغَدْرُ مِنْ شَرِّ أَنْوَاعِ الْفَسَادِ فِي الْأَرْضِ</h3><span class="meta">٥ صفحة</span></div>
+      <div class="info"><h3>الْخِيَانَاتُ وَالْغَدْرُ مِنْ شَرِّ أَنْوَاعِ الْفَسَادِ فِي الْأَرْضِ</h3><span class="meta">٥ صفحة · <a class="src" href="https://rabee.net/%d8%a7%d9%84%d8%ae%d9%8a%d8%a7%d9%86%d8%a7%d8%aa-%d9%88%d8%a7%d9%84%d8%ba%d8%af%d8%b1-%d9%85%d9%86-%d8%b4%d8%b1-%d8%a3%d9%86%d9%88%d8%a7%d8%b9-%d8%a7%d9%84%d9%81%d8%b3%d8%a7%d8%af-%d9%81%d9%8a-%d8%a7/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-al-khiyanat-wal-ghadr.pdf" download="الْخِيَانَاتُ وَالْغَدْرُ مِنْ شَرِّ أَنْوَاعِ الْفَسَادِ فِي الْأَرْضِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>الْعُبُودِيَّةُ لِلْمَالِ أَوْ لِغَيْرِهِ مِنَ الْخِصَالِ</h3><span class="meta">٨ صفحة</span></div>
+      <div class="info"><h3>الْعُبُودِيَّةُ لِلْمَالِ أَوْ لِغَيْرِهِ مِنَ الْخِصَالِ</h3><span class="meta">٨ صفحة · <a class="src" href="https://rabee.net/%d8%a7%d9%84%d8%b9%d8%a8%d9%88%d8%af%d9%8a%d8%a9-%d9%84%d9%84%d9%85%d8%a7%d9%84-%d8%a3%d9%88-%d9%84%d8%ba%d9%8a%d8%b1%d9%87-%d9%85%d9%86-%d8%a7%d9%84%d8%ae%d8%b5%d8%a7%d9%84/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-al-ubudiyyah-lil-mal.pdf" download="الْعُبُودِيَّةُ لِلْمَالِ أَوْ لِغَيْرِهِ مِنَ الْخِصَالِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>التَّكَلُّفُ فِي قِرَاءَةِ الْقُرْآنِ أَنْكَرَهُ أَئِمَّةُ السَّلَفِ رَحِمَهُمُ اللهُ</h3><span class="meta">٧ صفحة</span></div>
+      <div class="info"><h3>التَّكَلُّفُ فِي قِرَاءَةِ الْقُرْآنِ أَنْكَرَهُ أَئِمَّةُ السَّلَفِ رَحِمَهُمُ اللهُ</h3><span class="meta">٧ صفحة · <a class="src" href="https://rabee.net/%d8%a7%d9%84%d8%aa%d9%83%d9%84%d9%81-%d9%81%d9%8a-%d9%82%d8%b1%d8%a7%d8%a1%d8%a9-%d8%a7%d9%84%d9%82%d8%b1%d8%a2%d9%86-%d8%a3%d9%86%d9%83%d8%b1%d9%87-%d8%a3%d8%a6%d9%85%d8%a9-%d8%a7%d9%84%d8%b3%d9%84/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-at-takalluf-fi-qiraat-al-quran.pdf" download="التَّكَلُّفُ فِي قِرَاءَةِ الْقُرْآنِ أَنْكَرَهُ أَئِمَّةُ السَّلَفِ رَحِمَهُمُ اللهُ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>تَوْجِيهُ الْعَلَّامَةِ رَبِيعٍ الْمَدْخَلِيِّ، لِبَعْضِ الشَّبَابِ فِي الْمَغْرِبِ الْعَرَبِيِّ الَّذِينَ يُنْكِرُونَ بَعْضَ بِدَعِ الْمَقَابِرِ، وَيَتَرَتَّبُ عَلَى ذَلِكَ مَشَاكِلُ كَبِيرَةٌ</h3><span class="meta">٦ صفحة</span></div>
+      <div class="info"><h3>تَوْجِيهُ الْعَلَّامَةِ رَبِيعٍ الْمَدْخَلِيِّ، لِبَعْضِ الشَّبَابِ فِي الْمَغْرِبِ الْعَرَبِيِّ الَّذِينَ يُنْكِرُونَ بَعْضَ بِدَعِ الْمَقَابِرِ، وَيَتَرَتَّبُ عَلَى ذَلِكَ مَشَاكِلُ كَبِيرَةٌ</h3><span class="meta">٦ صفحة · <a class="src" href="https://rabee.net/%d8%aa%d9%88%d8%ac%d9%8a%d9%87-%d8%a7%d9%84%d8%b9%d9%84%d8%a7%d9%85%d8%a9-%d8%b1%d8%a8%d9%8a%d8%b9-%d8%a7%d9%84%d9%85%d8%af%d8%ae%d9%84%d9%8a%d8%8c-%d9%84%d8%a8%d8%b9%d8%b6-%d8%a7%d9%84%d8%b4%d8%a8/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-bida-al-maqabir.pdf" download="تَوْجِيهُ الْعَلَّامَةِ رَبِيعٍ الْمَدْخَلِيِّ، لِبَعْضِ الشَّبَابِ فِي الْمَغْرِبِ الْعَرَبِيِّ الَّذِينَ يُنْكِرُونَ بَعْضَ بِدَعِ الْمَقَابِرِ، وَيَتَرَتَّبُ عَلَى ذَلِكَ مَشَاكِلُ كَبِيرَةٌ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>حُكْمُ بِنَاءِ الْكَنَائِسِ فِي بِلَادِ الْمُسْلِمِينَ</h3><span class="meta">٧ صفحة</span></div>
+      <div class="info"><h3>حُكْمُ بِنَاءِ الْكَنَائِسِ فِي بِلَادِ الْمُسْلِمِينَ</h3><span class="meta">٧ صفحة · <a class="src" href="https://rabee.net/%d8%ad%d9%83%d9%85-%d8%a8%d9%86%d8%a7%d8%a1-%d8%a7%d9%84%d9%83%d9%86%d8%a7%d8%a6%d8%b3-%d9%81%d9%8a-%d8%a8%d9%84%d8%a7%d8%af-%d8%a7%d9%84%d9%85%d8%b3%d9%84%d9%85%d9%8a%d9%86/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-bina-al-kanais.pdf" download="حُكْمُ بِنَاءِ الْكَنَائِسِ فِي بِلَادِ الْمُسْلِمِينَ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>تَحْذِيرٌ مِنِ انْتِشَارِ دِينِ الرَّوَافِضِ فِي الْجَزَائِرِ وَغَيْرِهَا مِنْ بُلْدَانِ الْمُسْلِمِينَ</h3><span class="meta">٩ صفحة</span></div>
+      <div class="info"><h3>تَحْذِيرٌ مِنِ انْتِشَارِ دِينِ الرَّوَافِضِ فِي الْجَزَائِرِ وَغَيْرِهَا مِنْ بُلْدَانِ الْمُسْلِمِينَ</h3><span class="meta">٩ صفحة · <a class="src" href="https://rabee.net/%d8%aa%d8%ad%d8%b0%d9%8a%d8%b1-%d9%85%d9%86-%d8%a7%d9%86%d8%aa%d8%b4%d8%a7%d8%b1-%d8%af%d9%8a%d9%86-%d8%a7%d9%84%d8%b1%d9%91%d9%88%d8%a7%d9%81%d8%b6-%d9%81%d9%8a-%d8%a7%d9%84%d8%ac%d8%b2%d8%a7%d8%a6/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-din-ar-rawafid-fil-jazair.pdf" download="تَحْذِيرٌ مِنِ انْتِشَارِ دِينِ الرَّوَافِضِ فِي الْجَزَائِرِ وَغَيْرِهَا مِنْ بُلْدَانِ الْمُسْلِمِينَ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>الْحَدَّادِيُّونَ التَّكْفِيرِيُّونَ يَرْمُونَ أَهْلَ السُّنَّةِ السَّابِقِينَ وَاللَّاحِقِينَ وَأَئِمَّتَهُمْ بِالْإِرْجَاءِ لِأَنَّهُمْ يَقُولُونَ «الْإِيمَانُ أَصْلٌ وَالْعَمَلُ فَرْعٌ»</h3><span class="meta">٤٦ صفحة</span></div>
+      <div class="info"><h3>الْحَدَّادِيُّونَ التَّكْفِيرِيُّونَ يَرْمُونَ أَهْلَ السُّنَّةِ السَّابِقِينَ وَاللَّاحِقِينَ وَأَئِمَّتَهُمْ بِالْإِرْجَاءِ لِأَنَّهُمْ يَقُولُونَ «الْإِيمَانُ أَصْلٌ وَالْعَمَلُ فَرْعٌ»</h3><span class="meta">٤٦ صفحة · <a class="src" href="https://rabee.net/?p=237" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-haddadiyyun-takfiriyyun.pdf" download="الْحَدَّادِيُّونَ التَّكْفِيرِيُّونَ يَرْمُونَ أَهْلَ السُّنَّةِ السَّابِقِينَ وَاللَّاحِقِينَ وَأَئِمَّتَهُمْ بِالْإِرْجَاءِ لِأَنَّهُمْ يَقُولُونَ «الْإِيمَانُ أَصْلٌ وَالْعَمَلُ فَرْعٌ».pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>مَوْقِفُ شَيْخِ الْإِسْلَامِ ابْنِ تَيْمِيَّةَ وَعُلَمَاءِ الْإِسْلَامِ مِنْ دَعْوَةِ حُرِّيَّةِ التَّدَيُّنِ وَأُخُوَّةِ وَمُسَاوَاةِ الْأَدْيَانِ</h3><span class="meta">٤ صفحة</span></div>
+      <div class="info"><h3>مَوْقِفُ شَيْخِ الْإِسْلَامِ ابْنِ تَيْمِيَّةَ وَعُلَمَاءِ الْإِسْلَامِ مِنْ دَعْوَةِ حُرِّيَّةِ التَّدَيُّنِ وَأُخُوَّةِ وَمُسَاوَاةِ الْأَدْيَانِ</h3><span class="meta">٤ صفحة · <a class="src" href="https://rabee.net/%d9%85%d9%88%d9%82%d9%81-%d8%b4%d9%8a%d8%ae-%d8%a7%d9%84%d8%a5%d8%b3%d9%84%d8%a7%d9%85-%d8%a7%d8%a8%d9%86-%d8%aa%d9%8a%d9%85%d9%8a%d8%a9-%d9%88%d8%b9%d9%84%d9%85%d8%a7%d8%a1-%d8%a7%d9%84%d8%a5%d8%b3/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-hurriyyat-at-tadayyun.pdf" download="مَوْقِفُ شَيْخِ الْإِسْلَامِ ابْنِ تَيْمِيَّةَ وَعُلَمَاءِ الْإِسْلَامِ مِنْ دَعْوَةِ حُرِّيَّةِ التَّدَيُّنِ وَأُخُوَّةِ وَمُسَاوَاةِ الْأَدْيَانِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>مَنْزِلَةُ إِصْلَاحِ ذَاتِ الْبَيْنِ فِي الْإِسْلَامِ</h3><span class="meta">٨ صفحة</span></div>
+      <div class="info"><h3>مَنْزِلَةُ إِصْلَاحِ ذَاتِ الْبَيْنِ فِي الْإِسْلَامِ</h3><span class="meta">٨ صفحة · <a class="src" href="https://rabee.net/%d9%85%d9%86%d8%b2%d9%84%d8%a9-%d8%a5%d8%b5%d9%84%d8%a7%d8%ad-%d8%b0%d8%a7%d8%aa-%d8%a7%d9%84%d8%a8%d9%8a%d9%86-%d9%81%d9%8a-%d8%a7%d9%84%d8%a5%d8%b3%d9%84%d8%a7%d9%85/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-islah-dhat-al-bayn.pdf" download="مَنْزِلَةُ إِصْلَاحِ ذَاتِ الْبَيْنِ فِي الْإِسْلَامِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>مَنْ هُمُ الْإِرْهَابِيُّونَ؟</h3><span class="meta">٣٨ صفحة</span></div>
+      <div class="info"><h3>مَنْ هُمُ الْإِرْهَابِيُّونَ؟</h3><span class="meta">٣٨ صفحة · <a class="src" href="https://rabee.net/?p=93" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-man-hum-al-irhabiyyun.pdf" download="مَنْ هُمُ الْإِرْهَابِيُّونَ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>نَصِيحَةٌ إِلَى الْأُمَّةِ الْجَزَائِرِيَّةِ شَعْباً وَحُكُومَةً</h3><span class="meta">٥ صفحة</span></div>
+      <div class="info"><h3>نَصِيحَةٌ إِلَى الْأُمَّةِ الْجَزَائِرِيَّةِ شَعْباً وَحُكُومَةً</h3><span class="meta">٥ صفحة · <a class="src" href="https://rabee.net/%d9%86%d8%b5%d9%8a%d8%ad%d8%a9-%d8%a5%d9%84%d9%89-%d8%a7%d9%84%d8%a3%d9%85%d8%a9-%d8%a7%d9%84%d8%ac%d8%b2%d8%a7%d8%a6%d8%b1%d9%8a%d8%a9-%d8%b4%d8%b9%d8%a8%d8%a7%d9%8b-%d9%88%d8%ad%d9%83%d9%88%d9%85/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-nasihah-al-ummah-al-jazairiyyah.pdf" download="نَصِيحَةٌ إِلَى الْأُمَّةِ الْجَزَائِرِيَّةِ شَعْباً وَحُكُومَةً.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>نَصِيحَةٌ لِلسَّلَفِيِّينَ فِي الْجَزَائِرِ بِالِاجْتِمَاعِ وَعَدَمِ الِافْتِرَاقِ</h3><span class="meta">٤ صفحة</span></div>
+      <div class="info"><h3>نَصِيحَةٌ لِلسَّلَفِيِّينَ فِي الْجَزَائِرِ بِالِاجْتِمَاعِ وَعَدَمِ الِافْتِرَاقِ</h3><span class="meta">٤ صفحة · <a class="src" href="https://rabee.net/%d9%86%d8%b5%d9%8a%d8%ad%d8%a9-%d9%84%d9%84%d8%b3%d9%84%d9%81%d9%8a%d9%8a%d9%86-%d9%81%d9%8a-%d8%a7%d9%84%d8%ac%d8%b2%d8%a7%d8%a6%d8%b1-%d8%a8%d8%a7%d9%84%d8%a7%d8%ac%d8%aa%d9%85%d8%a7%d8%b9-%d9%88/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-nasihah-ijtima-jazair.pdf" download="نَصِيحَةٌ لِلسَّلَفِيِّينَ فِي الْجَزَائِرِ بِالِاجْتِمَاعِ وَعَدَمِ الِافْتِرَاقِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>نَصِيحَةٌ لِلْمُسْلِمِينَ عُمُومًا وَالسَّلَفِيِّينَ خَاصَّةً، فِي لِيبْيَا وَغَيْرِهَا مِنَ الْبِلَادِ الْإِسْلَامِيَّةِ</h3><span class="meta">٤ صفحة</span></div>
+      <div class="info"><h3>نَصِيحَةٌ لِلْمُسْلِمِينَ عُمُومًا وَالسَّلَفِيِّينَ خَاصَّةً، فِي لِيبْيَا وَغَيْرِهَا مِنَ الْبِلَادِ الْإِسْلَامِيَّةِ</h3><span class="meta">٤ صفحة · <a class="src" href="https://rabee.net/%d9%86%d8%b5%d9%8a%d8%ad%d8%a9-%d9%84%d9%84%d9%85%d8%b3%d9%84%d9%85%d9%8a%d9%86-%d8%b9%d9%85%d9%88%d9%85%d9%8b%d8%a7-%d9%88%d8%a7%d9%84%d8%b3%d9%84%d9%81%d9%8a%d9%8a%d9%86-%d8%ae%d8%a7%d8%b5%d8%a9/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-nasihah-libya.pdf" download="نَصِيحَةٌ لِلْمُسْلِمِينَ عُمُومًا وَالسَّلَفِيِّينَ خَاصَّةً، فِي لِيبْيَا وَغَيْرِهَا مِنَ الْبِلَادِ الْإِسْلَامِيَّةِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>نَصِيحَةٌ وَتَحْذِيرٌ لِلْأُخْوَةِ السَّلَفِيِّينَ فِي الْعِرَاقِ</h3><span class="meta">٥ صفحة</span></div>
+      <div class="info"><h3>نَصِيحَةٌ وَتَحْذِيرٌ لِلْأُخْوَةِ السَّلَفِيِّينَ فِي الْعِرَاقِ</h3><span class="meta">٥ صفحة · <a class="src" href="https://rabee.net/%d9%86%d8%b5%d9%8a%d8%ad%d8%a9-%d9%88%d8%aa%d8%ad%d8%b0%d9%8a%d8%b1-%d9%84%d9%84%d8%a3%d8%ae%d9%88%d8%a9-%d8%a7%d9%84%d8%b3%d9%84%d9%81%d9%8a%d9%8a%d9%86-%d9%81%d9%8a-%d8%a7%d9%84%d8%b9%d8%b1%d8%a7/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-nasihah-salafiyyin-iraq.pdf" download="نَصِيحَةٌ وَتَحْذِيرٌ لِلْأُخْوَةِ السَّلَفِيِّينَ فِي الْعِرَاقِ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>نَصِيحَةٌ وَبَيَانٌ لِلْأُخْوَةِ السَّلَفِيِّينَ فِي مِصْرَ وَغَيْرِهَا</h3><span class="meta">٣ صفحة</span></div>
+      <div class="info"><h3>نَصِيحَةٌ وَبَيَانٌ لِلْأُخْوَةِ السَّلَفِيِّينَ فِي مِصْرَ وَغَيْرِهَا</h3><span class="meta">٣ صفحة · <a class="src" href="https://rabee.net/%d9%86%d8%b5%d9%8a%d8%ad%d8%a9-%d9%88%d8%a8%d9%8a%d8%a7%d9%86-%d9%84%d9%84%d8%a3%d8%ae%d9%88%d8%a9-%d8%a7%d9%84%d8%b3%d9%84%d9%81%d9%8a%d9%8a%d9%86-%d9%81%d9%8a-%d9%85%d8%b5%d8%b1-%d9%88%d8%ba%d9%8a/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-nasihah-salafiyyin-misr.pdf" download="نَصِيحَةٌ وَبَيَانٌ لِلْأُخْوَةِ السَّلَفِيِّينَ فِي مِصْرَ وَغَيْرِهَا.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>مَا حُكْمُ تَسْمِيَةِ دَوْلَةِ يَهُودَ بِإِسْرَائِيلَ</h3><span class="meta">٨ صفحة</span></div>
+      <div class="info"><h3>مَا حُكْمُ تَسْمِيَةِ دَوْلَةِ يَهُودَ بِإِسْرَائِيلَ</h3><span class="meta">٨ صفحة · <a class="src" href="https://rabee.net/%d9%85%d8%a7-%d8%ad%d9%83%d9%85-%d8%aa%d8%b3%d9%85%d9%8a%d8%a9-%d8%af%d9%88%d9%84%d8%a9-%d9%8a%d9%87%d9%88%d8%af-%d8%a8%d8%a5%d8%b3%d8%b1%d8%a7%d8%a6%d9%8a%d9%84/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-tasmiyat-dawlat-yahud.pdf" download="مَا حُكْمُ تَسْمِيَةِ دَوْلَةِ يَهُودَ بِإِسْرَائِيلَ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>تَصْرِيحَاتُ شَيْخِ الْإِسْلَامِ ابْنِ تَيْمِيَّةَ رَحِمَهُ اللهُ بِتَوَاتُرِ أَحَادِيثِ الشَّفَاعَةِ وَأَنَّهُ يَخْرُجُ مِنَ النَّارِ مَنْ كَانَ فِي قَلْبِهِ مِثْقَالُ ذَرَّةٍ مِنْ إِيمَانٍ</h3><span class="meta">٥ صفحة</span></div>
+      <div class="info"><h3>تَصْرِيحَاتُ شَيْخِ الْإِسْلَامِ ابْنِ تَيْمِيَّةَ رَحِمَهُ اللهُ بِتَوَاتُرِ أَحَادِيثِ الشَّفَاعَةِ وَأَنَّهُ يَخْرُجُ مِنَ النَّارِ مَنْ كَانَ فِي قَلْبِهِ مِثْقَالُ ذَرَّةٍ مِنْ إِيمَانٍ</h3><span class="meta">٥ صفحة · <a class="src" href="https://rabee.net/%d8%aa%d8%b5%d8%b1%d9%8a%d8%ad%d8%a7%d8%aa-%d8%b4%d9%8a%d8%ae-%d8%a7%d9%84%d8%a5%d8%b3%d9%84%d8%a7%d9%85-%d8%a7%d8%a8%d9%86-%d8%aa%d9%8a%d9%85%d9%8a%d8%a9-%d8%b1%d8%ad%d9%85%d9%87-%d8%a7%d9%84%d9%84/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-tawatur-ahadith-ash-shafaah.pdf" download="تَصْرِيحَاتُ شَيْخِ الْإِسْلَامِ ابْنِ تَيْمِيَّةَ رَحِمَهُ اللهُ بِتَوَاتُرِ أَحَادِيثِ الشَّفَاعَةِ وَأَنَّهُ يَخْرُجُ مِنَ النَّارِ مَنْ كَانَ فِي قَلْبِهِ مِثْقَالُ ذَرَّةٍ مِنْ إِيمَانٍ.pdf">تحميل PDF</a>
     </li>
     <li class="book">
-      <div class="info"><h3>وَصِيَّةُ الشَّيْخِ الْعَلَّامَةِ رَبِيعِ بْنِ هَادِي عُمَيْرٍ الْمَدْخَلِيِّ (رَحِمَهُ اللهُ)</h3><span class="meta">٦ صفحة</span></div>
+      <div class="info"><h3>وَصِيَّةُ الشَّيْخِ الْعَلَّامَةِ رَبِيعِ بْنِ هَادِي عُمَيْرٍ الْمَدْخَلِيِّ (رَحِمَهُ اللهُ)</h3><span class="meta">٦ صفحة · <a class="src" href="https://rabee.net/9155-2/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/rabee-wasiyyah.pdf" download="وَصِيَّةُ الشَّيْخِ الْعَلَّامَةِ رَبِيعِ بْنِ هَادِي عُمَيْرٍ الْمَدْخَلِيِّ (رَحِمَهُ اللهُ).pdf">تحميل PDF</a>
     </li>
     </ul>
   </section>
-  <section>
+  <section id="a2">
     <h2>الشيخ محمد ناصر الدين الألباني</h2>
     <ul>
     <li class="book">
-      <div class="info"><h3>فِتْنَةُ التَّكْفِيرِ</h3><span class="meta">٩٧ صفحة</span></div>
+      <div class="info"><h3>فِتْنَةُ التَّكْفِيرِ</h3><span class="meta">٩٧ صفحة · <a class="src" href="https://archive.org/details/2791Pdf" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/albani-fitnat-at-takfir.pdf" download="فِتْنَةُ التَّكْفِيرِ.pdf">تحميل PDF</a>
     </li>
     </ul>
   </section>
-  <section>
+  <section id="a3">
     <h2>الشيخ بلال السالمي</h2>
     <ul>
     <li class="book">
-      <div class="info"><h3>السُّؤَالُ مِئَتَانِ وَاثْنَانِ وَعِشْرُونَ: حَدِيثُ أَسْمَاءَ وَكَشْفُ الْوَجْهِ</h3><span class="meta">٩ صفحة</span></div>
+      <div class="info"><h3>السُّؤَالُ مِئَتَانِ وَاثْنَانِ وَعِشْرُونَ: حَدِيثُ أَسْمَاءَ وَكَشْفُ الْوَجْهِ</h3><span class="meta">٩ صفحة · <a class="src" href="https://www.facebook.com/61574407779137/posts/122155876082813592/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="pdf/salimi-hadith-asma-kashf-al-wajh.pdf" download="السُّؤَالُ مِئَتَانِ وَاثْنَانِ وَعِشْرُونَ: حَدِيثُ أَسْمَاءَ وَكَشْفُ الْوَجْهِ.pdf">تحميل PDF</a>
     </li>
     </ul>
   </section>
+  <p id="none" hidden>لا توجد نتائج</p>
 </main>
+<script>
+const norm = t => t.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('h3').textContent)]);
+document.getElementById('q').addEventListener('input', e => {
+  const words = norm(e.target.value).split(/\s+/).filter(Boolean);
+  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
+  let any = false;
+  for (const sec of document.querySelectorAll('section')) {
+    const shown = sec.querySelector('.book:not([hidden])');
+    sec.hidden = !shown; any ||= !!shown;
+  }
+  document.getElementById('none').hidden = any;
+});
+</script>
 </body>
 </html>
