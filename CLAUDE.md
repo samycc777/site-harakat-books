@@ -15,3 +15,4 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 ## Deploy
 Push to main: `.github/workflows/deploy.yml` runs `wrangler pages deploy public --project-name harakat-books` (secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID). Live: https://harakat-books.pages.dev. Repo: samycc777/site-harakat-books (private). Pages project made with `wrangler pages project create harakat-books --production-branch main`; no wrangler.jsonc.
 Cloudflare token: the wrangler OAuth login expires; use `CLOUDFLARE_API_TOKEN` from `~/dev/archive-shaykh-bilal-salimi/.env.local` (never print it).
+GitHub Actions currently fails to start (account billing/spending limit, 6 Nov 2026). Until fixed, deploy by hand after pushing: export the token as above, then `wrangler pages deploy public --project-name harakat-books --branch main`.

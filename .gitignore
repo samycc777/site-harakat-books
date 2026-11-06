@@ -4,3 +4,7 @@ node_modules/
 .wrangler/
 __pycache__/
 *.session
+
+.dev.vars*
+!.dev.vars.example
+!.env.example
