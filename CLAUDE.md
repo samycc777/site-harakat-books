@@ -1,6 +1,6 @@
 # site-harakat-books
 
-Public static site «كتب مشكولة»: Salafi books with full harakat, grouped by author, each with a PDF download. One RTL Arabic page, light mode only, Droid Arabic Naskh self-hosted. Add no text of our own (no taglines, intros, footer); only site title, author headings and quick-jump links, search box («ابحث عن كتاب», «لا توجد نتائج»), book titles, «تحميل PDF», page count, «المصدر» link. Never mention or link Zaid's sites.
+Public static site «كتب مشكولة»: Salafi books with full harakat, grouped by author, each with a PDF download. One RTL Arabic page, opens light (dark only through the moon button, remembered per browser; never automatic), Droid Arabic Naskh self-hosted. Add no text of our own (no taglines, intros, footer); only site title, author headings and quick-jump links, search box («ابحث عن كتاب», «لا توجد نتائج»), moon/sun button labels, book titles, «تحميل PDF», page count, «المصدر» link. Never mention or link Zaid's sites.
 
 ## Where things live
 - `books.json` — published list: `authors` (display order, with «الشيخ») and `books` (slug, title, author, pdf file name in media-harakat-books/pdf/, optional `source` = list of original URLs).
