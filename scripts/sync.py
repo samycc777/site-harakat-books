@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Copy the PDFs listed in books.json from media-harakat-books/pdf/ into public/pdf/<slug>.pdf,
 write one reading page per book (public/<slug>/index.html, text taken from media-harakat-books
-books/<slug>/index.html) and regenerate public/index.html. Read-only on media-harakat-books.
+books/<slug>/index.html) and regenerate public/index.html and one page per author (public/<author_slugs>/index.html). Read-only on media-harakat-books.
 Look: public/site.css + public/theme.js (hand-edited)."""
 import json, os, re, shutil, html
 from pypdf import PdfReader
@@ -64,7 +64,7 @@ def book_text(b):
     return (sub.group(1) if sub else ''), body.group(1)
 
 
-def write_book_page(b, pages, urls, fname):
+def write_book_page(b, pages, urls, fname, aslug):
     sub, body = book_text(b)
     src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
@@ -79,7 +79,7 @@ def write_book_page(b, pages, urls, fname):
   <div class="actions">
     <a class="btn" href="../pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
     {src_links}
-    <span class="meta">{esc(b['author'])}، {ar(pages)} صفحة</span>
+    <span class="meta"><a class="src" href="../{aslug}/">{esc(b['author'])}</a>، {ar(pages)} صفحة</span>
   </div>
   <article class="text">
 {body}
@@ -92,9 +92,41 @@ def write_book_page(b, pages, urls, fname):
     open(os.path.join(PUB, b['slug'], 'index.html'), 'w', encoding='utf8').write(page)
 
 
+SEARCH = """<script>
+const norm = t => t.replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('h3').textContent)]);
+document.getElementById('q').addEventListener('input', e => {
+  const words = norm(e.target.value).split(/\\s+/).filter(Boolean);
+  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
+  let any = false;
+  for (const sec of document.querySelectorAll('section')) {
+    const shown = sec.querySelector('.book:not([hidden])');
+    sec.hidden = !shown; any ||= !!shown;
+  }
+  document.getElementById('none').hidden = any;
+});
+</script>"""
+BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>'
+
+
+def author_slug(i, author):
+    """Folder of the author's own page: books.json "author_slugs", else a<n>."""
+    return data.get('author_slugs', {}).get(author) or f'a{i + 1}'
+
+
+def book_item(b, pages, fname, urls, up=''):
+    links = ' '.join(f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
+                     for n, u in enumerate(urls, 1))
+    return f'''    <li class="book">
+      <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{ar(pages)} صفحة · {links}</span></div>
+      <a class="btn" href="{up}pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
+    </li>'''
+
+
 sections, nav = [], []
 for i, author in enumerate(data['authors']):
-    items = []
+    aslug = author_slug(i, author)
+    items, sub_items = [], []
     for b in data['books']:
         if b['author'] != author: continue
         dst = os.path.join(PUB, 'pdf', b['slug'] + '.pdf')
@@ -102,17 +134,34 @@ for i, author in enumerate(data['authors']):
         pages = len(PdfReader(dst).pages)
         fname = esc(b['title'].replace('؟', '').replace('/', ' ') + '.pdf')
         urls = sources(b)
-        write_book_page(b, pages, urls, fname)
-        links = ' '.join(f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
-                         for n, u in enumerate(urls, 1))
-        items.append(f'''    <li class="book">
-      <div class="info"><h3><a href="{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{ar(pages)} صفحة · {links}</span></div>
-      <a class="btn" href="pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
-    </li>''')
+        write_book_page(b, pages, urls, fname, aslug)
+        items.append(book_item(b, pages, fname, urls))
+        sub_items.append(book_item(b, pages, fname, urls, '../'))
     if items:
         sid = f'a{i + 1}'
-        nav.append(f'<a href="#{sid}">{esc(author)} <span>({ar(len(items))})</span></a>')
-        sections.append(f'  <section id="{sid}">\n    <h2>{esc(author)}</h2>\n    <ul>\n' + '\n'.join(items) + '\n    </ul>\n  </section>')
+        nav.append(f'<a href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
+        sections.append(f'  <section id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n    <ul>\n' + '\n'.join(items) + '\n    </ul>\n  </section>')
+        apage = head(author, '../') + f'''<body>
+<main>
+  <header>
+  {THEME_BTN}
+  <a class="home" href="../">كتب مشكولة</a>
+  <h1>{esc(author)}</h1>
+  </header>
+  {BAR}
+  <section>
+    <ul>
+''' + '\n'.join(sub_items) + f'''
+    </ul>
+  </section>
+  <p id="none" hidden>لا توجد نتائج</p>
+</main>
+{SEARCH}
+</body>
+</html>
+'''
+        os.makedirs(os.path.join(PUB, aslug), exist_ok=True)
+        open(os.path.join(PUB, aslug, 'index.html'), 'w', encoding='utf8').write(apage)
 
 page = head('كتب مشكولة') + f'''<body>
 <main>
@@ -121,24 +170,11 @@ page = head('كتب مشكولة') + f'''<body>
   <h1>كتب مشكولة</h1>
   </header>
   <nav class="authors">{''.join(nav)}</nav>
-  <div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>
+  {BAR}
 {chr(10).join(sections)}
   <p id="none" hidden>لا توجد نتائج</p>
 </main>
-<script>
-const norm = t => t.replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('h3').textContent)]);
-document.getElementById('q').addEventListener('input', e => {{
-  const words = norm(e.target.value).split(/\\s+/).filter(Boolean);
-  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
-  let any = false;
-  for (const sec of document.querySelectorAll('section')) {{
-    const shown = sec.querySelector('.book:not([hidden])');
-    sec.hidden = !shown; any ||= !!shown;
-  }}
-  document.getElementById('none').hidden = any;
-}});
-</script>
+{SEARCH}
 </body>
 </html>
 '''
