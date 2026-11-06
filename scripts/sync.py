@@ -47,8 +47,16 @@ def sources(b):
     raise SystemExit(f"{b['slug']}: no source link (add \"source\" to books.json)")
 
 
-def book_text(slug):
-    """Subtitle and body of the book's built page in media-harakat-books (scripts/build.py output)."""
+def book_text(b):
+    """Subtitle and body of the book's built page in media-harakat-books (scripts/build.py output),
+    or, for books with "html" (the tafsirs), of that file in media-harakat-books/pdf/ (their build_pdf.py
+    with KEEP_HTML=1): everything after the cover section."""
+    slug = b['slug']
+    if b.get('html'):
+        page = open(os.path.join(SRC, b['html']), encoding='utf8').read()
+        body = re.search(r'class="cover".*?</section>\n(.*)\n</body>', page, re.S)
+        if not body: raise SystemExit(f"{slug}: no text in {b['html']}")
+        return '', body.group(1)
     page = open(os.path.join(BOOKS, slug, 'index.html'), encoding='utf8').read()
     sub = re.search(r'<p class="sub">(.*?)</p>', page)
     body = re.search(r'<section>\n(.*)\n</section>', page, re.S)
@@ -57,7 +65,7 @@ def book_text(slug):
 
 
 def write_book_page(b, pages, urls, fname):
-    sub, body = book_text(b['slug'])
+    sub, body = book_text(b)
     src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
     page = head(b['title'], '../') + f'''<body>

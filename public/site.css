@@ -64,3 +64,7 @@ section{scroll-margin-top:4.5rem}
  .book{flex-direction:column;align-items:stretch;gap:.4rem}
  .btn{text-align:center;padding:.6rem 1rem}
 }
+.text .verses{color:var(--quran);border-inline-start:3px solid var(--accent);padding-inline-start:.7em;margin-top:1.1em}
+.text .basmala{text-align:center;color:var(--quran)}
+.text .ref{color:var(--brown);font-weight:700}
+.text .n{font-size:.85em}
