@@ -48,6 +48,29 @@ def sources(b):
     raise SystemExit(f"{b['slug']}: no source link (add \"source\" to books.json)")
 
 
+KINDS = {'book': 'كتب', 'article': 'مقالات', 'fatwa': 'فتاوى وفوائد'}  # display order
+
+
+def kind(b, urls):
+    """books.json "kind", else from the source: rabee.net fatwas/benefits (or a «فتاوى» title) = fatwa,
+    other rabee.net posts and Facebook posts = article, everything else (rabee.net/book PDFs, Shamela,
+    printed scans, tafsirs) = book."""
+    if b.get('kind'): return b['kind']
+    u = urls[0]
+    if '/alfatawi/' in u or '/benefits/' in u or 'فتاوى' in b['title'].replace('ٰ', '').translate({c: None for c in range(0x64B, 0x653)}): return 'fatwa'
+    if ('rabee.net' in u and '/book/' not in u) or 'facebook.com' in u: return 'article'
+    return 'book'
+
+
+def grouped(entries, cls):
+    """entries = [(kind, li)]: one <div class="group"> per kind present, with its heading."""
+    out = []
+    for k, label in KINDS.items():
+        lis = [li for kk, li in entries if kk == k]
+        if lis: out.append(f'  <div class="group {cls}">\n    <h3 class="kind">{label} <span>({ar(len(lis))})</span></h3>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </div>')
+    return '\n'.join(out)
+
+
 def book_text(b):
     """Subtitle and body of the book's built page in media-harakat-books (scripts/build.py output),
     or, for books with "html" (the tafsirs), of that file in media-harakat-books/pdf/ (their build_pdf.py
@@ -95,10 +118,11 @@ def write_book_page(b, pages, urls, fname, aslug):
 
 SEARCH = """<script>
 const norm = t => t.replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('h3').textContent)]);
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent)]);
 document.getElementById('q').addEventListener('input', e => {
   const words = norm(e.target.value).split(/\\s+/).filter(Boolean);
   for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
+  for (const g of document.querySelectorAll('.group')) g.hidden = !g.querySelector('.book:not([hidden])');
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
     const shown = sec.querySelector('.book:not([hidden])');
@@ -136,12 +160,13 @@ for i, author in enumerate(data['authors']):
         fname = esc(b['title'].replace('؟', '').replace('/', ' ') + '.pdf')
         urls = sources(b)
         write_book_page(b, pages, urls, fname, aslug)
-        items.append(book_item(b, pages, fname, urls))
-        sub_items.append(book_item(b, pages, fname, urls, '../'))
+        k = kind(b, urls)
+        items.append((k, book_item(b, pages, fname, urls)))
+        sub_items.append((k, book_item(b, pages, fname, urls, '../')))
     if items:
         sid = f'a{i + 1}'
         nav.append(f'<a href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
-        sections.append(f'  <section id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n    <ul>\n' + '\n'.join(items) + '\n    </ul>\n  </section>')
+        sections.append(f'  <section id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
         apage = head(author, '../') + f'''<body>
 <main>
   <header>
@@ -151,9 +176,7 @@ for i, author in enumerate(data['authors']):
   </header>
   {BAR}
   <section>
-    <ul>
-''' + '\n'.join(sub_items) + f'''
-    </ul>
+''' + grouped(sub_items, 'top') + f'''
   </section>
   <p id="none" hidden>لا توجد نتائج</p>
 </main>

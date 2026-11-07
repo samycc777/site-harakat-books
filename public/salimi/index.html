@@ -18,21 +18,25 @@
   </header>
   <div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>
   <section>
+  <div class="group top">
+    <h3 class="kind">مقالات <span>(١)</span></h3>
     <ul>
     <li class="book">
       <div class="info"><h3><a href="../salimi-hadith-asma-kashf-al-wajh/">السُّؤَالُ مِئَتَانِ وَاثْنَانِ وَعِشْرُونَ: حَدِيثُ أَسْمَاءَ وَكَشْفُ الْوَجْهِ</a></h3><span class="meta">٩ صفحة · <a class="src" href="https://www.facebook.com/61574407779137/posts/122155876082813592/" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/salimi-hadith-asma-kashf-al-wajh.pdf" download="السُّؤَالُ مِئَتَانِ وَاثْنَانِ وَعِشْرُونَ: حَدِيثُ أَسْمَاءَ وَكَشْفُ الْوَجْهِ.pdf">تحميل PDF</a>
     </li>
     </ul>
+  </div>
   </section>
   <p id="none" hidden>لا توجد نتائج</p>
 </main>
 <script>
 const norm = t => t.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('h3').textContent)]);
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent)]);
 document.getElementById('q').addEventListener('input', e => {
   const words = norm(e.target.value).split(/\s+/).filter(Boolean);
   for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
+  for (const g of document.querySelectorAll('.group')) g.hidden = !g.querySelector('.book:not([hidden])');
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
     const shown = sec.querySelector('.book:not([hidden])');
