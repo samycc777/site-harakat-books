@@ -6,6 +6,7 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 - `books.json` — published list (the tafsirs: one entry per PDF volume, `html` = media-harakat-books `pdf/<name>.html` from their `build_pdf.py` with `KEEP_HTML=1`, used for the reading page): `authors` (display order, with «الشيخ») `author_slugs` (author → folder of the author's page; missing = `a<n>`) and `books` (slug, title, author, pdf file name in media-harakat-books/pdf/, optional `source` = list of original URLs).
 - `scripts/sync.py` — copies the listed PDFs from `~/dev/media-harakat-books/pdf/` (read-only) to `public/pdf/<slug>.pdf` and regenerates `public/index.html` (needs `pypdf`). Every book needs a source link: `source` in books.json, else the URLs in media-harakat-books `books/<slug>/src/sources.tsv` (rabee.net books); sync.py stops if neither.
 - `public/` — the deployed folder. `site.css` and `theme.js` are hand-edited (shared look, dark button); `index.html`, `<slug>/index.html`, the author pages and `pdf/` are written by sync.py: never edit them by hand.
+- `scripts/years.py` (called by sync.py): on the website only, years (with هـ/م, after سَنَة/عَام/a month/«ت») are written in vowelled words, printed digits after them in brackets: «عَامِ أَلْفٍ وَأَرْبَعِمِائَةٍ وَسَبْعَةٍ وَعِشْرِينَ (١٤٢٧)». Dates with slashes/dashes stay digits. `python3 scripts/years.py` prints samples.
 - Book page text comes from media-harakat-books `books/<slug>/index.html` (its build.py output), so rebuild the book there before syncing after a text fix.
 
 ## Add a book

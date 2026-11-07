@@ -5,6 +5,7 @@ books/<slug>/index.html) and regenerate public/index.html and one page per autho
 Look: public/site.css + public/theme.js (hand-edited)."""
 import json, os, re, shutil, html
 from pypdf import PdfReader
+from years import years_to_words
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, 'public')
@@ -65,7 +66,7 @@ def book_text(b):
 
 
 def write_book_page(b, pages, urls, fname, aslug):
-    sub, body = book_text(b)
+    sub, body = map(years_to_words, book_text(b))  # years in words, website only
     src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
     page = head(b['title'], '../') + f'''<body>
