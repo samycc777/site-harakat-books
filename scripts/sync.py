@@ -43,7 +43,7 @@ def sources(b):
     if b.get('source'): return b['source']
     tsv = os.path.join(BOOKS, b['slug'], 'src/sources.tsv')
     if os.path.exists(tsv):
-        return [l.split('\t')[2] for l in open(tsv, encoding='utf8') if l.strip()]
+        return [f[2] for f in (l.split('\t') for l in open(tsv, encoding='utf8')) if len(f) > 2 and f[2].startswith('http')]  # titles may span lines
     raise SystemExit(f"{b['slug']}: no source link (add \"source\" to books.json)")
 
 
