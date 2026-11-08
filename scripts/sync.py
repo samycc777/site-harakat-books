@@ -88,6 +88,10 @@ def book_text(b):
     return (sub.group(1) if sub else ''), body.group(1)
 
 
+NOTE_POPUPS = {'rabee-jamaah-wahidah'}  # test: footnotes as pop-ups (public/notes.js) on these books only
+NOTES_JS = '<script src="../notes.js" defer></script>\n'
+
+
 def write_book_page(b, pages, urls, fname, aslug):
     sub, body = map(years_to_words, book_text(b))  # years in words, website only
     src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
@@ -109,7 +113,7 @@ def write_book_page(b, pages, urls, fname, aslug):
 {body}
   </article>
 </main>
-</body>
+{NOTES_JS if b['slug'] in NOTE_POPUPS else ''}</body>
 </html>
 '''
     os.makedirs(os.path.join(PUB, b['slug']), exist_ok=True)

@@ -74,3 +74,13 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 .group h3.kind{font-size:1.15rem;color:var(--btn-ink);background:var(--accent);display:inline-block;padding:0 .9rem;border-radius:2rem;margin:1.2rem 0 .3rem;line-height:1.9}
 .group h3.kind span{opacity:.8;font-weight:400}
 .group.top h3.kind{font-size:1.35rem;margin-top:1.6rem}
+
+/* footnote pop-ups (notes.js) */
+.nref{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:0 .3em;margin:0 .15em;border-radius:1em;border:1px solid var(--edge);background:var(--hover);color:var(--brown);font:700 .68em/1 "Droid Arabic Naskh",serif;vertical-align:.55em;cursor:pointer}
+.nref:hover,.nref:focus-visible,.nref[aria-expanded=true]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.note-pop{position:absolute;z-index:10;width:min(28rem,calc(100vw - 16px));background:var(--card);color:var(--ink);border:1px solid var(--edge);border-radius:.7rem;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:.7rem 1rem .8rem 2.4rem;font-size:1.05rem;line-height:2}
+.note-pop::before{content:"";position:absolute;top:-7px;left:calc(var(--ax,50%) - 7px);width:12px;height:12px;background:var(--card);border-left:1px solid var(--edge);border-top:1px solid var(--edge);transform:rotate(45deg)}
+.note-pop.up::before{top:auto;bottom:-7px;transform:rotate(225deg)}
+.note-pop .x{position:absolute;top:.35rem;left:.4rem;width:1.9rem;height:1.9rem;border:0;border-radius:50%;background:none;color:var(--muted);font-size:1.5rem;line-height:1;cursor:pointer}
+.note-pop .x:hover,.note-pop .x:focus-visible{background:var(--hover);color:var(--ink)}
+.note-pop .body{max-height:55vh;overflow:auto}
