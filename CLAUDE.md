@@ -17,7 +17,7 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 - Book page text comes from media-harakat-books `books/<slug>/index.html` (its build.py output), so rebuild the book there before syncing after a text fix.
 
 ## Add a book
-1. Only finished books (PDF built in media-harakat-books). Not in progress: عون الباري.
+1. Only finished books (PDF built in media-harakat-books).
 - `sources.tsv` titles can span lines: sync.py reads only rows whose 3rd field is a URL.
 2. Add an entry to `books.json` (title = first line of the book's `meta.txt`; new author = add to `authors` and `author_slugs` too; `source` = where the original came from, if the book has no `src/sources.tsv`).
 3. `python3 scripts/sync.py`, check `public/index.html`, commit, push.
