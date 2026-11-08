@@ -32,6 +32,9 @@ def plain(s): return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', s)
 def bare(s): return re.sub('[\u064B-\u065F\u0670]', '', s)  # no harakat: what people type into a search engine
 
 
+GOOGLE = '<meta name="google-site-verification" content="tHSDV-91DVQ5bg7mw8HwDJMwUipvEQ37bfjBGJ2HN_E">\n'  # Search Console ownership (home page only)
+
+
 def head(title, up='', path='', desc='', ld=None):
     """<head> shared by every page; up = '../' for the book pages; path = page folder ('' = home).
     Search engines get the canonical URL, a description (book title, author, the book's own subtitle:
@@ -56,7 +59,7 @@ def head(title, up='', path='', desc='', ld=None):
 <meta property="og:url" content="{url}">
 <meta property="og:type" content="{'book' if ld else 'website'}">
 <meta property="og:locale" content="ar_AR">
-{ld}<script src="{up}theme.js"></script>
+{GOOGLE if not path else ''}{ld}<script src="{up}theme.js"></script>
 <link rel="preload" href="{up}fonts/DroidNaskh-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{up}site.css">
 </head>
