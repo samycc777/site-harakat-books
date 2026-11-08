@@ -128,7 +128,6 @@ REPORT = '''  <div class="report" hidden>
     <p class="msg fail" hidden>تعذر الإرسال</p>
   </div>'''
 
-NOTE_POPUPS = {'rabee-jamaah-wahidah'}  # test: footnotes as pop-ups (public/notes.js) on these books only
 NOTES_JS = '<script src="../notes.js" defer></script>\n'
 
 
@@ -160,7 +159,7 @@ def write_book_page(b, pages, urls, fname, aslug):
   </article>
 {REPORT}
 </main>
-{NOTES_JS if b['slug'] in NOTE_POPUPS else ''}<script src="../report.js" defer></script>
+{NOTES_JS}<script src="../report.js" defer></script>
 </body>
 </html>
 '''

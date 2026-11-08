@@ -22,7 +22,7 @@
       pop.querySelector('.x').addEventListener('click', close);
       document.body.appendChild(pop);
     }
-    pop.querySelector('.body').innerHTML = btn._note.html;
+    pop.querySelector('.body').innerHTML = '<span class="n">(' + btn.textContent + ')</span> ' + btn._note.html;
     pop.hidden = false;
     cur = btn; btn.setAttribute('aria-expanded', 'true');
     place();
