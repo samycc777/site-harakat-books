@@ -23,8 +23,24 @@ SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
 
 
-def head(title, up=''):
-    """<head> shared by every page; up = '../' for the book pages."""
+SITE = 'https://harakat-books.pages.dev'
+NAME = 'كتب مشكولة'
+URLS = []  # every page, for sitemap.xml
+
+
+def plain(s): return re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', '', s))).strip()
+def bare(s): return re.sub('[\u064B-\u065F\u0670]', '', s)  # no harakat: what people type into a search engine
+
+
+def head(title, up='', path='', desc='', ld=None):
+    """<head> shared by every page; up = '../' for the book pages; path = page folder ('' = home).
+    Search engines get the canonical URL, a description (book title, author, the book's own subtitle:
+    no text of ours) and, on book pages, schema.org Book data."""
+    url = f'{SITE}/{path + "/" if path else ""}'
+    title, desc = bare(title), bare(desc)
+    URLS.append(url)
+    desc = esc(desc or title)
+    ld = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>\n' if ld else ''
     return f'''<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -32,7 +48,15 @@ def head(title, up=''):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>{esc(title)}</title>
-<script src="{up}theme.js"></script>
+<meta name="description" content="{desc}">
+<link rel="canonical" href="{url}">
+<meta property="og:site_name" content="{NAME}">
+<meta property="og:title" content="{esc(title)}">
+<meta property="og:description" content="{desc}">
+<meta property="og:url" content="{url}">
+<meta property="og:type" content="{'book' if ld else 'website'}">
+<meta property="og:locale" content="ar_AR">
+{ld}<script src="{up}theme.js"></script>
 <link rel="preload" href="{up}fonts/DroidNaskh-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{up}site.css">
 </head>
@@ -88,6 +112,19 @@ def book_text(b):
     return (sub.group(1) if sub else ''), body.group(1)
 
 
+# «إبلاغ عن خطأ»: public/report.js shows it once functions/api/report.js has its GitHub token;
+# a report becomes an issue in this repo. Words: the button, the box's hint, send/cancel, sent/failed.
+REPORT = '''  <div class="report" hidden>
+    <button type="button" class="btn light" id="report-open">إبلاغ عن خطأ</button>
+    <form id="report-form" hidden>
+      <textarea name="text" rows="4" maxlength="3000" required placeholder="ما الخطأ؟"></textarea>
+      <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+      <div class="row"><button class="btn" type="submit">إرسال</button> <button class="btn light" type="button" id="report-cancel">إلغاء</button></div>
+    </form>
+    <p class="msg ok" hidden>تم الإرسال</p>
+    <p class="msg fail" hidden>تعذر الإرسال</p>
+  </div>'''
+
 NOTE_POPUPS = {'rabee-jamaah-wahidah'}  # test: footnotes as pop-ups (public/notes.js) on these books only
 NOTES_JS = '<script src="../notes.js" defer></script>\n'
 
@@ -96,7 +133,13 @@ def write_book_page(b, pages, urls, fname, aslug):
     sub, body = map(years_to_words, book_text(b))  # years in words, website only
     src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
-    page = head(b['title'], '../') + f'''<body>
+    ld = {'@context': 'https://schema.org', '@type': 'Book', 'name': bare(b['title']), 'alternateName': b['title'], 'inLanguage': 'ar',
+          'author': {'@type': 'Person', 'name': b['author']}, 'url': f"{SITE}/{b['slug']}/",
+          'numberOfPages': pages, 'isAccessibleForFree': True,
+          'workExample': {'@type': 'Book', 'bookFormat': 'https://schema.org/EBook', 'encodingFormat': 'application/pdf',
+                          'url': f"{SITE}/pdf/{b['slug']}.pdf"}}
+    desc = '، '.join(x for x in (b['title'], b['author'], plain(sub)) if x)
+    page = head(f"{b['title']} — {b['author']} | {NAME}", '../', b['slug'], desc, ld) + f'''<body>
 <main class="read">
   <header>
   {THEME_BTN}
@@ -112,8 +155,10 @@ def write_book_page(b, pages, urls, fname, aslug):
   <article class="text">
 {body}
   </article>
+{REPORT}
 </main>
-{NOTES_JS if b['slug'] in NOTE_POPUPS else ''}</body>
+{NOTES_JS if b['slug'] in NOTE_POPUPS else ''}<script src="../report.js" defer></script>
+</body>
 </html>
 '''
     os.makedirs(os.path.join(PUB, b['slug']), exist_ok=True)
@@ -171,7 +216,7 @@ for i, author in enumerate(data['authors']):
         sid = f'a{i + 1}'
         nav.append(f'<a href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
         sections.append(f'  <section id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
-        apage = head(author, '../') + f'''<body>
+        apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
   <header>
   {THEME_BTN}
@@ -191,7 +236,7 @@ for i, author in enumerate(data['authors']):
         os.makedirs(os.path.join(PUB, aslug), exist_ok=True)
         open(os.path.join(PUB, aslug, 'index.html'), 'w', encoding='utf8').write(apage)
 
-page = head('كتب مشكولة') + f'''<body>
+page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
 <main>
   <header>
   {THEME_BTN}
@@ -207,4 +252,8 @@ page = head('كتب مشكولة') + f'''<body>
 </html>
 '''
 open(os.path.join(PUB, 'index.html'), 'w', encoding='utf8').write(page)
-print(len(data['books']), 'books')
+open(os.path.join(PUB, 'sitemap.xml'), 'w', encoding='utf8').write(
+    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    + ''.join(f'<url><loc>{u}</loc></url>\n' for u in sorted(set(URLS))) + '</urlset>\n')
+open(os.path.join(PUB, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
+print(len(data['books']), 'books,', len(set(URLS)), 'pages in sitemap.xml')

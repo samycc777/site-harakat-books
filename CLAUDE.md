@@ -17,6 +17,16 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 2. Add an entry to `books.json` (title = first line of the book's `meta.txt`; new author = add to `authors` and `author_slugs` too; `source` = where the original came from, if the book has no `src/sources.tsv`).
 3. `python3 scripts/sync.py`, check `public/index.html`, commit, push.
 
+## Search engines
+- sync.py writes into every page's `<head>`: canonical URL, description and og tags (book title, author, the book's own subtitle, harakat stripped because people search without them; no text of ours), schema.org Book data on book pages; plus `public/sitemap.xml` and `public/robots.txt`. Tab title: «<title> — <author> | كتب مشكولة».
+- Bing/Yandex: `scripts/indexnow.py` (key file `public/<key>.txt`); deploy.yml sends the changed pages after each push; `indexnow.py all` sends every page. Google reads the sitemap (Search Console, Bilal's Google account).
+
+## «إبلاغ عن خطأ» (reader reports)
+- Button + box under each book's text (`REPORT` in sync.py, `public/report.js`): it posts to `functions/api/report.js` (Pages Function), which opens an issue «[بلاغ] <title>» in this repo; `report.yml` then comments @samycc777 so GitHub emails Bilal (own-token issues send no notice).
+- The button shows only when the Pages secret `GITHUB_TOKEN` exists (fine-grained token: this repo only, Issues read/write). Set/renew: `bash scripts/set-report-token.sh` (asks for the token, saves it, redeploys).
+- Fix reports: `gh issue list -R samycc777/site-harakat-books --search "[بلاغ] in:title"`; fix the text in media-harakat-books, rebuild, sync here, close the issue.
+- Headless Chromium on this laptop paints blank pages after DOM changes; screenshot with Playwright's Firefox.
+
 ## Deploy
 Push to main: `.github/workflows/deploy.yml` runs `wrangler pages deploy public --project-name harakat-books` (secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID). Live: https://harakat-books.pages.dev. Repo: samycc777/site-harakat-books (private). Pages project made with `wrangler pages project create harakat-books --production-branch main`; no wrangler.jsonc.
 Repo is public so GitHub Actions minutes are free (the private-repo quota ran out). Deploy by hand only if Actions fails. Cloudflare token: the wrangler OAuth login expires; use `CLOUDFLARE_API_TOKEN` from `~/dev/archive-shaykh-bilal-salimi/.env.local` (never print it).

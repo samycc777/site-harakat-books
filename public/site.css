@@ -84,3 +84,14 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 .note-pop .x{position:absolute;top:.35rem;left:.4rem;width:1.9rem;height:1.9rem;border:0;border-radius:50%;background:none;color:var(--muted);font-size:1.5rem;line-height:1;cursor:pointer}
 .note-pop .x:hover,.note-pop .x:focus-visible{background:var(--hover);color:var(--ink)}
 .note-pop .body{max-height:55vh;overflow:auto}
+
+/* «إبلاغ عن خطأ» (report.js) */
+.report{margin:3rem 0 0;padding-top:1.5rem;border-top:1px solid var(--line);text-align:center}
+.report button{font:inherit;font-weight:700;font-size:1.05rem;cursor:pointer}
+.report form{text-align:start}
+.report textarea{width:100%;font:inherit;font-size:1.15rem;line-height:1.9;padding:.5rem .8rem;border:1px solid var(--edge);border-radius:.5rem;background:var(--card);color:inherit;resize:vertical}
+.report textarea:focus{outline:2px solid var(--accent);outline-offset:0}
+.report .row{display:flex;gap:.6rem;justify-content:center;margin-top:.6rem}
+.report .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.report .msg{margin:.8rem 0 0;color:var(--muted)}
+.report .fail{color:#b3261e}

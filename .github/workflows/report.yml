@@ -1,0 +1,17 @@
+# A reader's «إبلاغ عن خطأ» (functions/api/report.js) opens an issue with Bilal's token, and GitHub
+# doesn't notify you about your own issues: this bot comment mentions him so he gets an email.
+name: Report notice
+on:
+  issues:
+    types: [opened]
+permissions:
+  issues: write
+jobs:
+  notify:
+    if: startsWith(github.event.issue.title, '[بلاغ]')
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh issue comment "$N" -R "$GITHUB_REPOSITORY" --body "@samycc777"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          N: ${{ github.event.issue.number }}
