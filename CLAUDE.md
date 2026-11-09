@@ -5,6 +5,7 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 ## Zaid (@mawqi_bot)
 - One of Zaid's sites: he asks for changes through @mawqi_bot (`tool-progress-bot/listener.mjs` runs each conversation headless in this folder); treat him as the user for the look and layout: design, CSS, buttons, views, subject names and which subject a book is in (`sciences.json`).
 - Adding or removing books (`books.json`), book texts and harakat (media-harakat-books) are Bilal's: in Zaid's runs don't do them; tell Zaid plainly that Bilal decides these. Never write to or ask Bilal from his runs.
+- When Zaid asks for a book: don't add it (costly in tokens); append its name to `docs/notes/requested-books.md`, commit, and tell him Bilal will add it little by little.
 - Every task that changes the site posts a live card to his Telegram group: `~/dev/tool-progress-bot/progress.sh start "<title>"`, `step "<text>"` as each step begins, `done "<live url>" "<summary>"` after deploying, `fail "<reason>" "<summary>"` if it stops. Reading or answering only: no card. Summary: at most 4 short lines (~400 characters), plain language naming the site; never prompts, paths, code or logs.
 
 ## Two looks (`public/site.css`, `public/theme.js`)
