@@ -12,6 +12,10 @@ PUB = os.path.join(ROOT, 'public')
 SRC = os.path.expanduser('~/dev/media-harakat-books/pdf')
 BOOKS = os.path.expanduser('~/dev/media-harakat-books/books')
 data = json.load(open(os.path.join(ROOT, 'books.json'), encoding='utf8'))
+# Subject of each book for the home page's «حسب العلم» view: sciences.json "order" (display order) and
+# "books" (slug → subject). A book missing there goes under «أخرى» (sync.py warns).
+SCI = json.load(open(os.path.join(ROOT, 'sciences.json'), encoding='utf8'))
+OTHER = 'أخرى'
 os.makedirs(os.path.join(PUB, 'pdf'), exist_ok=True)
 
 DIG = str.maketrans('0123456789', '٠١٢٣٤٥٦٧٨٩')
@@ -200,6 +204,7 @@ def book_item(b, pages, fname, urls, up=''):
 
 
 sections, nav = [], []
+by_sci = {}  # subject → [(author, li)]
 for i, author in enumerate(data['authors']):
     aslug = author_slug(i, author)
     items, sub_items = [], []
@@ -214,10 +219,14 @@ for i, author in enumerate(data['authors']):
         k = kind(b, urls)
         items.append((k, book_item(b, pages, fname, urls)))
         sub_items.append((k, book_item(b, pages, fname, urls, '../')))
+        sci = SCI['books'].get(b['slug'])
+        if sci not in SCI['order']:
+            print(f"warning: {b['slug']} has no subject in sciences.json: listed under «{OTHER}»"); sci = OTHER
+        by_sci.setdefault(sci, []).append((author, items[-1][1]))
     if items:
         sid = f'a{i + 1}'
-        nav.append(f'<a href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
-        sections.append(f'  <section id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
+        nav.append(f'<a class="v-author" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
+        sections.append(f'  <section class="v-author" id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
         apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
   <header>
@@ -238,12 +247,24 @@ for i, author in enumerate(data['authors']):
         os.makedirs(os.path.join(PUB, aslug), exist_ok=True)
         open(os.path.join(PUB, aslug, 'index.html'), 'w', encoding='utf8').write(apage)
 
+for j, sci in enumerate(SCI['order'] + [OTHER]):
+    if sci not in by_sci: continue
+    sid, lis = f's{j + 1}', by_sci[sci]
+    nav.append(f'<a class="v-science" href="#{sid}">{esc(sci)} <span>({ar(len(lis))})</span></a>')
+    groups = []
+    for author in data['authors']:
+        mine = [li for a, li in lis if a == author]
+        if mine: groups.append(f'  <div class="group sub">\n    <h3 class="kind">{esc(author)} <span>({ar(len(mine))})</span></h3>\n    <ul>\n' + '\n'.join(mine) + '\n    </ul>\n  </div>')
+    sections.append(f'  <section class="v-science" id="{sid}">\n    <h2>{esc(sci)}</h2>\n' + '\n'.join(groups) + '\n  </section>')
+VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
+
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
 <main>
   <header>
   {THEME_BTN}
   <h1>كتب مشكولة</h1>
   </header>
+  {VIEWS}
   <nav class="authors">{''.join(nav)}</nav>
   {BAR}
 {chr(10).join(sections)}

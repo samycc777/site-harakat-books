@@ -13,7 +13,21 @@
     if (localStorage.getItem('look') === 'classic') root.dataset.look = 'classic';
   } catch (e) {}
   try { if (localStorage.getItem('theme') === 'dark') root.dataset.theme = 'dark'; } catch (e) {}
+  // Home page: books by author (default) or by subject («حسب العلم»), remembered in this browser.
+  try { if (localStorage.getItem('view') === 'science') root.dataset.view = 'science'; } catch (e) {}
   document.addEventListener('DOMContentLoaded', function () {
+    var views = document.querySelectorAll('.views button');
+    var mark = function () {
+      var v = root.dataset.view || 'author';
+      for (var i = 0; i < views.length; i++) views[i].setAttribute('aria-pressed', views[i].dataset.view === v);
+    };
+    for (var i = 0; i < views.length; i++) views[i].addEventListener('click', function () {
+      var v = this.dataset.view;
+      if (v === 'science') root.dataset.view = 'science'; else delete root.dataset.view;
+      try { if (v === 'science') localStorage.setItem('view', 'science'); else localStorage.removeItem('view'); } catch (e) {}
+      mark();
+    });
+    if (views.length) mark();
     var btn = document.getElementById('theme');
     if (!btn) return;
     var show = function () {

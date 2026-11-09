@@ -1,6 +1,6 @@
 # site-harakat-books
 
-Public static site «كتب مشكولة»: Salafi books with full harakat, grouped by author (each author also has a page `/<author slug>/`, linked from the author buttons and headings), each with a PDF download and its own reading page (`/<slug>/`: title, PDF, source, full text). RTL Arabic, opens light (dark only through the moon button, remembered per browser; never automatic). Add no text of our own (no taglines, intros, footer); only site title, author headings and quick-jump links, search box («ابحث عن كتاب», «لا توجد نتائج»), moon/sun button labels, the book's own text on its page, book titles, «تحميل PDF», page count, «المصدر» link, kind headings «كتب» / «مقالات» / «فتاوى وفوائد». Never mention or link Zaid's sites.
+Public static site «كتب مشكولة»: Salafi books with full harakat, grouped by author (each author also has a page `/<author slug>/`, linked from the author buttons and headings), each with a PDF download and its own reading page (`/<slug>/`: title, PDF, source, full text). RTL Arabic, opens light (dark only through the moon button, remembered per browser; never automatic). Add no text of our own (no taglines, intros, footer); only site title, author headings and quick-jump links, search box («ابحث عن كتاب», «لا توجد نتائج»), moon/sun button labels, the book's own text on its page, book titles, «تحميل PDF», page count, «المصدر» link, kind headings «كتب» / «مقالات» / «فتاوى وفوائد», view buttons «حسب المؤلف» / «حسب العلم», subject headings. Never mention or link Zaid's sites.
 
 ## Two looks (`public/site.css`, `public/theme.js`)
 - Everyone: «paper» look (Zaid's request): like the المقالات الواضحات videos: white page in a pink-and-red double frame on black, Amiri text (OFL), Thuluth Decorated titles (fontstatic.com, licence not stated), red accents; dark = cream on navy. CSS rules under `:root:not([data-look=classic])` at the end of site.css.
@@ -9,6 +9,7 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 
 ## Where things live
 - `books.json` — published list (the tafsirs: one entry per PDF volume, `html` = media-harakat-books `pdf/<name>.html` from their `build_pdf.py` with `KEEP_HTML=1`, used for the reading page): `authors` (display order, with «الشيخ») `author_slugs` (author → folder of the author's page; missing = `a<n>`) and `books` (slug, title, author, pdf file name in media-harakat-books/pdf/, optional `source` = list of original URLs, optional `kind` = book|article|fatwa when sync.py's guess is wrong).
+- `sciences.json` — subject of each book (`order` = display order, `books` = slug → subject; Zaid may send corrections): the home page's «حسب العلم» view (buttons in sync.py `VIEWS`, choice remembered by `theme.js`, CSS `.views`/`.v-author`/`.v-science`). A book missing there shows under «أخرى» and sync.py warns.
 - Under each author, books are grouped by kind (sync.py `kind()`): rabee.net/book PDFs, Shamela, printed scans, tafsirs = «كتب»; other rabee.net posts and Facebook posts = «مقالات»; rabee.net fatwas/benefits or a «فتاوى» title = «فتاوى وفوائد».
 - `scripts/sync.py` — copies the listed PDFs from `~/dev/media-harakat-books/pdf/` (read-only) to `public/pdf/<slug>.pdf` and regenerates `public/index.html` (needs `pypdf`). Every book needs a source link: `source` in books.json, else the URLs in media-harakat-books `books/<slug>/src/sources.tsv` (rabee.net books); sync.py stops if neither.
 - `public/` — the deployed folder. `site.css` and `theme.js` are hand-edited (shared look, dark button); `index.html`, `<slug>/index.html`, the author pages and `pdf/` are written by sync.py: never edit them by hand.
@@ -20,7 +21,8 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 1. Only finished books (PDF built in media-harakat-books).
 - `sources.tsv` titles can span lines: sync.py reads only rows whose 3rd field is a URL.
 2. Add an entry to `books.json` (title = first line of the book's `meta.txt`; new author = add to `authors` and `author_slugs` too; `source` = where the original came from, if the book has no `src/sources.tsv`).
-3. `python3 scripts/sync.py`, check `public/index.html`, commit, push.
+3. Add its subject to `sciences.json`.
+4. `python3 scripts/sync.py`, check `public/index.html`, commit, push.
 
 ## Search engines
 - sync.py writes into every page's `<head>`: canonical URL, description and og tags (book title, author, the book's own subtitle, harakat stripped because people search without them; no text of ours), schema.org Book data on book pages; plus `public/sitemap.xml` and `public/robots.txt`. Tab title: «<title> — <author> | كتب مشكولة».

@@ -33,6 +33,13 @@ nav.authors{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin:
 nav.authors a{border:1px solid var(--edge);border-radius:2rem;padding:.2rem .9rem;color:var(--brown);text-decoration:none;font-size:1.05rem;background:var(--card)}
 nav.authors a:hover,nav.authors a:focus{background:var(--hover)}
 nav.authors span{color:var(--muted)}
+.views{display:flex;justify-content:center;margin:0 0 1rem}
+.views button{font:inherit;font-size:1.1rem;line-height:1.8;padding:.2rem 1.2rem;border:1px solid var(--accent);background:var(--card);color:var(--brown);cursor:pointer}
+.views button:first-child{border-radius:0 2rem 2rem 0}
+.views button:last-child{border-radius:2rem 0 0 2rem;border-right:0}
+.views button:hover,.views button:focus-visible{background:var(--hover)}
+.views button[aria-pressed=true]{background:var(--btn);color:var(--btn-ink);font-weight:700}
+:root[data-view=science] .v-author,:root:not([data-view=science]) .v-science{display:none!important}
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:.6rem 0;border-bottom:1px solid var(--line)}
 .bar input{width:100%;font:inherit;font-size:1.15rem;padding:.4rem .9rem;border:1px solid var(--edge);border-radius:.5rem;background:var(--card);color:inherit}
 .bar input:focus{outline:2px solid var(--accent);outline-offset:0}
