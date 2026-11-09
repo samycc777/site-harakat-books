@@ -278,6 +278,15 @@ if soon or COMING['authors']:
     <p class="soon-authors">{chips}</p>
   </div>
 ''' if COMING['authors'] else '') + '  </section>')
+# author view also lists authors whose books are still to come
+_have = {a for a in data['authors'] if any(b['author'] == a for b in data['books'])}
+_extra = [a for a in COMING['authors'] if a not in _have] + [a for a in dict.fromkeys(c['author'] for c in soon) if a not in _have and a not in COMING['authors']]
+for k, a in enumerate(_extra):
+    mine = [c for c in soon if c['author'] == a]
+    lis = '\n'.join(f'    <li class="soon-book"><span class="t">{esc(c["title"])}</span></li>' for c in mine)
+    body = f'\n    <ul>\n{lis}\n    </ul>' if mine else ''
+    nav.insert(0, f'<a class="v-author" href="#x{k + 1}">{esc(a)}</a>') if False else None
+    sections.insert(sum(1 for x in sections if 'class="v-author"' in x) + k, f'  <section class="v-author" id="x{k + 1}">\n    <h2>{esc(a)}</h2>{body}\n  </section>')
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
