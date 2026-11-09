@@ -48,9 +48,10 @@ const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.que
 document.getElementById('q').addEventListener('input', e => {
   const words = norm(e.target.value).split(/\s+/).filter(Boolean);
   for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
-  for (const g of document.querySelectorAll('.group')) g.hidden = !g.querySelector('.book:not([hidden])');
+  for (const g of document.querySelectorAll('section:not(#soon) .group')) g.hidden = !g.querySelector('.book:not([hidden])');
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
+    if (sec.id === 'soon') { sec.hidden = words.length > 0; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
   }

@@ -83,6 +83,11 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 .group h3.kind{font-size:1.15rem;color:var(--btn-ink);background:var(--accent);display:inline-block;padding:0 .9rem;border-radius:2rem;margin:1.2rem 0 .3rem;line-height:1.9}
 .group h3.kind span{opacity:.8;font-weight:400}
 .group.top h3.kind{font-size:1.35rem;margin-top:1.6rem}
+/* «قريبًا»: coming books (no links) and authors (chips) */
+.soon-book{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.2rem 1rem;padding:.7rem 0;border-bottom:1px solid var(--line)}
+.soon-book .t{font-size:1.25rem;font-weight:700;line-height:2}
+.soon-authors{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0}
+.soon-authors span{border:1px solid var(--edge);border-radius:2rem;padding:.15rem .9rem;font-size:1.05rem;background:var(--card)}
 
 /* footnote pop-ups (notes.js) */
 .nref{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:0 .3em;margin:0 .15em;border-radius:1em;border:1px solid var(--edge);background:var(--hover);color:var(--brown);font:700 .68em/1 "Droid Arabic Naskh",serif;vertical-align:.55em;cursor:pointer}

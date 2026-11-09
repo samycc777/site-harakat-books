@@ -17,7 +17,7 @@
   "تزكية النفس",
   "الدعاء والذكر",
   "علوم العربية",
-    "السير"
+  "السير"
  ],
  "books": {
   "rabee-al-khatar-al-irani": "الردود",
@@ -259,6 +259,7 @@
   "salih-al-ash-shaykh-sharh-fadl-al-islam": "العقيدة",
   "salih-al-ash-shaykh-khasais-al-firqah-an-najiyah": "العقيدة",
   "salih-al-ash-shaykh-at-takmil": "علوم الحديث وأصوله",
-  "ibn-taymiyyah-al-iman": "العقيدة"
+  "ibn-taymiyyah-al-iman": "العقيدة",
+  "ibn-badis-al-aqaid-al-islamiyyah": "العقيدة"
  }
 }

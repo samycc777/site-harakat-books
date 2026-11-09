@@ -177,9 +177,10 @@ const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.que
 document.getElementById('q').addEventListener('input', e => {
   const words = norm(e.target.value).split(/\\s+/).filter(Boolean);
   for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
-  for (const g of document.querySelectorAll('.group')) g.hidden = !g.querySelector('.book:not([hidden])');
+  for (const g of document.querySelectorAll('section:not(#soon) .group')) g.hidden = !g.querySelector('.book:not([hidden])');
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
+    if (sec.id === 'soon') { sec.hidden = words.length > 0; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
   }
@@ -256,6 +257,27 @@ for j, sci in enumerate(SCI['order'] + [OTHER]):
         mine = [li for a, li in lis if a == author]
         if mine: groups.append(f'  <div class="group sub">\n    <h3 class="kind">{esc(author)} <span>({ar(len(mine))})</span></h3>\n    <ul>\n' + '\n'.join(mine) + '\n    </ul>\n  </div>')
     sections.append(f'  <section class="v-science" id="{sid}">\n    <h2>{esc(sci)}</h2>\n' + '\n'.join(groups) + '\n  </section>')
+# «قريبًا»: books and authors on the way (coming.json, hand-edited; drop an entry once its book is live)
+COMING = json.load(open(os.path.join(ROOT, 'coming.json'), encoding='utf8'))
+live = {bare(plain(b['title'])) for b in data['books']}
+soon = [c for c in COMING['books'] if bare(c['title']) not in live]
+if soon or COMING['authors']:
+    nav.append('<a href="#soon">قريبًا</a>')
+    lis = '\n'.join(f'    <li class="soon-book"><span class="t">{esc(c["title"])}</span><span class="meta">{esc(c["author"])}</span></li>' for c in soon)
+    chips = ''.join(f'<span>{esc(a)}</span>' for a in COMING['authors'])
+    sections.append(f'''  <section id="soon">
+    <h2>قريبًا</h2>
+''' + (f'''  <div class="group top">
+    <h3 class="kind">كتب <span>({ar(len(soon))})</span></h3>
+    <ul>
+{lis}
+    </ul>
+  </div>
+''' if soon else '') + (f'''  <div class="group top">
+    <h3 class="kind">المؤلفون <span>({ar(len(COMING['authors']))})</span></h3>
+    <p class="soon-authors">{chips}</p>
+  </div>
+''' if COMING['authors'] else '') + '  </section>')
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
