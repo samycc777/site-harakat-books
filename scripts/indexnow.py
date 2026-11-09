@@ -3,7 +3,7 @@
 it reads public/sitemap.xml). Usage: indexnow.py all | indexnow.py changed <old commit> (deploy.yml)."""
 import json, subprocess, sys, urllib.request, re, os
 
-SITE, KEY = 'https://harakat-books.pages.dev', '83fe532df8714c486724cf4da39cf02b'  # key file: public/83fe532df8714c486724cf4da39cf02b.txt
+SITE, KEY = 'https://kutub-mashkulah.pages.dev', '83fe532df8714c486724cf4da39cf02b'  # key file: public/83fe532df8714c486724cf4da39cf02b.txt
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if sys.argv[1] == 'all':
@@ -17,7 +17,7 @@ else:
 if not urls:
     sys.exit(print('nothing changed'))
 req = urllib.request.Request('https://api.indexnow.org/indexnow', method='POST',
-                             data=json.dumps({'host': 'harakat-books.pages.dev', 'key': KEY,
+                             data=json.dumps({'host': 'kutub-mashkulah.pages.dev', 'key': KEY,
                                               'keyLocation': f'{SITE}/{KEY}.txt', 'urlList': urls}).encode(),
                              headers={'content-type': 'application/json; charset=utf-8'})
 with urllib.request.urlopen(req, timeout=30) as r:

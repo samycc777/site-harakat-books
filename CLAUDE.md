@@ -41,5 +41,6 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 - Headless Chromium on this laptop paints blank pages after DOM changes; screenshot with Playwright's Firefox.
 
 ## Deploy
-Push to main: `.github/workflows/deploy.yml` runs `wrangler pages deploy public --project-name harakat-books` (secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID). Live: https://harakat-books.pages.dev. Repo: samycc777/site-harakat-books (private). Pages project made with `wrangler pages project create harakat-books --production-branch main`; no wrangler.jsonc.
+Push to main: `.github/workflows/deploy.yml` runs `wrangler pages deploy public --project-name kutub-mashkulah` (secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID). Live: https://kutub-mashkulah.pages.dev. Repo: samycc777/site-harakat-books (private). Pages project made with `wrangler pages project create kutub-mashkulah --production-branch main`; no wrangler.jsonc.
+- The old project `harakat-books` only holds `_redirects` sending every path to the same path here (301); never deploy the site there.
 Repo is public so GitHub Actions minutes are free (the private-repo quota ran out). Deploy by hand only if Actions fails. Cloudflare token: the wrangler OAuth login expires; use `CLOUDFLARE_API_TOKEN` from `~/dev/archive-shaykh-bilal-salimi/.env.local` (never print it).

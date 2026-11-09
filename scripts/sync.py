@@ -27,7 +27,7 @@ SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
 
 
-SITE = 'https://harakat-books.pages.dev'
+SITE = 'https://kutub-mashkulah.pages.dev'
 NAME = 'كتب مشكولة'
 URLS = []  # every page, for sitemap.xml
 

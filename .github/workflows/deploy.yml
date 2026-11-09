@@ -1,4 +1,4 @@
-# Every push to main uploads public/ to the Cloudflare Pages project harakat-books.
+# Every push to main uploads public/ to the Cloudflare Pages project kutub-mashkulah.
 name: Deploy
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npx --yes wrangler@4 pages deploy public --project-name harakat-books --branch main --commit-hash "$GITHUB_SHA"
+      - run: npx --yes wrangler@4 pages deploy public --project-name kutub-mashkulah --branch main --commit-hash "$GITHUB_SHA"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

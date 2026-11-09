@@ -13,7 +13,7 @@ export async function onRequestPost({ request, env }) {
   if (d.website) return json({ ok: true });  // hidden field: only bots fill it
   const slug = String(d.slug || ''), text = String(d.text || '').trim(), title = String(d.title || '').trim().slice(0, 200);
   if (!/^[a-z0-9-]{1,120}$/.test(slug) || text.length < 2 || text.length > 3000) return json({ ok: false }, 400);
-  const url = `https://harakat-books.pages.dev/${slug}/`;
+  const url = `https://kutub-mashkulah.pages.dev/${slug}/`;
   const r = await fetch(`https://api.github.com/repos/${REPO}/issues`, {
     method: 'POST',
     headers: { authorization: `Bearer ${env.GITHUB_TOKEN}`, accept: 'application/vnd.github+json',

@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://harakat-books.pages.dev/sitemap.xml
+Sitemap: https://kutub-mashkulah.pages.dev/sitemap.xml
