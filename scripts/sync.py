@@ -248,8 +248,8 @@ for i, author in enumerate(data['authors']):
         open(os.path.join(PUB, aslug, 'index.html'), 'w', encoding='utf8').write(apage)
 
 for j, sci in enumerate(SCI['order'] + [OTHER]):
-    if sci not in by_sci: continue
-    sid, lis = f's{j + 1}', by_sci[sci]
+    if sci not in by_sci and sci == OTHER: continue
+    sid, lis = f's{j + 1}', by_sci.get(sci, [])
     nav.append(f'<a class="v-science" href="#{sid}">{esc(sci)} <span>({ar(len(lis))})</span></a>')
     groups = []
     for author in data['authors']:
