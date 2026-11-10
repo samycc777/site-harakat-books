@@ -11,7 +11,7 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 ## Two looks (`public/site.css`, `public/theme.js`)
 - Everyone: «paper» look (Zaid's request): like the المقالات الواضحات videos: white page in a pink-and-red double frame on black, Amiri text (OFL), Thuluth Decorated titles (fontstatic.com, licence not stated), red accents; dark = cream on navy. CSS rules under `:root:not([data-look=classic])` at the end of site.css.
 - Bilal only: the older «classic» look (cream, brown, Droid Arabic Naskh). Any page opened with `?look=classic` remembers it in that browser; `?look=paper` undoes it. Keep both working when changing the look.
-- Fonts in `public/fonts/` are woff2 subsets (pyftsubset, Arabic + Latin). Never use Adwa Assalaf here: paid font.
+- Fonts in `public/fonts/` are woff2 subsets (pyftsubset, Arabic + Latin). Made smaller by `~/dev/tool-zaid-sites-kit/fonts/shrink.py` (originals in `fonts-src/`; `*-rare.woff2` = letters no page shows, fetched only if one appears; rerun it after adding a font). Pages preload Amiri and carry an empty icon link (without it browsers fetched the whole home page as `/favicon.ico`). Never use Adwa Assalaf here: paid font.
 
 ## Where things live
 - `books.json` — published list (the tafsirs: one entry per PDF volume, `html` = media-harakat-books `pdf/<name>.html` from their `build_pdf.py` with `KEEP_HTML=1`, used for the reading page): `authors` (display order, with «الشيخ») `author_slugs` (author → folder of the author's page; missing = `a<n>`) and `books` (slug, title, author, pdf file name in media-harakat-books/pdf/, optional `source` = list of original URLs, optional `kind` = book|article|fatwa when sync.py's guess is wrong).

@@ -64,7 +64,8 @@ def head(title, up='', path='', desc='', ld=None):
 <meta property="og:type" content="{'book' if ld else 'website'}">
 <meta property="og:locale" content="ar_AR">
 {GOOGLE if not path else ''}{ld}<script src="{up}theme.js"></script>
-<link rel="preload" href="{up}fonts/DroidNaskh-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="data:,">
+<link rel="preload" href="{up}fonts/Amiri-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{up}site.css">
 </head>
 '''

@@ -113,8 +113,8 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 
 /* ===== paper look (everyone; Bilal's browsers keep the classic look above through ?look=classic, see theme.js) =====
    Like the المقالات الواضحات videos: white page in a pink-and-red double frame, Amiri text, Thuluth titles. */
-@font-face{font-family:"Amiri";src:url(fonts/Amiri-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:"Amiri";src:url(fonts/Amiri-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:"Amiri";src:url(fonts/Amiri-Regular.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0000-074F,U+0780-089F,U+08A1-08AB,U+08AD-08B5,U+08BE-FB4F,U+FBC2-FBD2,U+FD3E-FD4F,U+FD90-FD91,U+FDC8-10FFFF}
+@font-face{font-family:"Amiri";src:url(fonts/Amiri-Bold.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0000-074F,U+0780-089F,U+08A1-08AB,U+08AD-08B5,U+08BE-FB4F,U+FBC2-FBD2,U+FD3E-FD4F,U+FD90-FD91,U+FDC8-10FFFF}
 @font-face{font-family:"Thuluth";src:url(fonts/ThuluthDecorated.woff2) format("woff2");font-display:swap}
 :root:not([data-look=classic]){--bg:#000;--page:#fff;--ink:#1b1b1b;--brown:#a3222b;--brown2:#7d1820;--muted:#5c5552;--line:#f0d6d4;--edge:#e2a19f;--accent:#a3222b;--hover:#fbf1f0;--card:#fff;--btn:#a3222b;--btn2:#7d1820;--btn-ink:#fff;--quran:#2c6b45}
 :root[data-theme=dark]:not([data-look=classic]){--bg:#081120;--page:#0f1b2d;--ink:#f2e8d5;--brown:#f2a097;--brown2:#f7c0b9;--muted:#b3aa9c;--line:#2a3550;--edge:#9e4a4b;--accent:#f2a097;--hover:#1f2234;--card:#0f1b2d;--btn:#f2a097;--btn2:#f7c0b9;--btn-ink:#0f1b2d;--quran:#a9dbb8}
@@ -142,3 +142,7 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
  :root:not([data-look=classic]) .read h1{font-size:2.4rem}
  :root:not([data-look=classic]) h2{font-size:1.8rem}
 }
+/* fonts-split:start (made by tool-zaid-sites-kit/fonts/shrink.py; do not edit) */
+@font-face{font-family:"Amiri";src:url(fonts/Amiri-Regular-rare.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0750-077F,U+08A0,U+08AC,U+08B6-08BD,U+FB50-FBC1,U+FBD3-FD3D,U+FD50-FD8F,U+FD92-FDC7}
+@font-face{font-family:"Amiri";src:url(fonts/Amiri-Bold-rare.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0750-077F,U+08A0,U+08AC,U+08B6-08BD,U+FB50-FBC1,U+FBD3-FD3D,U+FD50-FD8F,U+FD92-FDC7}
+/* fonts-split:end */
