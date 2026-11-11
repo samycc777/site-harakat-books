@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>الإمام أحمد بن حنبل | كتب مشكولة</title>
+<meta name="description" content="كتب مشكولة: الإمام أحمد بن حنبل">
+<link rel="canonical" href="https://kutub-mashkulah.pages.dev/ahmad/">
+<meta property="og:site_name" content="كتب مشكولة">
+<meta property="og:title" content="الإمام أحمد بن حنبل | كتب مشكولة">
+<meta property="og:description" content="كتب مشكولة: الإمام أحمد بن حنبل">
+<meta property="og:url" content="https://kutub-mashkulah.pages.dev/ahmad/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_AR">
+<script src="../theme.js"></script>
+<link rel="icon" href="data:,">
+<link rel="preload" href="../fonts/Amiri-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<main>
+  <header>
+  <button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg></button>
+  <a class="home" href="../">كتب مشكولة</a>
+  <h1>الإمام أحمد بن حنبل</h1>
+  </header>
+  <div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>
+  <section>
+  <div class="group top">
+    <h3 class="kind">كتب <span>(١)</span></h3>
+    <ul>
+    <li class="book">
+      <div class="info"><h3><a href="../ahmad-usul-as-sunnah/">أصول السنة</a></h3><span class="meta">١٤ صفحة · <a class="src" href="https://shamela.ws/book/6418" target="_blank" rel="noopener">المصدر</a></span></div>
+      <a class="btn" href="../pdf/ahmad-usul-as-sunnah.pdf" download="أصول السنة.pdf">تحميل PDF</a>
+    </li>
+    </ul>
+  </div>
+  </section>
+  <p id="none" hidden>لا توجد نتائج</p>
+</main>
+<script>
+const norm = t => t.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent)]);
+document.getElementById('q').addEventListener('input', e => {
+  const words = norm(e.target.value).split(/\s+/).filter(Boolean);
+  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
+  for (const g of document.querySelectorAll('section:not(#soon) .group')) g.hidden = !g.querySelector('.book:not([hidden])');
+  let any = false;
+  for (const sec of document.querySelectorAll('section')) {
+    if (sec.id === 'soon') { sec.hidden = words.length > 0; continue; }
+    const shown = sec.querySelector('.book:not([hidden])');
+    sec.hidden = !shown; any ||= !!shown;
+  }
+  document.getElementById('none').hidden = any;
+});
+</script>
+</body>
+</html>
