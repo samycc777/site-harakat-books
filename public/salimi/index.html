@@ -25,6 +25,7 @@
   <a class="home" href="../">كتب مشكولة</a>
   <h1>الشيخ بلال السالمي</h1>
   </header>
+  
   <div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>
   <section>
   <div class="group top">
@@ -41,19 +42,42 @@
 </main>
 <script>
 const norm = t => t.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent)]);
-document.getElementById('q').addEventListener('input', e => {
-  const words = norm(e.target.value).split(/\s+/).filter(Boolean);
-  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
-  for (const g of document.querySelectorAll('section:not(#soon) .group')) g.hidden = !g.querySelector('.book:not([hidden])');
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent), li.classList.contains('nh')]);
+const q = document.getElementById('q'), hb = [...document.querySelectorAll('.harakat button')];
+// harakat filter («الكل» / «مشكولة» / «غير مشكولة»), remembered in this browser; li.nh = book without harakat
+let hv = 'all';
+try { if (hb.length) hv = localStorage.getItem('harakat') || 'all'; } catch (e) {}
+const okH = nh => hv === 'all' || (hv === '1') !== nh;
+const arN = n => '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
+const count = (el, n) => { const s = el && el.querySelector(':scope > span'); if (s) s.textContent = arN(n); };
+function apply() {
+  const words = norm(q.value).split(/\s+/).filter(Boolean);
+  for (const [li, t, nh] of books) li.hidden = !okH(nh) || !words.every(w => t.includes(w));
+  for (const g of document.querySelectorAll('section:not(#soon) .group')) {
+    const n = g.querySelectorAll('.book:not([hidden])').length;
+    g.hidden = !n; count(g.querySelector('h3.kind'), n);
+  }
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
-    if (sec.id === 'soon') { sec.hidden = words.length > 0; continue; }
+    if (sec.id === 'soon' || !sec.querySelector('.book')) { sec.hidden = words.length > 0 || hv !== 'all'; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
   }
+  for (const a of document.querySelectorAll('nav.authors a[data-s]')) {
+    const n = [...document.querySelectorAll('#' + a.dataset.s + ' .book')].filter(li => okH(li.classList.contains('nh'))).length;
+    a.hidden = !n; count(a, n);
+  }
+  for (const a of document.querySelectorAll('nav.authors a:not([data-s])')) a.hidden = hv !== 'all';  // «قريبًا» and authors still to come
+  for (const b of hb) b.setAttribute('aria-pressed', b.dataset.h === hv);
   document.getElementById('none').hidden = any;
+}
+q.addEventListener('input', apply);
+for (const b of hb) b.addEventListener('click', () => {
+  hv = b.dataset.h;
+  try { if (hv === 'all') localStorage.removeItem('harakat'); else localStorage.setItem('harakat', hv); } catch (e) {}
+  apply();
 });
+if (hb.length) apply();
 </script>
 </body>
 </html>

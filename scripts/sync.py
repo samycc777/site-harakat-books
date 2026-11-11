@@ -176,20 +176,44 @@ def write_book_page(b, pages, urls, fname, aslug):
 
 SEARCH = """<script>
 const norm = t => t.replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent)]);
-document.getElementById('q').addEventListener('input', e => {
-  const words = norm(e.target.value).split(/\\s+/).filter(Boolean);
-  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
-  for (const g of document.querySelectorAll('section:not(#soon) .group')) g.hidden = !g.querySelector('.book:not([hidden])');
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent), li.classList.contains('nh')]);
+const q = document.getElementById('q'), hb = [...document.querySelectorAll('.harakat button')];
+// harakat filter («الكل» / «مشكولة» / «غير مشكولة»), remembered in this browser; li.nh = book without harakat
+let hv = 'all';
+try { if (hb.length) hv = localStorage.getItem('harakat') || 'all'; } catch (e) {}
+const okH = nh => hv === 'all' || (hv === '1') !== nh;
+const arN = n => '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
+const count = (el, n) => { const s = el && el.querySelector(':scope > span'); if (s) s.textContent = arN(n); };
+function apply() {
+  const words = norm(q.value).split(/\\s+/).filter(Boolean);
+  for (const [li, t, nh] of books) li.hidden = !okH(nh) || !words.every(w => t.includes(w));
+  for (const g of document.querySelectorAll('section:not(#soon) .group')) {
+    const n = g.querySelectorAll('.book:not([hidden])').length;
+    g.hidden = !n; count(g.querySelector('h3.kind'), n);
+  }
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
-    if (sec.id === 'soon') { sec.hidden = words.length > 0; continue; }
+    if (sec.id === 'soon' || !sec.querySelector('.book')) { sec.hidden = words.length > 0 || hv !== 'all'; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
   }
+  for (const a of document.querySelectorAll('nav.authors a[data-s]')) {
+    const n = [...document.querySelectorAll('#' + a.dataset.s + ' .book')].filter(li => okH(li.classList.contains('nh'))).length;
+    a.hidden = !n; count(a, n);
+  }
+  for (const a of document.querySelectorAll('nav.authors a:not([data-s])')) a.hidden = hv !== 'all';  // «قريبًا» and authors still to come
+  for (const b of hb) b.setAttribute('aria-pressed', b.dataset.h === hv);
   document.getElementById('none').hidden = any;
+}
+q.addEventListener('input', apply);
+for (const b of hb) b.addEventListener('click', () => {
+  hv = b.dataset.h;
+  try { if (hv === 'all') localStorage.removeItem('harakat'); else localStorage.setItem('harakat', hv); } catch (e) {}
+  apply();
 });
+if (hb.length) apply();
 </script>"""
+FILTER = '<div class="views harakat" role="group"><button type="button" data-h="all">الكل</button><button type="button" data-h="1">مشكولة</button><button type="button" data-h="0">غير مشكولة</button></div>'
 BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>'
 
 
@@ -201,7 +225,8 @@ def author_slug(i, author):
 def book_item(b, pages, fname, urls, up=''):
     links = ' '.join(f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                      for n, u in enumerate(urls, 1))
-    return f'''    <li class="book">
+    nh = ' nh' if b.get('harakat') is False else ''
+    return f'''    <li class="book{nh}">
       <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{ar(pages)} صفحة · {links}</span></div>
       <a class="btn" href="{up}pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
     </li>'''
@@ -229,7 +254,7 @@ for i, author in enumerate(data['authors']):
         by_sci.setdefault(sci, []).append((author, items[-1][1]))
     if items:
         sid = f'a{i + 1}'
-        nav.append(f'<a class="v-author" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
+        nav.append(f'<a class="v-author" data-s="{sid}" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
         sections.append(f'  <section class="v-author" id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
         apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
@@ -238,6 +263,7 @@ for i, author in enumerate(data['authors']):
   <a class="home" href="../">كتب مشكولة</a>
   <h1>{esc(author)}</h1>
   </header>
+  {FILTER if len({b.get('harakat') is False for b in data['books'] if b['author'] == author}) > 1 else ''}
   {BAR}
   <section>
 ''' + grouped(sub_items, 'top') + f'''
@@ -254,7 +280,7 @@ for i, author in enumerate(data['authors']):
 for j, sci in enumerate(SCI['order'] + [OTHER]):
     if sci not in by_sci and sci == OTHER: continue
     sid, lis = f's{j + 1}', by_sci.get(sci, [])
-    nav.append(f'<a class="v-science" href="#{sid}">{esc(sci)} <span>({ar(len(lis))})</span></a>')
+    nav.append(f'<a class="v-science" data-s="{sid}" href="#{sid}">{esc(sci)} <span>({ar(len(lis))})</span></a>')
     groups = []
     for author in data['authors']:
         mine = [li for a, li in lis if a == author]
@@ -301,6 +327,7 @@ page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if
   <h1>كتب مشكولة</h1>
   </header>
   {VIEWS}
+  {FILTER}
   <nav class="authors">{''.join(nav)}</nav>
   {BAR}
 {chr(10).join(sections)}

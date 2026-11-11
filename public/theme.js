@@ -16,7 +16,7 @@
   // Home page: books by author (default) or by subject («حسب العلم»), remembered in this browser.
   try { if (localStorage.getItem('view') === 'science') root.dataset.view = 'science'; } catch (e) {}
   document.addEventListener('DOMContentLoaded', function () {
-    var views = document.querySelectorAll('.views button');
+    var views = document.querySelectorAll('.views button[data-view]');
     var mark = function () {
       var v = root.dataset.view || 'author';
       for (var i = 0; i < views.length; i++) views[i].setAttribute('aria-pressed', views[i].dataset.view === v);

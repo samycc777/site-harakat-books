@@ -25,40 +25,41 @@
   <a class="home" href="../">كتب مشكولة</a>
   <h1>الشيخ أحمد بن يحيى النجمي</h1>
   </header>
+  
   <div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>
   <section>
   <div class="group top">
     <h3 class="kind">كتب <span>(٨)</span></h3>
     <ul>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-al-mawrid-al-adhb-az-zulal/">المورد العذب الزلال فيما انتقد على بعض المناهج الدعوية من العقائد والأعمال</a></h3><span class="meta">٤٤٥ صفحة · <a class="src" href="https://ketabonline.com/ar/books/54907" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-al-mawrid-al-adhb-az-zulal.pdf" download="المورد العذب الزلال فيما انتقد على بعض المناهج الدعوية من العقائد والأعمال.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-haff-al-hawajib/">حف الحواجب وتشقيرها</a></h3><span class="meta">١٤ صفحة · <a class="src" href="https://ketabonline.com/ar/books/55005" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-haff-al-hawajib.pdf" download="حف الحواجب وتشقيرها.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-ar-radd-ala-man-yazum/">الرد على من يزعم على أن الصوفية من أهل السنة والجماعة</a></h3><span class="meta">١٧ صفحة · <a class="src" href="https://ketabonline.com/ar/books/54981" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-ar-radd-ala-man-yazum.pdf" download="الرد على من يزعم على أن الصوفية من أهل السنة والجماعة.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-radd-ala-sufi/">ردٌّ على صوفي</a></h3><span class="meta">١٨ صفحة · <a class="src" href="https://ketabonline.com/ar/books/54986" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-radd-ala-sufi.pdf" download="ردٌّ على صوفي.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-al-hiwar-al-wadi/">الحوار الوديع مع فضيلة الشيخ عبد الله المنيع</a></h3><span class="meta">١٧ صفحة · <a class="src" href="https://ketabonline.com/ar/books/54621" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-al-hiwar-al-wadi.pdf" download="الحوار الوديع مع فضيلة الشيخ عبد الله المنيع.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-al-qat-hukmuhu/">القات حكمه الشرعي وأضراره</a></h3><span class="meta">٢٧ صفحة · <a class="src" href="https://ketabonline.com/ar/books/19269" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-al-qat-hukmuhu.pdf" download="القات حكمه الشرعي وأضراره.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-al-fath-ar-rabbani/">الفتح الرباني في الدفاع عن الشيخ الألباني</a></h3><span class="meta">٤٩ صفحة · <a class="src" href="https://ketabonline.com/ar/books/54654" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-al-fath-ar-rabbani.pdf" download="الفتح الرباني في الدفاع عن الشيخ الألباني.pdf">تحميل PDF</a>
     </li>
-    <li class="book">
+    <li class="book nh">
       <div class="info"><h3><a href="../najmi-ar-radd-ala-mufti-misr/">الرد على مفتي مصر</a></h3><span class="meta">٤٥ صفحة · <a class="src" href="https://ketabonline.com/ar/books/55007" target="_blank" rel="noopener">المصدر</a></span></div>
       <a class="btn" href="../pdf/najmi-ar-radd-ala-mufti-misr.pdf" download="الرد على مفتي مصر.pdf">تحميل PDF</a>
     </li>
@@ -69,19 +70,42 @@
 </main>
 <script>
 const norm = t => t.replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent)]);
-document.getElementById('q').addEventListener('input', e => {
-  const words = norm(e.target.value).split(/\s+/).filter(Boolean);
-  for (const [li, t] of books) li.hidden = !words.every(w => t.includes(w));
-  for (const g of document.querySelectorAll('section:not(#soon) .group')) g.hidden = !g.querySelector('.book:not([hidden])');
+const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent), li.classList.contains('nh')]);
+const q = document.getElementById('q'), hb = [...document.querySelectorAll('.harakat button')];
+// harakat filter («الكل» / «مشكولة» / «غير مشكولة»), remembered in this browser; li.nh = book without harakat
+let hv = 'all';
+try { if (hb.length) hv = localStorage.getItem('harakat') || 'all'; } catch (e) {}
+const okH = nh => hv === 'all' || (hv === '1') !== nh;
+const arN = n => '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
+const count = (el, n) => { const s = el && el.querySelector(':scope > span'); if (s) s.textContent = arN(n); };
+function apply() {
+  const words = norm(q.value).split(/\s+/).filter(Boolean);
+  for (const [li, t, nh] of books) li.hidden = !okH(nh) || !words.every(w => t.includes(w));
+  for (const g of document.querySelectorAll('section:not(#soon) .group')) {
+    const n = g.querySelectorAll('.book:not([hidden])').length;
+    g.hidden = !n; count(g.querySelector('h3.kind'), n);
+  }
   let any = false;
   for (const sec of document.querySelectorAll('section')) {
-    if (sec.id === 'soon') { sec.hidden = words.length > 0; continue; }
+    if (sec.id === 'soon' || !sec.querySelector('.book')) { sec.hidden = words.length > 0 || hv !== 'all'; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
   }
+  for (const a of document.querySelectorAll('nav.authors a[data-s]')) {
+    const n = [...document.querySelectorAll('#' + a.dataset.s + ' .book')].filter(li => okH(li.classList.contains('nh'))).length;
+    a.hidden = !n; count(a, n);
+  }
+  for (const a of document.querySelectorAll('nav.authors a:not([data-s])')) a.hidden = hv !== 'all';  // «قريبًا» and authors still to come
+  for (const b of hb) b.setAttribute('aria-pressed', b.dataset.h === hv);
   document.getElementById('none').hidden = any;
+}
+q.addEventListener('input', apply);
+for (const b of hb) b.addEventListener('click', () => {
+  hv = b.dataset.h;
+  try { if (hv === 'all') localStorage.removeItem('harakat'); else localStorage.setItem('harakat', hv); } catch (e) {}
+  apply();
 });
+if (hb.length) apply();
 </script>
 </body>
 </html>

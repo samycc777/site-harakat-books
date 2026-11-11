@@ -37,6 +37,9 @@ nav.authors span{color:var(--muted)}
 .views button{font:inherit;font-size:1.1rem;line-height:1.8;padding:.2rem 1.2rem;border:1px solid var(--accent);background:var(--card);color:var(--brown);cursor:pointer}
 .views button:first-child{border-radius:0 2rem 2rem 0}
 .views button:last-child{border-radius:2rem 0 0 2rem;border-right:0}
+.views button:not(:first-child){border-right:0}
+.views button:not(:first-child):not(:last-child){border-radius:0}
+.views.harakat button{font-size:1rem;padding:.1rem 1rem}
 .views button:hover,.views button:focus-visible{background:var(--hover)}
 .views button[aria-pressed=true]{background:var(--btn);color:var(--btn-ink);font-weight:700}
 :root[data-view=science] .v-author,:root:not([data-view=science]) .v-science{display:none!important}
