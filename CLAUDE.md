@@ -45,3 +45,6 @@ Public static site «كتب مشكولة»: Salafi books with full harakat, grou
 Push to main: `.github/workflows/deploy.yml` runs `wrangler pages deploy public --project-name kutub-mashkulah` (secrets CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID). Live: https://kutub-mashkulah.pages.dev. Repo: samycc777/site-harakat-books (private). Pages project made with `wrangler pages project create kutub-mashkulah --production-branch main`; no wrangler.jsonc.
 - The old project `harakat-books` only holds `_redirects` sending every path to the same path here (301); never deploy the site there.
 Repo is public so GitHub Actions minutes are free (the private-repo quota ran out). Deploy by hand only if Actions fails. Cloudflare token: the wrangler OAuth login expires; use `CLOUDFLARE_API_TOKEN` from `~/dev/archive-shaykh-bilal-salimi/.env.local` (never print it).
+
+## Mistakes to avoid
+- Every author needs an entry in books.json `author_slugs`: without one the page is `/a<n>/` by position, and each author inserted before it moves the address (old links then show another author). `public/_redirects` sends the old `/a4`…`/a10` to the fixed pages.
