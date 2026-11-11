@@ -3259,6 +3259,14 @@
    "author": "الشيخ مبارك بن محمد الميلي",
    "pdf": "تاريخ الجزائر في القديم والحديث.pdf",
    "harakat": false
+  },
+  {
+   "slug": "ubayd-al-jabiri-fatawa-mutafarriqah",
+   "title": "فتاوى متفرقة",
+   "author": "الشيخ عبيد بن عبد الله الجابري",
+   "pdf": "فتاوى متفرقة - الشيخ عبيد الجابري.pdf",
+   "harakat": false,
+   "kind": "fatwa"
   }
  ]
 }
