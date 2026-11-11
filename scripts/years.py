@@ -101,7 +101,8 @@ def convert_text(t):
     for s, e, n, g in found:
         w = g and words(n, g == 'f')
         if not w: continue
-        out += [t[pos:s], f'{w} ({t[s:e]})']
+        sp = ' ' if re.match('[\u0621-\u064A]', t[s - 1:s]) else ''  # «(ت١٣٢٣هـ)»: keep «ت» apart from the words
+        out += [t[pos:s], f'{sp}{w} ({t[s:e]})']
         LOG.append((t[max(0, s - 30):e + 10], f'{w} ({t[s:e]})'))
         pos = e
     out.append(t[pos:])

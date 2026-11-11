@@ -137,7 +137,9 @@ NOTES_JS = '<script src="../notes.js" defer></script>\n'
 
 
 def write_book_page(b, pages, urls, fname, aslug):
-    sub, body = map(years_to_words, book_text(b))  # years in words, website only
+    sub, body = book_text(b)
+    if b.get('harakat') is not False:  # years in words (vowelled), website only; never in an unvowelled book
+        sub, body = years_to_words(sub), years_to_words(body)
     src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
     ld = {'@context': 'https://schema.org', '@type': 'Book', 'name': bare(b['title']), 'alternateName': b['title'], 'inLanguage': 'ar',
