@@ -237,11 +237,14 @@ by_sci = {}  # subject → [(author, li)]
 for i, author in enumerate(data['authors']):
     aslug = author_slug(i, author)
     items, sub_items = [], []
+    mine_b = []
     for b in data['books']:
         if b['author'] != author: continue
         dst = os.path.join(PUB, 'pdf', b['slug'] + '.pdf')
         shutil.copyfile(os.path.join(SRC, b['pdf']), dst)
-        pages = len(PdfReader(dst).pages)
+        mine_b.append((len(PdfReader(dst).pages), b))
+    mine_b.sort(key=lambda x: x[0])  # shortest to longest
+    for pages, b in mine_b:
         fname = esc(b['title'].replace('؟', '').replace('/', ' ') + '.pdf')
         urls = sources(b)
         write_book_page(b, pages, urls, fname, aslug)
