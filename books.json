@@ -6492,6 +6492,14 @@
    "pdf": "تحذير الداعية من القصص الواهية.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "wasifi-hiwar-maa-shii",
+   "title": "حوار مع شيعي رافضي",
+   "author": "الشيخ علي بن السيد الوصيفي",
+   "pdf": "حوار مع شيعي رافضي.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
