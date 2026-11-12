@@ -6462,6 +6462,14 @@
    "pdf": "الإخوان المسلمون بين الابتداع الديني والإفلاس السياسي.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "wasifi-al-qada-wal-qadar",
+   "title": "القضاء والقدر عند السلف",
+   "author": "الشيخ علي بن السيد الوصيفي",
+   "pdf": "القضاء والقدر عند السلف.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
