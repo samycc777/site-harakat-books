@@ -3,7 +3,7 @@
 write one reading page per book (public/<slug>/index.html, text taken from media-harakat-books
 books/<slug>/index.html) and regenerate public/index.html and one page per author (public/<author_slugs>/index.html). Read-only on media-harakat-books.
 Look: public/site.css + public/theme.js (hand-edited)."""
-import json, os, re, shutil, html
+import json, os, re, shutil, html, subprocess, time
 from pypdf import PdfReader
 from years import years_to_words
 
@@ -17,6 +17,34 @@ data = json.load(open(os.path.join(ROOT, 'books.json'), encoding='utf8'))
 SCI = json.load(open(os.path.join(ROOT, 'sciences.json'), encoding='utf8'))
 OTHER = 'أخرى'
 os.makedirs(os.path.join(PUB, 'pdf'), exist_ok=True)
+
+
+# «أُضيفت حديثًا» / «شُكِّلت حديثًا» on the home page: when each book entered books.json, and when its
+# "harakat": false went away, read from git history (commits of the last 4 days; books.json changes not
+# committed yet = now). The page's RECENT script then drops what is older than 3 days when it is viewed.
+RECENT_DAYS = 3
+def recent_times():
+    def git(*a): return subprocess.run(['git', '-C', ROOT, *a], capture_output=True, text=True).stdout
+    def state(rev):
+        try: d = json.loads(git('show', f'{rev}:books.json') or '{}')
+        except ValueError: return {}
+        return {b['slug']: b.get('harakat') is False for b in d.get('books', [])}
+    added, vowelled = {}, {}
+    def compare(cur, par, t):
+        for s, nh in cur.items():
+            if s not in par: added[s] = min(t, added.get(s, t))
+            elif par[s] and not nh: vowelled[s] = min(t, vowelled.get(s, t))
+    now = int(time.time())
+    log = git('log', '--no-merges', f'--since={now - (RECENT_DAYS + 1) * 86400}', '--format=%H %ct', '--', 'books.json').splitlines()
+    for line in log:
+        h, t = line.split()
+        compare(state(h), state(h + '^'), int(t))
+    compare({b['slug']: b.get('harakat') is False for b in data['books']}, state('HEAD'), now)
+    live = {b['slug']: b.get('harakat') is False for b in data['books']}
+    cut = now - RECENT_DAYS * 86400
+    return ({s: t for s, t in added.items() if s in live and t >= cut},
+            {s: t for s, t in vowelled.items() if s in live and not live[s] and t >= cut})
+ADDED, VOWELLED = recent_times()
 
 DIG = str.maketrans('0123456789', '٠١٢٣٤٥٦٧٨٩')
 def ar(n): return str(n).translate(DIG)
@@ -196,6 +224,7 @@ function apply() {
     if (sec.id === 'soon' || !sec.querySelector('.book')) { sec.hidden = words.length > 0 || hv !== 'all'; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
+    if (sec.classList.contains('recent')) count(sec.querySelector('h2'), sec.querySelectorAll('.book:not([hidden])').length);
   }
   for (const a of document.querySelectorAll('nav.authors a[data-s]')) {
     const n = [...document.querySelectorAll('#' + a.dataset.s + ' .book')].filter(li => okH(li.classList.contains('nh'))).length;
@@ -222,18 +251,19 @@ def author_slug(i, author):
     return data.get('author_slugs', {}).get(author) or f'a{i + 1}'
 
 
-def book_item(b, pages, fname, urls, up=''):
+def book_item(b, pages, fname, urls, up='', who=False):
     links = ' '.join(f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                      for n, u in enumerate(urls, 1))
     nh = ' nh' if b.get('harakat') is False else ''
     return f'''    <li class="book{nh}">
-      <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{ar(pages)} صفحة · {links}</span></div>
+      <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{esc(b['author']) + ' · ' if who else ''}{ar(pages)} صفحة · {links}</span></div>
       <a class="btn" href="{up}pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
     </li>'''
 
 
 sections, nav = [], []
 by_sci = {}  # subject → [(author, li)]
+recent = {'a': [], 'v': []}  # (time, li) for «أُضيفت حديثًا» / «شُكِّلت حديثًا»
 for i, author in enumerate(data['authors']):
     aslug = author_slug(i, author)
     items, sub_items = [], []
@@ -251,6 +281,9 @@ for i, author in enumerate(data['authors']):
         k = kind(b, urls)
         items.append((k, book_item(b, pages, fname, urls)))
         sub_items.append((k, book_item(b, pages, fname, urls, '../')))
+        for key, times in (('a', ADDED), ('v', VOWELLED)):
+            if b['slug'] in times:
+                recent[key].append((times[b['slug']], book_item(b, pages, fname, urls, who=True).replace('<li class="book', f'<li data-t="{times[b["slug"]]}" class="book', 1)))
         sci = SCI['books'].get(b['slug'])
         if sci not in SCI['order']:
             print(f"warning: {b['slug']} has no subject in sciences.json: listed under «{OTHER}»"); sci = OTHER
@@ -321,6 +354,20 @@ for k, a in enumerate(_extra):
     nav.insert(0, f'<a class="v-author" href="#x{k + 1}">{esc(a)}</a>') if False else None
     nav.insert(_base + k, f'<a class="v-author" href="#x{k + 1}">{esc(a)}</a>')
     sections.insert(_base + k, f'  <section class="v-author" id="x{k + 1}">\n    <h2>{esc(a)}</h2>{body}\n  </section>')
+# newest first, above the author buttons (shown in both views)
+_rec = []
+for key, sid, label in (('a', 'new', 'أُضيفت حديثًا'), ('v', 'vowelled', 'شُكِّلت حديثًا')):
+    lis = [li for t, li in sorted(recent[key], key=lambda x: -x[0])]
+    if lis: _rec.append(f'  <section class="recent" id="{sid}">\n    <h2>{label} <span>({ar(len(lis))})</span></h2>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </section>')
+# drops books older than RECENT_DAYS when the page is viewed (the page may be days old), before SEARCH counts
+RECENT = f"""<script>
+for (const sec of document.querySelectorAll('section.recent')) {{
+  for (const li of sec.querySelectorAll('li[data-t]')) if (Date.now() / 1000 - li.dataset.t > {RECENT_DAYS} * 86400) li.remove();
+  const n = sec.querySelectorAll('li.book').length, c = sec.querySelector('h2 > span');
+  if (!n) sec.remove(); else if (c) c.textContent = '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
+}}
+</script>
+"""
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
@@ -331,12 +378,13 @@ page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if
   </header>
   {VIEWS}
   {FILTER}
+{chr(10).join(_rec)}
   <nav class="authors">{''.join(nav)}</nav>
   {BAR}
 {chr(10).join(sections)}
   <p id="none" hidden>لا توجد نتائج</p>
 </main>
-{SEARCH}
+{RECENT}{SEARCH}
 </body>
 </html>
 '''

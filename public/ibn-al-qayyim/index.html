@@ -178,6 +178,7 @@ function apply() {
     if (sec.id === 'soon' || !sec.querySelector('.book')) { sec.hidden = words.length > 0 || hv !== 'all'; continue; }
     const shown = sec.querySelector('.book:not([hidden])');
     sec.hidden = !shown; any ||= !!shown;
+    if (sec.classList.contains('recent')) count(sec.querySelector('h2'), sec.querySelectorAll('.book:not([hidden])').length);
   }
   for (const a of document.querySelectorAll('nav.authors a[data-s]')) {
     const n = [...document.querySelectorAll('#' + a.dataset.s + ' .book')].filter(li => okH(li.classList.contains('nh'))).length;
