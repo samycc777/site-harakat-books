@@ -20,9 +20,10 @@ os.makedirs(os.path.join(PUB, 'pdf'), exist_ok=True)
 
 
 # «أُضيفت حديثًا» / «شُكِّلت حديثًا» on the home page: when each book entered books.json, and when its
-# "harakat": false went away, read from git history (commits of the last 4 days; books.json changes not
-# committed yet = now). The page's RECENT script then drops what is older than 3 days when it is viewed.
-RECENT_DAYS = 3
+# "harakat": false went away, read from git history (commits of the last 3 days; books.json changes not
+# committed yet = now). The page's RECENT script then keeps only what was done on the viewer's today
+# (Bilal's order), and each section folds when its title is clicked (remembered per browser).
+RECENT_DAYS = 2
 def recent_times():
     def git(*a): return subprocess.run(['git', '-C', ROOT, *a], capture_output=True, text=True).stdout
     def state(rev):
@@ -358,14 +359,20 @@ for k, a in enumerate(_extra):
 _rec = []
 for key, sid, label in (('a', 'new', 'أُضيفت حديثًا'), ('v', 'vowelled', 'شُكِّلت حديثًا')):
     lis = [li for t, li in sorted(recent[key], key=lambda x: -x[0])]
-    if lis: _rec.append(f'  <section class="recent" id="{sid}">\n    <h2>{label} <span>({ar(len(lis))})</span></h2>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </section>')
-# drops books older than RECENT_DAYS when the page is viewed (the page may be days old), before SEARCH counts
-RECENT = f"""<script>
-for (const sec of document.querySelectorAll('section.recent')) {{
-  for (const li of sec.querySelectorAll('li[data-t]')) if (Date.now() / 1000 - li.dataset.t > {RECENT_DAYS} * 86400) li.remove();
+    if lis: _rec.append(f'  <section class="recent" id="{sid}">\n    <details open><summary><h2>{label} <span>({ar(len(lis))})</span></h2></summary>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n    </details>\n  </section>')
+# keeps only books done on the viewer's today (the page may be days old), before SEARCH counts;
+# restores and remembers each section's folded state
+RECENT = """<script>
+for (const sec of document.querySelectorAll('section.recent')) {
+  const today = new Date().toDateString();
+  for (const li of sec.querySelectorAll('li[data-t]')) if (new Date(li.dataset.t * 1000).toDateString() !== today) li.remove();
   const n = sec.querySelectorAll('li.book').length, c = sec.querySelector('h2 > span');
-  if (!n) sec.remove(); else if (c) c.textContent = '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
-}}
+  if (!n) { sec.remove(); continue; }
+  if (c) c.textContent = '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
+  const d = sec.querySelector('details'), key = 'fold-' + sec.id;
+  try { if (localStorage.getItem(key) === '1') d.open = false; } catch (e) {}
+  d.addEventListener('toggle', () => { try { localStorage.setItem(key, d.open ? '0' : '1'); } catch (e) {} });
+}
 </script>
 """
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
