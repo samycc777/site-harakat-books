@@ -150,3 +150,7 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 @font-face{font-family:"Amiri";src:url(fonts/Amiri-Bold-rare.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0750-077F,U+08A0,U+08AC,U+08B6-08BD,U+FB50-FBC1,U+FBD3-FD3D,U+FD50-FD8F,U+FD92-FDC7}
 /* fonts-split:end */
 section.recent h2 span{font-size:.6em;opacity:.75;font-family:"Amiri",serif}
+section.recent summary{list-style:none;cursor:pointer}
+section.recent summary::-webkit-details-marker{display:none}
+section.recent summary h2::after{content:"▾";display:inline-block;margin-inline-start:.4em;font-size:.55em;opacity:.6;font-family:sans-serif;transition:transform .2s}
+section.recent details:not([open]) summary h2::after{transform:rotate(90deg)}
