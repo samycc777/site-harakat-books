@@ -195,7 +195,8 @@ def write_book_page(b, pages, urls, fname, aslug):
   </article>
 {REPORT}
 </main>
-{NOTES_JS}<script src="../report.js" defer></script>
+{NOTES_JS}<script src="../progress.js" defer></script>
+<script src="../report.js" defer></script>
 </body>
 </html>
 '''
