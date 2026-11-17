@@ -60,6 +60,8 @@
         while ((m = NUM.exec(s))) {
           var n = notes[m[1]];
           if (!n || n.used) continue;
+          var pre = s.slice(0, m.index);
+          if (pre.split('\ufd3f').length > pre.split('\ufd3e').length) continue;  // a verse number inside ﴿ ﴾
           n.used = true;
           frag = frag || document.createDocumentFragment();
           frag.appendChild(document.createTextNode(s.slice(i, m.index)));
