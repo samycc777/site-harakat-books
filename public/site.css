@@ -154,3 +154,9 @@ section.recent summary{list-style:none;cursor:pointer}
 section.recent summary::-webkit-details-marker{display:none}
 section.recent summary h2::after{content:"▾";display:inline-block;margin-inline-start:.4em;font-size:.55em;opacity:.6;font-family:sans-serif;transition:transform .2s}
 section.recent details:not([open]) summary h2::after{transform:rotate(90deg)}
+
+/* a paragraph quoting a weak or fabricated hadith (media-harakat-books grades.tsv): faded, with a red bar and label */
+.text p.weak{border-right:3px solid #c0453c;padding-right:.7em;color:var(--muted)}
+.text p.weak::before{content:attr(data-grade);display:block;color:#c0453c;font-size:.72em;font-weight:700;line-height:1.6}
+:root[data-theme=dark] .text p.weak{border-right-color:#e07a72}
+:root[data-theme=dark] .text p.weak::before{color:#e07a72}
