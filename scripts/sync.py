@@ -113,6 +113,10 @@ def sources(b):
 
 
 KINDS = {'book': 'كتب', 'article': 'مقالات', 'fatwa': 'فتاوى وفوائد'}  # display order
+# groups.json (Zaid's order): books shown under their own heading (e.g. one per person refuted) instead of by kind
+GROUPS = json.load(open(os.path.join(ROOT, 'groups.json'), encoding='utf8'))['groups']
+IN_GROUP = {(g['author'], s): g['key'] for g in GROUPS for s in g['books']}
+LABELS = {**KINDS, **{g['key']: g['title'] for g in GROUPS}}  # display order: kinds, then groups
 
 
 def kind(b, urls):
@@ -129,10 +133,10 @@ def kind(b, urls):
 def grouped(entries, cls):
     """entries = [(kind, li)]: one <div class="group"> per kind present, with its heading."""
     out = []
-    for k, label in KINDS.items():
+    for k, label in LABELS.items():
         lis = [li for kk, li in entries if kk == k]
         gid = f' id="k-{k}"' if cls == 'top' else ''
-        if lis: out.append(f'  <div class="group {cls}"{gid}>\n    <h3 class="kind">{label} <span>({ar(len(lis))})</span></h3>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </div>')
+        if lis: out.append(f'  <div class="group {cls}"{gid}>\n    <h3 class="kind">{esc(label)} <span>({ar(len(lis))})</span></h3>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </div>')
     return '\n'.join(out)
 
 
@@ -303,7 +307,7 @@ for i, author in enumerate(data['authors']):
         urls = sources(b)
         write_book_page(b, pages, urls, fname, aslug)
         INFO[b['slug']] = (pages, fname, urls)
-        k = kind(b, urls)
+        k = IN_GROUP.get((author, b['slug'])) or kind(b, urls)
         items.append((k, book_item(b, pages, fname, urls)))
         sub_items.append((k, book_item(b, pages, fname, urls, '../')))
         for key, times in (('a', ADDED), ('v', VOWELLED)):
@@ -317,8 +321,8 @@ for i, author in enumerate(data['authors']):
         sid = f'a{i + 1}'
         nav.append(f'<a class="v-author" data-s="{sid}" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
         sections.append(f'  <section class="v-author" id="{sid}" style="--n:{len(items)}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
-        kinds = [k for k in KINDS if any(kk == k for kk, _ in sub_items)]
-        jump = '<nav class="authors kinds">' + ''.join(f'<a data-s="k-{k}" href="#k-{k}">{KINDS[k]} <span>({ar(sum(1 for kk, _ in sub_items if kk == k))})</span></a>' for k in kinds) + '</nav>' if len(kinds) > 1 else ''
+        kinds = [k for k in LABELS if any(kk == k for kk, _ in sub_items)]
+        jump = '<nav class="authors kinds">' + ''.join(f'<a data-s="k-{k}" href="#k-{k}">{esc(LABELS[k])} <span>({ar(sum(1 for kk, _ in sub_items if kk == k))})</span></a>' for k in kinds) + '</nav>' if len(kinds) > 1 else ''
         apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
   <header>
