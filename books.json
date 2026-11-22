@@ -9324,6 +9324,14 @@
    "pdf": "بحوث فقهية.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-nur-ala-ad-darb",
+   "title": "نور على الدرب",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "نور على الدرب.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
