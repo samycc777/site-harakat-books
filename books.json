@@ -9140,6 +9140,13 @@
    "pdf": "مختارات من الخطب المنبرية الرمضانية.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "muqbil-rijal-al-hakim",
+   "title": "رجال الحاكم في المستدرك",
+   "author": "الشيخ مقبل بن هادي الوادعي",
+   "pdf": "رجال الحاكم في المستدرك.pdf",
+   "harakat": false
   }
  ]
 }
