@@ -1,6 +1,18 @@
 {
- "_": "Sections inside an author's list (Zaid's order): each book listed here shows under its group's heading instead of «كتب»/«مقالات»/«فتاوى وفوائد».",
+ "_": "Sections inside an author's list (Zaid's order): each book listed here shows under its group's heading instead of «كتب»/«مقالات»/«فتاوى وفوائد». \"first\": true = shown before them, at the top of the list (\"title\": \"\" = no heading).",
  "groups": [
+  {
+   "key": "rabee-first",
+   "author": "الشيخ ربيع بن هادي المدخلي",
+   "title": "",
+   "first": true,
+   "books": [
+    "rabee-ilm-al-kitab-was-sunnah",
+    "rabee-makanat-ahl-al-hadith",
+    "rabee-al-kitab-was-sunnah-fit-talim",
+    "rabee-makanat-as-salah"
+   ]
+  },
   {
    "key": "qutb",
    "author": "الشيخ ربيع بن هادي المدخلي",
