@@ -116,6 +116,7 @@ KINDS = {'book': 'كتب', 'article': 'مقالات', 'fatwa': 'فتاوى وف�
 # groups.json (Zaid's order): books shown under their own heading (e.g. one per person refuted) instead of by kind
 GROUPS = json.load(open(os.path.join(ROOT, 'groups.json'), encoding='utf8'))['groups']
 IN_GROUP = {(g['author'], s): g['key'] for g in GROUPS for s in g['books']}
+FIRST_POS = {(g['author'], s): i for g in GROUPS if g.get('first') for i, s in enumerate(g['books'])}  # Zaid's order
 # "first": true = shown before the kinds, at the top of the author's list (title "" = no heading)
 LABELS = {**{g['key']: g['title'] for g in GROUPS if g.get('first')}, **KINDS,
           **{g['key']: g['title'] for g in GROUPS if not g.get('first')}}  # display order: first groups, kinds, other groups
@@ -304,7 +305,7 @@ for i, author in enumerate(data['authors']):
         dst = os.path.join(PUB, 'pdf', b['slug'] + '.pdf')
         shutil.copyfile(os.path.join(SRC, b['pdf']), dst)
         mine_b.append((len(PdfReader(dst).pages), b))
-    mine_b.sort(key=lambda x: x[0])  # shortest to longest
+    mine_b.sort(key=lambda x: (FIRST_POS.get((author, x[1]['slug']), 1e9), x[0]))  # "first" groups in their order, the rest shortest to longest
     for pages, b in mine_b:
         fname = esc(b['title'].replace('؟', '').replace('/', ' ') + '.pdf')
         urls = sources(b)
