@@ -264,6 +264,7 @@ def book_item(b, pages, fname, urls, up='', who=False):
 
 
 sections, nav = [], []
+INFO = {}  # slug → (pages, PDF file name, source links), for the «بماذا يبدأ طالب العلم؟» page
 by_sci = {}  # subject → [(author, li)]
 recent = {'a': [], 'v': []}  # (time, li) for «أُضيفت حديثًا» / «شُكِّلت حديثًا»
 for i, author in enumerate(data['authors']):
@@ -280,6 +281,7 @@ for i, author in enumerate(data['authors']):
         fname = esc(b['title'].replace('؟', '').replace('/', ' ') + '.pdf')
         urls = sources(b)
         write_book_page(b, pages, urls, fname, aslug)
+        INFO[b['slug']] = (pages, fname, urls)
         k = kind(b, urls)
         items.append((k, book_item(b, pages, fname, urls)))
         sub_items.append((k, book_item(b, pages, fname, urls, '../')))
@@ -376,6 +378,53 @@ for (const sec of document.querySelectorAll('section.recent')) {
 }
 </script>
 """
+# «بماذا يبدأ طالب العلم؟» (Bilal's order): the books each shaykh named for a beginner, in his order,
+# from reading.json (hand-edited): per shaykh "said" = his own words, unchanged, each with its "source",
+# and "steps" = science → books in his order ("slug" = the book on this site; "href" = an author page
+# for a work in several volumes; else title only).
+READING = json.load(open(os.path.join(ROOT, 'reading.json'), encoding='utf8'))
+START, START_T = 'ibtida', 'بماذا يبدأ طالب العلم؟'
+START_LINK = f'<a class="start" href="{START}/">{START_T}</a>'
+def start_page():
+    by_slug = {b['slug']: b for b in data['books']}
+    nav, secs = [], []
+    for i, s in enumerate(READING['shaykhs'], 1):
+        groups = []
+        for st in s['steps']:
+            lis = []
+            for bk in st['books']:
+                b = by_slug.get(bk.get('slug'))
+                if bk.get('slug') and not b: raise SystemExit(f"reading.json: no book {bk['slug']}")
+                if b: lis.append(book_item(b, *INFO[b['slug']], '../', who=True)); continue
+                t = esc(bk['title'])
+                if bk.get('href'): t = f'<a href="../{esc(bk["href"])}/">{t}</a>'  # several volumes: the author's page
+                lis.append(f'    <li class="soon-book{" here" if bk.get("href") else ""}"><span class="t">{t}</span>' + (f'<span class="meta">{esc(bk["author"])}</span>' if bk.get('author') else '') + '</li>')
+            groups.append(f'  <div class="group sub">\n    <h3 class="kind">{esc(st["science"])}</h3>\n    <ol class="order">\n' + '\n'.join(lis) + '\n    </ol>\n  </div>')
+        quote = '\n'.join('\n'.join(f'      <p>{esc(q)}</p>' for q in w['text'])
+                          + f'\n      <p class="meta"><a class="src" href="{esc(w["source"])}" target="_blank" rel="noopener">المصدر</a></p>' for w in s['said'])
+        nav.append(f'<a href="#sh{i}">{esc(s["name"])}</a>')
+        secs.append(f'''  <section id="sh{i}">
+    <h2>{esc(s['name'])}</h2>
+    <details class="said"><summary>كلام الشيخ</summary>
+{quote}
+    </details>
+''' + '\n'.join(groups) + '\n  </section>')
+    page = head(f'{START_T} | {NAME}', '../', START, f"{NAME}: {START_T} " + '، '.join(s['name'] for s in READING['shaykhs'])) + f'''<body>
+<main>
+  <header>
+  {THEME_BTN}
+  <a class="home" href="../">كتب مشكولة</a>
+  <h1>{START_T}</h1>
+  </header>
+  <nav class="authors">{''.join(nav)}</nav>
+{chr(10).join(secs)}
+</main>
+</body>
+</html>
+'''
+    os.makedirs(os.path.join(PUB, START), exist_ok=True)
+    open(os.path.join(PUB, START, 'index.html'), 'w', encoding='utf8').write(page)
+start_page()
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
@@ -384,6 +433,7 @@ page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if
   {THEME_BTN}
   <h1>كتب مشكولة</h1>
   </header>
+  {START_LINK}
   {VIEWS}
   {FILTER}
 {chr(10).join(_rec)}
