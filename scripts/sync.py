@@ -249,6 +249,19 @@ for (const b of hb) b.addEventListener('click', () => {
 });
 if (hb.length) apply();
 window.applyFilter = apply;
+// sections far from the screen are laid out lazily (site.css content-visibility), so a jump to #id lands short: repeat it for a few frames
+function settle(id) {
+  const t = document.getElementById(id); if (!t) return;
+  let n = 0; const go = () => { t.scrollIntoView(); if (++n < 12) requestAnimationFrame(go); }; go();
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  const id = decodeURIComponent(a.getAttribute('href').slice(1));
+  if (!document.getElementById(id)) return;
+  e.preventDefault(); history.pushState(null, '', '#' + id); settle(id);
+});
+if (location.hash) addEventListener('load', () => settle(decodeURIComponent(location.hash.slice(1))));
 </script>"""
 FILTER = '<div class="views harakat" role="group"><button type="button" data-h="all">الكل</button><button type="button" data-h="1">مشكولة</button><button type="button" data-h="0">غير مشكولة</button></div>'
 BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>'
@@ -301,7 +314,7 @@ for i, author in enumerate(data['authors']):
     if items:
         sid = f'a{i + 1}'
         nav.append(f'<a class="v-author" data-s="{sid}" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
-        sections.append(f'  <section class="v-author" id="{sid}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
+        sections.append(f'  <section class="v-author" id="{sid}" style="--n:{len(items)}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
         apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
   <header>
@@ -331,7 +344,7 @@ for j, sci in enumerate(SCI['order'] + [OTHER]):
     for author in data['authors']:
         mine = [li for a, li in lis if a == author]
         if mine: groups.append(f'  <div class="group sub">\n    <h3 class="kind">{esc(author)} <span>({ar(len(mine))})</span></h3>\n    <ul>\n' + '\n'.join(mine) + '\n    </ul>\n  </div>')
-    sections.append(f'  <section class="v-science" id="{sid}">\n    <h2>{esc(sci)}</h2>\n' + '\n'.join(groups) + '\n  </section>')
+    sections.append(f'  <section class="v-science" id="{sid}" style="--n:{len(lis)}">\n    <h2>{esc(sci)}</h2>\n' + '\n'.join(groups) + '\n  </section>')
 # «قريبًا»: books and authors on the way (coming.json, hand-edited; drop an entry once its book is live)
 COMING = json.load(open(os.path.join(ROOT, 'coming.json'), encoding='utf8'))
 live = {bare(plain(b['title'])) for b in data['books']}

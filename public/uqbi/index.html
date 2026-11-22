@@ -84,6 +84,19 @@ for (const b of hb) b.addEventListener('click', () => {
 });
 if (hb.length) apply();
 window.applyFilter = apply;
+// sections far from the screen are laid out lazily (site.css content-visibility), so a jump to #id lands short: repeat it for a few frames
+function settle(id) {
+  const t = document.getElementById(id); if (!t) return;
+  let n = 0; const go = () => { t.scrollIntoView(); if (++n < 12) requestAnimationFrame(go); }; go();
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey) return;
+  const id = decodeURIComponent(a.getAttribute('href').slice(1));
+  if (!document.getElementById(id)) return;
+  e.preventDefault(); history.pushState(null, '', '#' + id); settle(id);
+});
+if (location.hash) addEventListener('load', () => settle(decodeURIComponent(location.hash.slice(1))));
 </script>
 </body>
 </html>
