@@ -8927,6 +8927,13 @@
    "pdf": "تكحيل العينين بشرح عقيدة الرازيين.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-sharh-al-aqidah-al-wasitiyyah",
+   "title": "شرح العقيدة الواسطية",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "شرح العقيدة الواسطية - صالح الفوزان.pdf",
+   "harakat": false
   }
  ]
 }
