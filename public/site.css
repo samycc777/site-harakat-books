@@ -160,3 +160,37 @@ section.recent details:not([open]) summary h2::after{transform:rotate(90deg)}
 .text p.weak::before{content:attr(data-grade);display:block;color:#c0453c;font-size:.72em;font-weight:700;line-height:1.6}
 :root[data-theme=dark] .text p.weak{border-right-color:#e07a72}
 :root[data-theme=dark] .text p.weak::before{color:#e07a72}
+
+/* reader account (account.js): round button next to the moon, pop-up with Google's button / sign-out */
+#acct{position:absolute;top:.2rem;left:3.2rem;width:2.6rem;height:2.6rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--brown);cursor:pointer;display:grid;place-items:center;padding:0;overflow:hidden}
+#acct:hover,#acct:focus-visible{background:var(--hover)}
+#acct svg{width:1.3rem;height:1.3rem}
+#acct img{width:100%;height:100%;object-fit:cover;display:block}
+:root:not([data-look=classic]) #acct{top:0;background:var(--page);color:var(--accent)}
+#acct-pop{position:absolute;top:3.2rem;left:0;z-index:20;min-width:16rem;background:var(--card);border:1px solid var(--edge);border-radius:.8rem;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:1rem;text-align:center}
+#acct-pop .who{margin:0 0 .6rem;font-weight:700;color:var(--brown)}
+#acct-pop button{font:inherit;font-weight:700;font-size:1.05rem;cursor:pointer}
+#acct-pop .gbtn{display:flex;justify-content:center;min-height:44px}
+/* how far each started book is read (account.js) */
+.prog{display:flex;align-items:center;gap:.6rem;margin-top:.15rem;line-height:1}
+.prog .track{flex:0 1 13rem;height:5px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog .track i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.prog .pct{font-size:.9rem;color:var(--muted)}
+.prog.done .track i{background:var(--quran)}
+.prog.done .pct{color:var(--quran);font-weight:700}
+/* book page: how far through the book, top of the screen (progress.js) */
+#readbar{position:fixed;top:0;right:0;left:0;height:3px;z-index:30;pointer-events:none}
+#readbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s linear}
+/* back to the top of long lists (account.js) */
+#totop{position:fixed;bottom:1.2rem;left:1.2rem;z-index:15;width:2.8rem;height:2.8rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--accent);cursor:pointer;display:grid;place-items:center;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.2);opacity:0;transform:translateY(.6rem);transition:opacity .2s,transform .2s;pointer-events:none}
+#totop.on{opacity:1;transform:none;pointer-events:auto}
+#totop:hover,#totop:focus-visible{background:var(--hover)}
+#totop svg{width:1.3rem;height:1.3rem}
+/* phones: the PDF button sits small beside the title instead of a full-width bar under every book */
+@media(max-width:560px){
+ .book{flex-direction:row;align-items:center;gap:.7rem}
+ .book .info{flex:1;min-width:0}
+ .book .btn{padding:.3rem .75rem;font-size:.95rem;line-height:1.7;white-space:nowrap;background:var(--card);color:var(--brown);border:1px solid var(--edge)}
+ .book .btn:hover,.book .btn:focus{background:var(--hover)}
+ #acct-pop{left:-.4rem}
+}
