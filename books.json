@@ -9013,6 +9013,14 @@
    "pdf": "مختصر أحكام الجنائز.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-mujmal-aqidat-as-salaf",
+   "title": "مجمل عقيدة السلف الصالح",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "مجمل عقيدة السلف الصالح.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
