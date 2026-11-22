@@ -211,3 +211,9 @@ ol.order>li.soon-book.here .t{color:inherit}
 ol.order>li.soon-book .t a{color:inherit;text-decoration:none}
 ol.order>li.soon-book .t a:hover,ol.order>li.soon-book .t a:focus{color:var(--brown);text-decoration:underline;text-underline-offset:.35em}
 details.said p.meta{margin:0 0 .8em;text-align:start}
+/* home page: «حسب المؤلف/العلم» and the harakat filter share one row; search box right under them */
+.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem 1rem;margin:0 0 1rem}
+.controls .views{margin:0}
+/* calm lists: the PDF button is outlined and fills only on hover (2,600 solid red buttons were loud) */
+.book .btn{background:var(--card);color:var(--brown);border:1px solid var(--edge);font-size:1rem;padding:.3rem .95rem;line-height:1.7;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.book .btn:hover,.book .btn:focus-visible{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
