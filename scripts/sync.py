@@ -191,7 +191,7 @@ def write_book_page(b, pages, urls, fname, aslug):
   <div class="actions">
     <a class="btn" href="../pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
     {src_links}
-    <span class="meta"><a class="src" href="../{aslug}/">{esc(b['author'])}</a>، {ar(pages)} صفحة</span>
+    <span class="meta"><a class="src" href="../{aslug}/">{esc(b['author'])}</a>، {ar(pages)} صفحة</span>
   </div>
   <article class="text">
 {body}
@@ -264,7 +264,7 @@ def book_item(b, pages, fname, urls, up='', who=False):
                      for n, u in enumerate(urls, 1))
     nh = ' nh' if b.get('harakat') is False else ''
     return f'''    <li class="book{nh}">
-      <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{esc(b['author']) + ' · ' if who else ''}{ar(pages)} صفحة · {links}</span></div>
+      <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{esc(b['author']) + ' · ' if who else ''}{ar(pages)} صفحة · {links}</span></div>
       <a class="btn" href="{up}pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
     </li>'''
 
@@ -440,11 +440,10 @@ page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if
   <h1>كتب مشكولة</h1>
   </header>
   {START_LINK}
-  {VIEWS}
-  {FILTER}
+  <div class="controls">{VIEWS}{FILTER}</div>
+  {BAR}
 {chr(10).join(_rec)}
   <nav class="authors">{''.join(nav)}</nav>
-  {BAR}
 {chr(10).join(sections)}
   <p id="none" hidden>لا توجد نتائج</p>
 </main>
