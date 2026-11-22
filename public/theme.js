@@ -14,7 +14,7 @@
   } catch (e) {}
   // Colours: the moon button opens a row of colour circles. "light"/"dark" are the first two looks;
   // the others set data-palette (CSS at the end of site.css), and the dark ones also data-theme=dark.
-  var DARK = { dark: 1, blue: 1, black: 1, darkgreen: 1 };
+  var DARK = { dark: 1, blue: 1, black: 1, darkgreen: 1, monokai: 1, dracula: 1, onedark: 1, nord: 1, gruvbox: 1, tokyo: 1, catppuccin: 1, soldark: 1, ghdark: 1 };
   var apply = function (t) {
     if (DARK[t]) root.dataset.theme = 'dark'; else delete root.dataset.theme;
     if (t === 'light' || t === 'dark') delete root.dataset.palette; else root.dataset.palette = t;
@@ -47,7 +47,18 @@
       ['green', 'أخضر', ['#f3f6ef', '#2c6b45']],
       ['blue', 'أزرق ليلي', ['#0f1724', '#8cbbe6']],
       ['black', 'أسود', ['#000', '#d4b06a']],
-      ['darkgreen', 'أخضر ليلي', ['#141b16', '#9fd0a8']]
+      ['darkgreen', 'أخضر ليلي', ['#141b16', '#9fd0a8']],
+      ['ghlight', 'GitHub Light', ['#ffffff', '#0969da']],
+      ['sollight', 'Solarized Light', ['#fdf6e3', '#b58900']],
+      ['monokai', 'Monokai', ['#272822', '#a6e22e']],
+      ['dracula', 'Dracula', ['#282a36', '#bd93f9']],
+      ['onedark', 'One Dark', ['#282c34', '#c678dd']],
+      ['nord', 'Nord', ['#2e3440', '#81a1c1']],
+      ['gruvbox', 'Gruvbox', ['#282828', '#fe8019']],
+      ['tokyo', 'Tokyo Night', ['#1a1b26', '#bb9af7']],
+      ['catppuccin', 'Catppuccin', ['#1e1e2e', '#f5c2e7']],
+      ['soldark', 'Solarized Dark', ['#002b36', '#268bd2']],
+      ['ghdark', 'GitHub Dark', ['#0d1117', '#4493f8']]
     ];
     btn.setAttribute('aria-label', 'الألوان'); btn.title = 'الألوان';
     btn.setAttribute('aria-expanded', 'false');
