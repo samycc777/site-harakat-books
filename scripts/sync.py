@@ -54,6 +54,8 @@ def esc(s): return html.escape(s, quote=True)
 MOON = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
 SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>'
 THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
+# reader account (public/account.js): round button next to the moon, shown once sign-in is set up on the server
+THEME_BTN += '<button id="acct" type="button" hidden aria-label="تسجيل الدخول" title="تسجيل الدخول"></button>'
 
 
 SITE = 'https://kutub-mashkulah.pages.dev'
@@ -93,6 +95,7 @@ def head(title, up='', path='', desc='', ld=None):
 <meta property="og:type" content="{'book' if ld else 'website'}">
 <meta property="og:locale" content="ar_AR">
 {GOOGLE if not path else ''}{ld}<script src="{up}theme.js"></script>
+<script src="{up}account.js" defer></script>
 <link rel="icon" href="data:,">
 <link rel="preload" href="{up}fonts/Amiri-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{up}site.css">
@@ -206,7 +209,9 @@ def write_book_page(b, pages, urls, fname, aslug):
 
 SEARCH = """<script>
 const norm = t => t.replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-const books = [...document.querySelectorAll('.book')].map(li => [li, norm(li.querySelector('.info h3').textContent), li.classList.contains('nh')]);
+// read the list on every run: account.js adds «متابعة القراءة» copies after this script
+const T = new WeakMap(), tx = li => T.get(li) ?? (T.set(li, norm(li.querySelector('.info h3').textContent)), T.get(li));
+const books = () => [...document.querySelectorAll('.book')].map(li => [li, tx(li), li.classList.contains('nh')]);
 const q = document.getElementById('q'), hb = [...document.querySelectorAll('.harakat button')];
 // harakat filter («الكل» / «مشكولة» / «غير مشكولة»), remembered in this browser; li.nh = book without harakat
 let hv = 'all';
@@ -216,7 +221,7 @@ const arN = n => '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d
 const count = (el, n) => { const s = el && el.querySelector(':scope > span'); if (s) s.textContent = arN(n); };
 function apply() {
   const words = norm(q.value).split(/\\s+/).filter(Boolean);
-  for (const [li, t, nh] of books) li.hidden = !okH(nh) || !words.every(w => t.includes(w));
+  for (const [li, t, nh] of books()) li.hidden = !okH(nh) || !words.every(w => t.includes(w));
   for (const g of document.querySelectorAll('section:not(#soon) .group')) {
     const n = g.querySelectorAll('.book:not([hidden])').length;
     g.hidden = !n; count(g.querySelector('h3.kind'), n);
@@ -243,6 +248,7 @@ for (const b of hb) b.addEventListener('click', () => {
   apply();
 });
 if (hb.length) apply();
+window.applyFilter = apply;
 </script>"""
 FILTER = '<div class="views harakat" role="group"><button type="button" data-h="all">الكل</button><button type="button" data-h="1">مشكولة</button><button type="button" data-h="0">غير مشكولة</button></div>'
 BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>'
