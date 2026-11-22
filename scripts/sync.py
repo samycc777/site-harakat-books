@@ -131,7 +131,8 @@ def grouped(entries, cls):
     out = []
     for k, label in KINDS.items():
         lis = [li for kk, li in entries if kk == k]
-        if lis: out.append(f'  <div class="group {cls}">\n    <h3 class="kind">{label} <span>({ar(len(lis))})</span></h3>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </div>')
+        gid = f' id="k-{k}"' if cls == 'top' else ''
+        if lis: out.append(f'  <div class="group {cls}"{gid}>\n    <h3 class="kind">{label} <span>({ar(len(lis))})</span></h3>\n    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </div>')
     return '\n'.join(out)
 
 
@@ -200,6 +201,7 @@ def write_book_page(b, pages, urls, fname, aslug):
 </main>
 {NOTES_JS}<script src="../progress.js" defer></script>
 <script src="../report.js" defer></script>
+<script src="../toc.js" defer></script>
 </body>
 </html>
 '''
@@ -315,6 +317,8 @@ for i, author in enumerate(data['authors']):
         sid = f'a{i + 1}'
         nav.append(f'<a class="v-author" data-s="{sid}" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
         sections.append(f'  <section class="v-author" id="{sid}" style="--n:{len(items)}">\n    <h2><a href="{aslug}/">{esc(author)}</a></h2>\n' + grouped(items, 'sub') + '\n  </section>')
+        kinds = [k for k in KINDS if any(kk == k for kk, _ in sub_items)]
+        jump = '<nav class="authors kinds">' + ''.join(f'<a data-s="k-{k}" href="#k-{k}">{KINDS[k]} <span>({ar(sum(1 for kk, _ in sub_items if kk == k))})</span></a>' for k in kinds) + '</nav>' if len(kinds) > 1 else ''
         apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
   <header>
@@ -324,6 +328,7 @@ for i, author in enumerate(data['authors']):
   </header>
   {FILTER if len({b.get('harakat') is False for b in data['books'] if b['author'] == author}) > 1 else ''}
   {BAR}
+  {jump}
   <section>
 ''' + grouped(sub_items, 'top') + f'''
   </section>
@@ -392,7 +397,8 @@ for (const sec of document.querySelectorAll('section.recent')) {
   if (!n) { sec.remove(); continue; }
   if (c) c.textContent = '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
   const d = sec.querySelector('details'), key = 'fold-' + sec.id;
-  try { if (localStorage.getItem(key) === '1') d.open = false; } catch (e) {}
+  let f = null; try { f = localStorage.getItem(key); } catch (e) {}
+  if (f === '1' || (f === null && n > 6)) d.open = false;
   d.addEventListener('toggle', () => { try { localStorage.setItem(key, d.open ? '0' : '1'); } catch (e) {} });
 }
 </script>

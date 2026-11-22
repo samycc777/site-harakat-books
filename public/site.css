@@ -266,3 +266,18 @@ section.v-author,section.v-science{content-visibility:auto;contain-intrinsic-siz
 :root[data-look=classic][data-palette=ghlight]{--bg:#ffffff;--card:#ffffff;--ink:#1f2328;--brown:#0969da;--brown2:#0550ae;--muted:#59636e;--line:#d1d9e0;--edge:#d1d9e0;--accent:#0969da;--hover:#f6f8fa;--btn:#1f883d;--btn2:#1a7f37;--btn-ink:#fff}
 :root[data-palette=ghlight]:not([data-look=classic]){--bg:#e6eaef;--page:#ffffff;--card:#ffffff;--ink:#1f2328;--brown:#0969da;--brown2:#0550ae;--muted:#59636e;--line:#d1d9e0;--edge:#d1d9e0;--accent:#0969da;--hover:#f6f8fa;--btn:#1f883d;--btn2:#1a7f37;--btn-ink:#fff}
 #theme-pop{display:grid;grid-template-columns:repeat(6,2.2rem);border-radius:1.2rem}
+/* author pages: jump chips to «كتب» / «مقالات» / «فتاوى وفوائد» (sync.py); the sticky search box stays above a jumped-to group */
+.group{scroll-margin-top:4.5rem}
+nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:visible;margin:.8rem 0 0;padding:0}
+/* book pages: list of the book's headings (toc.js) */
+#tocbtn{position:fixed;bottom:1.2rem;left:1.2rem;z-index:15;width:2.8rem;height:2.8rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--accent);cursor:pointer;display:grid;place-items:center;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.2);opacity:0;transform:translateY(.6rem);transition:opacity .2s,transform .2s;pointer-events:none}
+#tocbtn.on,#tocbtn[aria-expanded=true]{opacity:1;transform:none;pointer-events:auto}
+#tocbtn:hover,#tocbtn:focus-visible{background:var(--hover)}
+#tocbtn svg{width:1.3rem;height:1.3rem}
+#toc-back{position:fixed;inset:0;z-index:16;background:rgba(0,0,0,.35)}
+#toc{position:fixed;z-index:17;bottom:4.6rem;left:1.2rem;width:min(26rem,calc(100vw - 2.4rem));max-height:min(70vh,40rem);overflow-y:auto;overscroll-behavior:contain;background:var(--card);border:1px solid var(--edge);border-radius:1rem;box-shadow:0 8px 30px rgba(0,0,0,.35);padding:.4rem}
+#toc ol{list-style:none;margin:0;padding:0}
+#toc button{display:block;width:100%;text-align:start;font:inherit;font-size:1.1rem;line-height:1.7;color:var(--ink);background:none;border:0;border-radius:.6rem;padding:.35rem .8rem;cursor:pointer}
+#toc button:hover,#toc button:focus-visible{background:var(--hover)}
+#toc button[aria-current]{color:var(--accent);font-weight:700;background:var(--hover)}
+:root:not([data-look=classic]) #tocbtn,:root:not([data-look=classic]) #toc{background:var(--page)}

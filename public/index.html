@@ -13181,7 +13181,8 @@ for (const sec of document.querySelectorAll('section.recent')) {
   if (!n) { sec.remove(); continue; }
   if (c) c.textContent = '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
   const d = sec.querySelector('details'), key = 'fold-' + sec.id;
-  try { if (localStorage.getItem(key) === '1') d.open = false; } catch (e) {}
+  let f = null; try { f = localStorage.getItem(key); } catch (e) {}
+  if (f === '1' || (f === null && n > 6)) d.open = false;
   d.addEventListener('toggle', () => { try { localStorage.setItem(key, d.open ? '0' : '1'); } catch (e) {} });
 }
 </script>
