@@ -217,3 +217,14 @@ details.said p.meta{margin:0 0 .8em;text-align:start}
 /* calm lists: the PDF button is outlined and fills only on hover (2,600 solid red buttons were loud) */
 .book .btn{background:var(--card);color:var(--brown);border:1px solid var(--edge);font-size:1rem;padding:.3rem .95rem;line-height:1.7;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
 .book .btn:hover,.book .btn:focus-visible{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+/* author buttons: tighter chips; on phones a sideways strip of four rows (one chip per row made a 4,500px wall) */
+nav.authors{gap:.4rem}
+nav.authors a{padding:.1rem .8rem;font-size:1rem;white-space:nowrap}
+@media(max-width:560px){
+ nav.authors{display:grid;grid-auto-flow:column;grid-template-rows:repeat(4,auto);justify-content:start;gap:.4rem;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--edge) transparent;padding:.1rem 0 .6rem}
+ nav.authors a{font-size:.95rem}
+}
+/* long home and author pages: the browser lays out only the sections near the screen */
+/* (sync.py writes --n = number of books, so the scrollbar stays close to the real length) */
+section.v-author,section.v-science{content-visibility:auto;contain-intrinsic-size:auto calc(6rem + var(--n,4)*7.3rem)}
+@media(max-width:560px){section.v-author,section.v-science{contain-intrinsic-size:auto calc(4rem + var(--n,4)*10.3rem)}}
