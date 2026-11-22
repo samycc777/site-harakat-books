@@ -9045,6 +9045,14 @@
    "pdf": "من أصول عقيدة أهل السنة والجماعة.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-tadabbur-al-quran",
+   "title": "تدبر القرآن",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "تدبر القرآن.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
