@@ -9316,6 +9316,14 @@
    "pdf": "دروس من القرآن.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-buhuth-fiqhiyyah",
+   "title": "بحوث فقهية",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "بحوث فقهية.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
