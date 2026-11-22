@@ -8741,6 +8741,14 @@
    "pdf": "البيان المرصع شرح القواعد الأربع.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "ubayd-al-jabiri-taysir-al-ilah",
+   "title": "تيسير الإله بشرح أدلة شروط لا إله إلا الله",
+   "author": "الشيخ عبيد بن عبد الله الجابري",
+   "pdf": "تيسير الإله بشرح أدلة شروط لا إله إلا الله.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
