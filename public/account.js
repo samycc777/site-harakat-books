@@ -133,8 +133,9 @@
     var ul = sec.querySelector('ul');
     ul.textContent = '';
     for (var i = 0; i < list.length; i++) {
-      var li = first[list[i]].cloneNode(true);
+      var li = first[list[i]].cloneNode(true), from = first[list[i]].closest('section.v-author'), meta = li.querySelector('.meta');
       li.removeAttribute('hidden');
+      if (from && meta) meta.insertBefore(document.createTextNode(from.querySelector('h2').textContent.trim() + ' · '), meta.firstChild);  // whose book
       ul.appendChild(li);
     }
     sec.querySelector('h2 > span').textContent = '(' + arN(list.length) + ')';

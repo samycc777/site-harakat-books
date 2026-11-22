@@ -179,7 +179,7 @@ section.recent details:not([open]) summary h2::after{transform:rotate(90deg)}
 .prog.done .track i{background:var(--quran)}
 .prog.done .pct{color:var(--quran);font-weight:700}
 /* book page: how far through the book, top of the screen (progress.js) */
-#readbar{position:fixed;top:0;right:0;left:0;height:3px;z-index:30;pointer-events:none}
+#readbar{position:fixed;top:0;right:0;left:0;height:4px;z-index:30;pointer-events:none}
 #readbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s linear}
 /* back to the top of long lists (account.js) */
 #totop{position:fixed;bottom:1.2rem;left:1.2rem;z-index:15;width:2.8rem;height:2.8rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--accent);cursor:pointer;display:grid;place-items:center;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.2);opacity:0;transform:translateY(.6rem);transition:opacity .2s,transform .2s;pointer-events:none}
@@ -193,4 +193,7 @@ section.recent details:not([open]) summary h2::after{transform:rotate(90deg)}
  .book .btn{padding:.3rem .75rem;font-size:.95rem;line-height:1.7;white-space:nowrap;background:var(--card);color:var(--brown);border:1px solid var(--edge)}
  .book .btn:hover,.book .btn:focus{background:var(--hover)}
  #acct-pop{left:-.4rem}
+ /* home page: the centred title is wide, so the account button takes the other corner */
+ header:not(:has(.home)) #acct{left:auto;right:0}
+ header:not(:has(.home)) #acct-pop{left:auto;right:-.4rem}
 }
