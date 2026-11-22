@@ -2,6 +2,7 @@
 // D1 (binding DB): one row per reader, reading(sub, data, t), data = JSON {slug: {s, p, d, t}}, so a
 // sync is always 2 queries (the free plan allows 50 per request). Per book the newest t wins.
 // GET → {items}. POST {items} (text body, also from keepalive on page close) → merged into the row.
+// DELETE → the reader's row is removed (button on the hidden /privacy/ page).
 import { json, readUser } from '../lib/session.js';
 
 let made = false;  // table made on first use (scripts/progress-schema.sql), once per worker
@@ -42,5 +43,13 @@ export async function onRequestPost({ request, env }) {
   }
   if (n) await env.DB.prepare('INSERT INTO reading (sub, data, t) VALUES (?, ?, ?) ON CONFLICT (sub) DO UPDATE SET data = excluded.data, t = excluded.t')
     .bind(u.sub, JSON.stringify(data), Date.now()).run();
+  return json({ ok: true });
+}
+
+export async function onRequestDelete({ request, env }) {
+  const u = await readUser(request, env);
+  if (!u) return json({ ok: false }, 401);
+  await table(env);
+  await env.DB.prepare('DELETE FROM reading WHERE sub = ?').bind(u.sub).run();
   return json({ ok: true });
 }
