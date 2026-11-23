@@ -9332,6 +9332,14 @@
    "pdf": "نور على الدرب.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-sharh-lumat-al-itiqad",
+   "title": "شرح لمعة الاعتقاد الهادي إلى سبيل الرشاد",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "شرح لمعة الاعتقاد الهادي إلى سبيل الرشاد.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
