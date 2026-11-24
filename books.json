@@ -10163,6 +10163,34 @@
    "author": "الشيخ عبد الرحمن بن يحيى المعلمي اليماني",
    "pdf": "تحقيق الكلام في المسائل الثلاث.pdf",
    "harakat": false
+  },
+  {
+   "slug": "muallimi-at-tankil",
+   "title": "التنكيل بما في تأنيب الكوثري من الأباطيل",
+   "author": "الشيخ عبد الرحمن بن يحيى المعلمي اليماني",
+   "pdf": "التنكيل بما في تأنيب الكوثري من الأباطيل.pdf",
+   "harakat": false
+  },
+  {
+   "slug": "ibn-rajab-ahkam-al-khawatim",
+   "title": "أحكام الخواتيم",
+   "author": "الحافظ ابن رجب الحنبلي",
+   "pdf": "أحكام الخواتيم.pdf",
+   "harakat": false
+  },
+  {
+   "slug": "ibn-rajab-fadail-ash-sham",
+   "title": "فضائل الشام",
+   "author": "الحافظ ابن رجب الحنبلي",
+   "pdf": "فضائل الشام.pdf",
+   "harakat": false
+  },
+  {
+   "slug": "ibn-rajab-al-istikhraj-li-ahkam-al-kharaj",
+   "title": "الاستخراج لأحكام الخراج",
+   "author": "الحافظ ابن رجب الحنبلي",
+   "pdf": "الاستخراج لأحكام الخراج.pdf",
+   "harakat": false
   }
  ]
 }
