@@ -1,8 +1,9 @@
-// Footnotes as pop-ups: each «(n)» in the text becomes a small number button; tapping it opens
-// that page's note in a box under the number (close with ×, a tap outside, or Esc).
+// Footnotes as pop-ups: each «(n)» or «(٭)» in the text becomes a small button; tapping it opens
+// that page's note in a box under the marker (close with ×, a tap outside, or Esc).
 // Works on the .fn blocks sync.py writes after each page's text; notes it can't pair stay as they are.
 (function () {
-  var NUM = /\(([٠-٩0-9]+)\)/g, LEAD = /^\s*\(([٠-٩0-9]+)\)\s*/;
+  var NUM = /\(([٠-٩0-9]+|[٭*]+)\)/g, LEAD = /^\s*\(([٠-٩0-9]+|[٭*]+)\)\s*/;
+  var SOLO = /^\s*\([٠-٩0-9]+\)\s*$/;
   var pop, cur, carry = null;  // carry = last note of the previous page (a note can run onto the next page)
 
   function close() {
@@ -40,21 +41,13 @@
     pop.style.setProperty('--ax', Math.max(14, Math.min(mid - left, w - 14)) + 'px');
   }
 
-  function pair(fn) {
-    var notes = {}, last = carry;
-    [].forEach.call(fn.querySelectorAll('p'), function (p) {
-      var m = p.textContent.match(LEAD);
-      if (m && !notes[m[1]]) {
-        last = notes[m[1]] = { html: p.innerHTML.replace(LEAD, ''), ps: [p] };
-      } else if (last) { last.html += '<br>' + p.innerHTML; last.ps.push(p); }
-    });
-    carry = last;
-    var els = [];
-    for (var e = fn.previousElementSibling; e && !e.classList.contains('fn'); e = e.previousElementSibling) els.unshift(e);
+  function scan(els, notes) {
     els.forEach(function (el) {
+      if (el.tagName === 'H2' && SOLO.test(el.textContent)) return;  // standalone numbered heading like «(١)»
       var w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT), nodes = [];
       while (w.nextNode()) nodes.push(w.currentNode);
       nodes.forEach(function (t) {
+        if (t.parentNode && t.parentNode.classList && t.parentNode.classList.contains('nref')) return;
         var s = t.nodeValue, i = 0, m, frag = null;
         NUM.lastIndex = 0;
         while ((m = NUM.exec(s))) {
@@ -75,9 +68,23 @@
         if (frag) { frag.appendChild(document.createTextNode(s.slice(i))); t.parentNode.replaceChild(frag, t); }
       });
     });
+  }
+
+  function pair(r) {
+    var fn = r.fn, notes = {}, prev = carry, last = carry;
+    [].forEach.call(fn.querySelectorAll('p'), function (p) {
+      var m = p.textContent.match(LEAD);
+      if (m && !notes[m[1]]) {
+        last = notes[m[1]] = { html: p.innerHTML.replace(LEAD, ''), ps: [p] };
+      } else if (last) { last.html += '<br>' + p.innerHTML; last.ps.push(p); }
+    });
+    carry = last;
+    scan(r.els, notes);
+    if (r.prev && Object.keys(notes).some(function (k) { return !notes[k].used; })) scan([r.prev], notes);
     Object.keys(notes).forEach(function (k) { var n = notes[k];
       if (n.used) n.ps.forEach(function (p) { p.remove(); });
     });
+    if (prev && prev.used) prev.ps.forEach(function (p) { p.remove(); });
     if (last && last.used) last.ps.forEach(function (p) { p.remove(); });
     if (!fn.querySelector('p')) fn.remove();
   }
@@ -85,7 +92,14 @@
   document.addEventListener('DOMContentLoaded', function () {
     var text = document.querySelector('.text');
     if (!text) return;
-    [].forEach.call(text.querySelectorAll('.fn'), pair);
+    // Collect each .fn's page slice before any .fn is removed, so removing one never widens the next scan.
+    var ranges = [].map.call(text.querySelectorAll('.fn'), function (fn) {
+      var els = [], e = fn.previousElementSibling;
+      for (; e && !e.classList.contains('fn'); e = e.previousElementSibling) els.unshift(e);
+      while (e && e.classList.contains('fn')) e = e.previousElementSibling;
+      return { fn: fn, els: els, prev: e };
+    });
+    ranges.forEach(pair);
     text.addEventListener('click', function (e) {
       var b = e.target.closest('.nref');
       if (b) { e.stopPropagation(); open(b); }
