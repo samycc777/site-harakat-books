@@ -280,3 +280,8 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
 :root[data-palette=nextjs]:not([data-look=classic]){--bg:#000;--page:#000;--card:#000;--ink:#ededed;--brown:#fff;--brown2:#d4d4d4;--muted:#a1a1a1;--line:#1f1f1f;--edge:#333;--accent:#ededed;--hover:#1a1a1a;--btn:#ededed;--btn2:#fff;--btn-ink:#000}
 :root[data-palette=nextjs]:not([data-look=classic]) main::before{border-width:1px;box-shadow:none}
 :root[data-palette=nextjs] h2{border-bottom-color:#333}
+
+/* Gruvbox Dark theme */
+:root[data-look=classic][data-palette=gruvbox]{--bg:#282828;--card:#32302f;--ink:#ebdbb2;--brown:#fabd2f;--brown2:#fcd46b;--muted:#a89984;--line:#3c3836;--edge:#504945;--accent:#fe8019;--hover:#3c3836;--btn:#b8bb26;--btn2:#cdd03a;--btn-ink:#282828;--quran:#8ec07c}
+:root[data-palette=gruvbox]:not([data-look=classic]){--bg:#1d2021;--page:#282828;--card:#282828;--ink:#ebdbb2;--brown:#fabd2f;--brown2:#fcd46b;--muted:#a89984;--line:#3c3836;--edge:#504945;--accent:#fe8019;--hover:#3c3836;--btn:#b8bb26;--btn2:#cdd03a;--btn-ink:#282828;--quran:#8ec07c}
+@media(max-width:560px){#theme-pop{display:grid;grid-template-columns:repeat(4,2.2rem);border-radius:1.2rem}}
