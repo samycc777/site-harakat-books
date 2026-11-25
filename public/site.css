@@ -66,6 +66,23 @@ section{scroll-margin-top:4.5rem}
 .text .fn p{margin:.2em 0}
 .text .tbl{border-collapse:collapse;margin:1em auto;font-size:.9em}
 .text .tbl td,.text .tbl th{border:1px solid var(--line);padding:.15em .6em;text-align:center}
+.text .tree{list-style:none;margin:1em 0;padding:0;font-size:.92em;line-height:1.85}
+.text .tree ul{list-style:none;margin:0;padding:.25em 0 0;padding-inline-start:1.5em}
+.text .tree li{position:relative;margin:0;padding:.22em 0}
+.text .tree>li{padding:0}
+.text .tree ul>li::before{content:"";position:absolute;inset-inline-start:-.9em;top:0;bottom:0;border-inline-start:2px solid var(--edge)}
+.text .tree ul>li:first-child::before{top:-.25em}
+.text .tree ul>li:last-child::before{bottom:auto;height:calc(1.25em + 2px)}
+.text .tree ul>li:only-child::before{height:calc(1.5em + 2px)}
+.text .tree ul>li::after{content:"";position:absolute;inset-inline-start:-.9em;top:1.25em;width:.9em;border-top:2px solid var(--edge)}
+.text .tree .node{display:inline-block;max-width:100%;padding:.15em .65em;border:1px solid var(--line);border-radius:.45em;background:var(--card)}
+.text .tree .node.branch{border-color:var(--edge);background:var(--hover)}
+.text .tree>li>.node{border:1.5px solid var(--accent);background:var(--hover)}
+@media(max-width:560px){
+ .text .tree ul{padding-inline-start:1.1em}
+ .text .tree ul>li::before,.text .tree ul>li::after{inset-inline-start:-.65em}
+ .text .tree ul>li::after{width:.65em}
+}
 .text .sig{text-align:left;color:var(--brown)}
 /* large reading text on laptops; phones keep their size */
 @media(min-width:700px){.text{font-size:2rem}.read h1{font-size:2.6rem}}
