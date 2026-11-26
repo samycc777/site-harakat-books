@@ -117,10 +117,11 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 /* footnote pop-ups (notes.js) */
 .nref{display:inline-grid;place-items:center;min-width:1.7em;height:1.7em;padding:0 .3em;margin:0 .15em;border-radius:1em;border:1px solid var(--edge);background:var(--hover);color:var(--brown);font:700 .68em/1 "Droid Arabic Naskh",serif;vertical-align:.55em;cursor:pointer}
 .nref:hover,.nref:focus-visible,.nref[aria-expanded=true]{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
-.note-pop{position:absolute;z-index:10;width:min(34rem,calc(100vw - 16px));background:var(--card);color:var(--ink);border:1px solid var(--edge);border-radius:.7rem;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:.7rem 1rem .8rem 2.4rem;font-size:1.4rem;line-height:2}
+.note-pop{position:absolute;z-index:10;width:min(24em,calc(100vw - 16px));background:var(--card);color:var(--ink);border:1px solid var(--edge);border-radius:.7rem;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:.65em .95em .75em max(2.4rem,1.7em);font-size:calc(1.25rem * var(--fs,1));line-height:2}
+@media(min-width:700px){.note-pop{font-size:calc(1.8rem * var(--fs,1))}}
 .note-pop::before{content:"";position:absolute;top:-7px;left:calc(var(--ax,50%) - 7px);width:12px;height:12px;background:var(--card);border-left:1px solid var(--edge);border-top:1px solid var(--edge);transform:rotate(45deg)}
 .note-pop.up::before{top:auto;bottom:-7px;transform:rotate(225deg)}
-.note-pop .x{position:absolute;top:.35rem;left:.4rem;width:1.9rem;height:1.9rem;border:0;border-radius:50%;background:none;color:var(--muted);font-size:1.5rem;line-height:1;cursor:pointer}
+.note-pop .x{position:absolute;top:.35rem;left:.4rem;width:max(1.9rem,1.25em);height:max(1.9rem,1.25em);border:0;border-radius:50%;background:none;color:var(--muted);font-size:max(1.5rem,1.05em);line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
 .note-pop .x:hover,.note-pop .x:focus-visible{background:var(--hover);color:var(--ink)}
 .note-pop .body{max-height:55vh;overflow:auto}
 .note-pop .n{color:var(--brown);font-weight:700}
@@ -160,7 +161,7 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 :root:not([data-look=classic]) .text .fn{border-top-color:var(--edge)}
 :root:not([data-look=classic]) .note-pop{font-family:"Amiri",serif}
 :root:not([data-look=classic]) .nref{font-family:"Amiri",serif}
-@media(min-width:700px){:root:not([data-look=classic]) .text{font-size:calc(1.8rem * var(--fs,1))}:root:not([data-look=classic]) .read h1{font-size:3.8rem}}
+@media(min-width:700px){:root:not([data-look=classic]) .text{font-size:calc(1.8rem * var(--fs,1))}:root:not([data-look=classic]) .note-pop{font-size:calc(1.65rem * var(--fs,1))}:root:not([data-look=classic]) .read h1{font-size:3.8rem}}
 @media(max-width:560px){
  :root:not([data-look=classic]) main,:root:not([data-look=classic]) main.read{margin:.35rem;padding:1.9rem 1.4rem 2.2rem}
  :root:not([data-look=classic]) main::before{inset:7px;border-width:4px;box-shadow:inset 0 0 0 3px var(--page),inset 0 0 0 4px var(--accent)}
@@ -328,7 +329,7 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
  .actions{gap:.45rem}
  .actions .btn{padding:.4rem .9rem;font-size:1rem}
  .read-tools .tool-btn{padding:.26rem .65rem;font-size:.95rem;min-width:2.35rem}
- .note-pop{font-size:1.15rem;line-height:1.95;padding:.65rem .85rem .75rem 2.3rem}
+ .note-pop{font-size:calc(1.15rem * var(--fs,1));line-height:1.95;padding:.65rem .85rem .75rem max(2.3rem,1.7em)}
  #fab{bottom:.85rem;left:.85rem;gap:.45rem}
  #fab button{width:2.6rem;height:2.6rem}
  #toc{bottom:4.1rem;left:.85rem;width:calc(100vw - 1.7rem);max-height:65vh}
