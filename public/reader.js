@@ -1,6 +1,7 @@
 // Book page reading tools (hand-edited, defer):
 // - Font size controls (أ− / أ+) in .actions, remembered in localStorage "fs" (applied before paint by theme.js).
 // - Harakat-insensitive in-book search bar (#findbar), opened from .actions, floating #findbtn, or "/".
+// - Short passage deep links (#p12 or #p12-16, 1-based over direct p/h2/h3 in article.text).
 (function () {
   var art = document.querySelector('article.text');
   if (!art) return;
@@ -353,4 +354,42 @@
       openFind(t);
     }
   });
+
+  // ---- Short passage deep links (#p12 or #p12-16) ----
+  var pinTarget = null, pinMoved = false, pinJumping = false, pinTimer = null;
+  function clearPin() {
+    var prev = art.querySelectorAll('.hl');
+    for (var i = 0; i < prev.length; i++) prev[i].classList.remove('hl');
+    pinTarget = null;
+  }
+  function scrollToPin() {
+    if (!pinTarget || pinMoved) return;
+    var r = pinTarget.getBoundingClientRect();
+    var pad = Math.min(72, Math.round(innerHeight * 0.12));
+    pinJumping = true;
+    clearTimeout(pinTimer);
+    window.scrollTo(0, Math.max(0, window.scrollY + r.top - pad));
+    pinTimer = setTimeout(function () { pinJumping = false; }, 140);
+  }
+  function applyPin() {
+    clearPin();
+    var m = location.hash.match(/^#p(\d+)(?:-(\d+))?$/i);
+    if (!m) return;
+    var ps = art.querySelectorAll(':scope > p, :scope > h2, :scope > h3');
+    var a = parseInt(m[1], 10), b = m[2] ? parseInt(m[2], 10) : a;
+    if (a > b) { var tmp = a; a = b; b = tmp; }
+    if (a < 1 || a > ps.length) return;
+    b = Math.min(b, ps.length);
+    for (var i = a - 1; i < b; i++) ps[i].classList.add('hl');
+    pinTarget = ps[a - 1];
+    pinMoved = false;
+    scrollToPin();
+  }
+  window.addEventListener('scroll', function () { if (pinTarget && !pinJumping) pinMoved = true; }, { passive: true });
+  window.addEventListener('hashchange', applyPin);
+  if (location.hash) {
+    applyPin();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scrollToPin);
+    window.addEventListener('load', scrollToPin);
+  }
 })();
