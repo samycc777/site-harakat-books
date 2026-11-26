@@ -11037,6 +11037,22 @@
    "pdf": "حاجة الأمة للمنهج السلفي.pdf",
    "harakat": false,
    "kind": "book"
+  },
+  {
+   "slug": "fawzan-al-bidah",
+   "title": "البدعة: تعريفها - أنواعها - أحكامها",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "البدعة- تعريفها - أنواعها - أحكامها.pdf",
+   "harakat": false,
+   "kind": "book"
+  },
+  {
+   "slug": "fawzan-al-ajwibah-al-mufidah",
+   "title": "الأجوبة المفيدة عن أسئلة المناهج الجديدة",
+   "author": "الشيخ صالح بن فوزان الفوزان",
+   "pdf": "الأجوبة المفيدة عن أسئلة المناهج الجديدة.pdf",
+   "harakat": false,
+   "kind": "book"
   }
  ]
 }
