@@ -1,8 +1,8 @@
 /* Shared look for index.html and the book pages (hand-edited; sync.py only links it). */
 @font-face{font-family:"Droid Arabic Naskh";src:url(fonts/DroidNaskh-Regular.woff2) format("woff2");font-weight:400;font-display:swap}
 @font-face{font-family:"Droid Arabic Naskh";src:url(fonts/DroidNaskh-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
-:root{color-scheme:light;--bg:#fbf8f1;--ink:#1d1d1b;--brown:#5a4420;--brown2:#3f2f13;--muted:#6b6556;--line:#e3dac6;--edge:#c9b88f;--accent:#8a6d3b;--hover:#f1e8d4;--card:#fff;--btn:#5a4420;--btn2:#3f2f13;--btn-ink:#fff;--quran:#2c6b45}
-:root[data-theme=dark]{color-scheme:dark;--bg:#1e1e1e;--ink:#e8e4dc;--brown:#d9b97a;--brown2:#f0d49b;--muted:#a3a3a3;--line:#333333;--edge:#474747;--accent:#b8955a;--hover:#2d2d2d;--card:#252526;--btn:#b8955a;--btn2:#d9b97a;--btn-ink:#1e1e1e;--quran:#a9dbb8}
+:root{color-scheme:light;--bg:#fbf8f1;--ink:#1d1d1b;--brown:#5a4420;--brown2:#3f2f13;--muted:#6b6556;--line:#e3dac6;--edge:#c9b88f;--accent:#8a6d3b;--hover:#f1e8d4;--card:#fff;--btn:#5a4420;--btn2:#3f2f13;--btn-ink:#fff;--quran:#2c6b45;--ex-ok:#237a47;--ex-bad:#b83333}
+:root[data-theme=dark]{color-scheme:dark;--bg:#1e1e1e;--ink:#e8e4dc;--brown:#d9b97a;--brown2:#f0d49b;--muted:#a3a3a3;--line:#333333;--edge:#474747;--accent:#b8955a;--hover:#2d2d2d;--card:#252526;--btn:#b8955a;--btn2:#d9b97a;--btn-ink:#1e1e1e;--quran:#a9dbb8;--ex-ok:#5fd08c;--ex-bad:#f07272}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Droid Arabic Naskh",serif;font-size:1.25rem;line-height:2.1}
 main{max-width:820px;margin:0 auto;padding:1.5rem 1rem 4rem}
@@ -341,13 +341,46 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
 }
 
 /* interactive exercises (exercises.js) */
-.ex-bar{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:1.4em;margin:-.25em 0 .6em;font-size:.66em;line-height:1.6}
-.ex-bar:has(.ex-cnt:empty):has(.ex-clr[hidden]){display:none}
+.ex-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.45rem .6rem;min-height:1.4em;margin:-.25em 0 .6em;font-size:.66em;line-height:1.6}
+.ex-bar:not(.has-key):has(.ex-cnt:empty):has(.ex-clr[hidden]){display:none}
+.ex-bar-meta,.ex-bar-acts{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45em}
 .ex-cnt{color:var(--muted);font-weight:700}
 .ex-cnt.all{color:var(--quran)}
-.ex-clr{font:inherit;color:var(--muted);background:none;border:1px solid var(--line);border-radius:1.5em;padding:.08em .75em;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
-.ex-clr:hover,.ex-clr:focus-visible{background:var(--hover);color:var(--brown);border-color:var(--edge)}
-.ex-clr.arm{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.ex-sscore,.ex-qscore{font-weight:700;border-radius:1.2em;padding:.02em .55em}
+.ex-sscore:empty,.ex-qscore:empty{display:none}
+.ex-sscore.ok,.ex-qscore.ok{color:var(--ex-ok);background:color-mix(in srgb,var(--ex-ok) 13%,transparent)}
+.ex-sscore.bad,.ex-qscore.bad{color:var(--ex-bad);background:color-mix(in srgb,var(--ex-bad) 12%,transparent)}
+.ex-sscore.part,.ex-qscore.part{color:var(--brown);background:var(--hover)}
+.ex-qscore.open{color:var(--muted);background:var(--hover)}
+.ex-clr,.ex-qbtn{font:inherit;color:var(--muted);background:none;border:1px solid var(--line);border-radius:1.5em;padding:.08em .75em;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.ex-clr:hover,.ex-clr:focus-visible,.ex-qbtn:hover,.ex-qbtn:focus-visible{background:var(--hover);color:var(--brown);border-color:var(--edge)}
+.ex-clr.arm,.ex-clr.on,.ex-qbtn.on{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.ex-qbar{display:flex;flex-wrap:wrap;align-items:center;gap:.45em;margin:.35em 0 .9em;font-size:.66em;line-height:1.6}
+.ex-qbtn.ex-chk{color:var(--brown);border-color:var(--edge);font-weight:700}
+.ex-ans-panel{margin:-.45em 0 1.05em;padding:.65em .9em;border:1px solid color-mix(in srgb,var(--ex-ok) 38%,var(--line));border-inline-start:4px solid var(--ex-ok);border-radius:.48em;background:color-mix(in srgb,var(--ex-ok) 6%,var(--card));font-size:.86em;line-height:1.95}
+:where(:root:not([data-look=classic])) .ex-ans-panel{background:color-mix(in srgb,var(--ex-ok) 6%,var(--page))}
+.ex-ans-hdr{font-weight:700;color:var(--ex-ok);font-size:.88em;margin-bottom:.25em}
+.ex-ans-line{margin:.15em 0}
+.ex-ans-note{margin-top:.4em;font-size:.86em;color:var(--muted);border-top:1px dashed var(--line);padding-top:.3em}
+.ex-ans-tbl-wrap{overflow-x:auto;margin:.35em 0}
+.ex-ans-tbl{display:grid;grid-template-columns:repeat(var(--cols,2),minmax(6.5em,1fr));border:1px solid var(--line);border-radius:.38em;overflow:hidden}
+.ex-ans-tr{display:contents}
+.ex-ans-th,.ex-ans-td{padding:.28em .55em;border-bottom:1px solid var(--line);border-inline-end:1px solid var(--line);text-align:start}
+.ex-ans-th{background:var(--hover);color:var(--brown);font-weight:700;text-align:center}
+.ex-ans-tr:last-child .ex-ans-td{border-bottom:0}
+.ex-ans-th:last-child,.ex-ans-td:last-child{border-inline-end:0}
+.ex-blank.ex-ok,.ex-area.ex-ok,.ex-cell.ex-ok{border-color:var(--ex-ok)!important;border-bottom-style:solid!important;background:color-mix(in srgb,var(--ex-ok) 11%,transparent)!important}
+.ex-blank.ex-bad,.ex-area.ex-bad,.ex-cell.ex-bad{border-color:var(--ex-bad)!important;border-bottom-style:solid!important;background:color-mix(in srgb,var(--ex-bad) 11%,transparent)!important}
+.ex-blank.ex-open,.ex-area.ex-open,.ex-cell.ex-open{border-color:var(--accent)!important;background:color-mix(in srgb,var(--accent) 8%,transparent)!important}
+.ex-tf.ex-ok .ex-btn.on,.ex-choices.ex-ok .ex-btn.on{background:var(--ex-ok);border-color:var(--ex-ok);color:#fff}
+.ex-tf.ex-bad .ex-btn.on,.ex-choices.ex-bad .ex-btn.on{background:var(--ex-bad);border-color:var(--ex-bad);color:#fff}
+.ex-word.ex-w-ok{text-decoration-color:var(--ex-ok)!important;border-color:var(--ex-ok)!important;background:color-mix(in srgb,var(--ex-ok) 18%,transparent)!important}
+.ex-word.ex-w-bad{text-decoration-color:var(--ex-bad)!important;border-color:var(--ex-bad)!important;background:color-mix(in srgb,var(--ex-bad) 18%,transparent)!important}
+.ex-word.ex-w-miss,.ex-word.ex-w-ans{text-decoration:underline dashed var(--ex-ok) 2.5px;text-underline-offset:.28em;background:color-mix(in srgb,var(--ex-ok) 12%,transparent)}
+.ex-word.ex-circle.ex-w-miss,.ex-word.ex-circle.ex-w-ans{text-decoration:none;border-color:var(--ex-ok);border-style:dashed;background:color-mix(in srgb,var(--ex-ok) 12%,transparent)}
+.text p.ex-opt.ex-ok{border-color:var(--ex-ok);background:color-mix(in srgb,var(--ex-ok) 12%,transparent);box-shadow:inset -4px 0 0 var(--ex-ok)}
+.text p.ex-opt.ex-bad{border-color:var(--ex-bad);background:color-mix(in srgb,var(--ex-bad) 12%,transparent);box-shadow:inset -4px 0 0 var(--ex-bad)}
+.text p.ex-opt.ex-opt-ans{border-color:var(--ex-ok);border-style:dashed;background:color-mix(in srgb,var(--ex-ok) 8%,transparent)}
 .text .ex-item{line-height:2.35}
 .ex-blank,.ex-area,.ex-cell{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--edge);border-radius:.38em;transition:border-color .15s,box-shadow .15s,background .15s}
 :where(:root:not([data-look=classic])) .ex-blank,:where(:root:not([data-look=classic])) .ex-area,:where(:root:not([data-look=classic])) .ex-cell{background:var(--page)}
@@ -411,7 +444,7 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
 
 /* clean print output for book pages and lists */
 @media print{
- #theme,#acct,#theme-pop,#acct-pop,#readbar,#fab,#toc,#toc-back,#findbar,.report,.read-tools,.actions .btn,.home,.bar,.controls,nav.authors,.prog,.ex-bar,#harakat-bar{display:none!important}
+ #theme,#acct,#theme-pop,#acct-pop,#readbar,#fab,#toc,#toc-back,#findbar,.report,.read-tools,.actions .btn,.home,.bar,.controls,nav.authors,.prog,.ex-bar,.ex-qbar,.ex-ans-panel,#harakat-bar{display:none!important}
  .ex-area,.ex-blank,.ex-cell{background:none!important;color:#000!important;border-color:#888!important;box-shadow:none!important}
  .ex-btn:not(.on){display:none!important}
  .ex-btn.on{background:none!important;color:#000!important;border-color:#000!important}

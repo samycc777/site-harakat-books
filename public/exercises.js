@@ -19,8 +19,154 @@
   var store = {};
   try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; } catch (e) { store = {}; }
   var dirty = {}, saveTimer = null, syncTimer = null;
-  var controls = {};       // id -> { get, set, isFilled, section }
-  var sections = [];       // [{ fields: [id], countEl, clearBtn }]
+  var controls = {};       // id -> { get, set, isFilled, section, q, setState, setReveal }
+  var sections = [];       // [{ fields: [id], questions: [qObj], countEl, clearBtn, actsEl }]
+  var curQ = null;         // active question object while enhanceSub builds its controls
+  var answerKey = null;    // loaded from ../exercises/<slug>.json if available
+  var qByKey = {};         // qKey -> qObj
+  var fieldQ = {};         // fieldId -> qObj
+
+  function normAr(s) {
+    return String(s || '')
+      .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .replace(/ﷲ/g, 'الله')
+      .replace(/[.,،؛:؟!()\[\]«»﴿﴾"'ـ\-–—/\\]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function hasToken(normText, tok) {
+    var t = normAr(tok.charAt(0) === '=' ? tok.slice(1) : tok);
+    if (!t) return false;
+    if (tok.charAt(0) === '=') {
+      return (' ' + normText + ' ').indexOf(' ' + t + ' ') !== -1;
+    }
+    return normText.indexOf(t) !== -1;
+  }
+
+  function expandDiacPattern(pat) {
+    // Allow optional diacritics between base Arabic letters unless explicitly constrained
+    var out = '';
+    for (var i = 0; i < pat.length; i++) {
+      var ch = pat[i];
+      out += ch;
+      if (/[\u0621-\u064A]/.test(ch)) {
+        var nxt = pat[i + 1] || '';
+        if (!/[\u064B-\u065F\u0670\[]/.test(nxt)) out += '[\\u064B-\\u065F\\u0670]*';
+      }
+    }
+    return out;
+  }
+
+  function prepDiacRaw(s) {
+    return String(s || '')
+      .replace(/\u0640/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/([\u064B-\u0650\u0652])\u0651/g, '\u0651$1')
+      .replace(/[.,،؛:؟!()\[\]«»﴿﴾"'ـ\-–—/\\]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function setsEqual(a, b) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    var sa = a.slice().sort(function (x, y) { return x - y; });
+    var sb = b.slice().sort(function (x, y) { return x - y; });
+    for (var i = 0; i < sa.length; i++) if (sa[i] !== sb[i]) return false;
+    return true;
+  }
+
+  function matchSpec(val, spec) {
+    if (!spec) return null;
+    var mode = spec.mode || 'match';
+    if (mode === 'open') return 'open';
+    if (mode === 'words') {
+      var arr = Array.isArray(val) ? val : [];
+      if (!arr.length) return 'empty';
+      if (setsEqual(arr, spec.idx)) return 'ok';
+      if (spec.alt) {
+        for (var ai = 0; ai < spec.alt.length; ai++) {
+          if (setsEqual(arr, spec.alt[ai])) return 'ok';
+        }
+      }
+      return 'bad';
+    }
+    var raw = String(val || '').trim();
+    if (!raw) return 'empty';
+    if (mode === 'exact') {
+      var rNorm = raw.replace(/([\u064B-\u0650\u0652])\u0651/g, '\u0651$1');
+      var aNorm = String(spec.a || '').replace(/([\u064B-\u0650\u0652])\u0651/g, '\u0651$1');
+      if (rNorm === aNorm) return 'ok';
+      if (spec.al) {
+        for (var ei = 0; ei < spec.al.length; ei++) {
+          if (rNorm === String(spec.al[ei]).replace(/([\u064B-\u0650\u0652])\u0651/g, '\u0651$1')) return 'ok';
+        }
+      }
+      return 'bad';
+    }
+    var n = normAr(raw);
+    if (!n) return 'empty';
+    if (mode === 'strict_diac') {
+      // Base letters must match spec.a or spec.al, AND at least one diac regex must match raw
+      var baseOk = n === normAr(spec.a);
+      if (!baseOk && spec.al) {
+        for (var si = 0; si < spec.al.length; si++) {
+          if (n === normAr(spec.al[si])) { baseOk = true; break; }
+        }
+      }
+      if (!baseOk) return 'bad';
+      var pr = prepDiacRaw(raw);
+      var prNoSh = pr.replace(/\u0651/g, '');
+      var pats = spec.diac || [];
+      for (var di = 0; di < pats.length; di++) {
+        var re = new RegExp(expandDiacPattern(pats[di]));
+        if (re.test(pr) || re.test(prNoSh)) return 'ok';
+      }
+      return 'bad';
+    }
+    // Default 'match' mode
+    if (spec.no) {
+      for (var ni = 0; ni < spec.no.length; ni++) {
+        if (hasToken(n, spec.no[ni])) return 'bad';
+      }
+    }
+    if (spec.a && n === normAr(spec.a)) return 'ok';
+    if (spec.al) {
+      for (var li = 0; li < spec.al.length; li++) {
+        if (n === normAr(spec.al[li])) return 'ok';
+      }
+    }
+    if (spec.all) {
+      var allOk = true;
+      for (var gi = 0; gi < spec.all.length; gi++) {
+        var grp = spec.all[gi], hit = false;
+        for (var g2 = 0; g2 < grp.length; g2++) {
+          if (hasToken(n, grp[g2])) { hit = true; break; }
+        }
+        if (!hit) { allOk = false; break; }
+      }
+      if (allOk) return 'ok';
+    }
+    if (spec.kw) {
+      var kwOk = true;
+      for (var ki = 0; ki < spec.kw.length; ki++) {
+        var kgrp = spec.kw[ki], khit = false;
+        for (var k2 = 0; k2 < kgrp.length; k2++) {
+          if (hasToken(n, kgrp[k2])) { khit = true; break; }
+        }
+        if (!khit) { kwOk = false; break; }
+      }
+      if (kwOk) return 'ok';
+    }
+    return 'bad';
+  }
 
   function persistLocal() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) {}
@@ -81,9 +227,297 @@
 
   function register(sec, id, ctrl) {
     ctrl.section = sec;
+    ctrl.q = curQ;
     controls[id] = ctrl;
     sec.fields.push(id);
+    if (curQ) {
+      curQ.fields.push(id);
+      fieldQ[id] = curQ;
+    }
     if (store[id] && store[id].v !== undefined) ctrl.set(store[id].v);
+  }
+
+  function clearFieldState(id) {
+    var c = controls[id];
+    if (!c) return;
+    if (c.setState) c.setState('');
+    if (c.q && c.q.scoreEl) {
+      c.q.scoreEl.textContent = '';
+      c.q.scoreEl.className = 'ex-qscore';
+    }
+    if (c.section && c.section.scoreEl) {
+      c.section.scoreEl.textContent = '';
+      c.section.scoreEl.className = 'ex-sscore';
+    }
+  }
+
+  function findPoolForField(qData, id) {
+    if (qData.tuplePools) {
+      for (var i = 0; i < qData.tuplePools.length; i++) {
+        var tp = qData.tuplePools[i];
+        for (var s = 0; s < tp.slots.length; s++) {
+          if (tp.slots[s].indexOf(id) !== -1) return { kind: 'tuple', pool: tp };
+        }
+      }
+    }
+    if (qData.setPools) {
+      for (var j = 0; j < qData.setPools.length; j++) {
+        if (qData.setPools[j].ids.indexOf(id) !== -1) return { kind: 'set', pool: qData.setPools[j] };
+      }
+    }
+    return null;
+  }
+
+  function evalTuplePool(tp, onlyFilled) {
+    var used = {};
+    var ok = 0, total = 0;
+    for (var s = 0; s < tp.slots.length; s++) {
+      var slot = tp.slots[s];
+      var keyIdx = tp.keyCol || 0;
+      var keyId = slot[keyIdx];
+      var keyCtrl = controls[keyId];
+      var keyVal = keyCtrl ? keyCtrl.get() : '';
+      var keyFilled = keyCtrl && keyCtrl.isFilled();
+      total += slot.length;
+      if (!keyFilled) {
+        for (var c0 = 0; c0 < slot.length; c0++) {
+          var cc0 = controls[slot[c0]];
+          if (cc0 && cc0.setState) {
+            if (!onlyFilled && cc0.isFilled()) cc0.setState('bad');
+            else cc0.setState('');
+          }
+        }
+        continue;
+      }
+      // Match key column against unused entries
+      var matchIdx = -1;
+      for (var e = 0; e < tp.entries.length; e++) {
+        if (used[e]) continue;
+        if (matchSpec(keyVal, tp.entries[e][keyIdx]) === 'ok') { matchIdx = e; break; }
+      }
+      if (matchIdx === -1) {
+        if (keyCtrl && keyCtrl.setState) keyCtrl.setState('bad');
+        for (var c1 = 0; c1 < slot.length; c1++) {
+          if (c1 === keyIdx) continue;
+          var cc1 = controls[slot[c1]];
+          if (cc1 && cc1.setState) cc1.setState('');
+        }
+      } else {
+        used[matchIdx] = 1;
+        if (keyCtrl && keyCtrl.setState) keyCtrl.setState('ok');
+        ok++;
+        var entry = tp.entries[matchIdx];
+        for (var c2 = 0; c2 < slot.length; c2++) {
+          if (c2 === keyIdx) continue;
+          var cc2 = controls[slot[c2]];
+          if (!cc2) continue;
+          if (!cc2.isFilled()) {
+            if (cc2.setState) cc2.setState('');
+            continue;
+          }
+          var r2 = matchSpec(cc2.get(), entry[c2]);
+          if (cc2.setState) cc2.setState(r2 === 'ok' ? 'ok' : (r2 === 'open' ? 'open' : 'bad'));
+          if (r2 === 'ok') ok++;
+        }
+      }
+    }
+    return { ok: ok, total: total };
+  }
+
+  function evalSetPool(sp, onlyFilled) {
+    var used = {};
+    var ok = 0, total = sp.ids.length;
+    for (var i = 0; i < sp.ids.length; i++) {
+      var id = sp.ids[i], ctrl = controls[id];
+      if (!ctrl) continue;
+      if (!ctrl.isFilled()) {
+        if (ctrl.setState) ctrl.setState('');
+        continue;
+      }
+      var val = ctrl.get(), hit = -1;
+      for (var p = 0; p < sp.pool.length; p++) {
+        if (used[p]) continue;
+        if (matchSpec(val, sp.pool[p]) === 'ok') { hit = p; break; }
+      }
+      if (hit !== -1) {
+        used[hit] = 1;
+        if (ctrl.setState) ctrl.setState('ok');
+        ok++;
+      } else {
+        if (ctrl.setState) ctrl.setState('bad');
+      }
+    }
+    return { ok: ok, total: total };
+  }
+
+  function liveCheckField(id) {
+    if (!answerKey) return;
+    var qObj = fieldQ[id];
+    if (!qObj) return;
+    var qData = answerKey[qObj.key];
+    if (!qData) return;
+    var ctrl = controls[id];
+    if (!ctrl || !ctrl.isFilled()) { clearFieldState(id); return; }
+    var poolInfo = findPoolForField(qData, id);
+    if (poolInfo) {
+      if (poolInfo.kind === 'tuple') evalTuplePool(poolInfo.pool, true);
+      else evalSetPool(poolInfo.pool, true);
+      return;
+    }
+    var spec = qData.fields && qData.fields[id];
+    if (!spec || spec.mode === 'open') return;
+    var res = matchSpec(ctrl.get(), spec);
+    if (spec.mode === 'words') {
+      // Only celebrate automatically when exact match; don't mark red mid-selection
+      if (res === 'ok' && ctrl.setState) ctrl.setState('ok', spec, false);
+      else if (ctrl.setState) ctrl.setState('');
+      return;
+    }
+    if (ctrl.setState) ctrl.setState(res === 'ok' ? 'ok' : (res === 'bad' ? 'bad' : ''));
+  }
+
+  function checkQuestion(qObj, silentOpen) {
+    if (!answerKey) return null;
+    var qData = answerKey[qObj.key];
+    if (!qData) return null;
+    var ok = 0, total = 0, openCount = 0, filledOpen = 0;
+
+    if (qData.tuplePools) {
+      for (var ti = 0; ti < qData.tuplePools.length; ti++) {
+        var tr = evalTuplePool(qData.tuplePools[ti], false);
+        ok += tr.ok; total += tr.total;
+      }
+    }
+    if (qData.setPools) {
+      for (var si = 0; si < qData.setPools.length; si++) {
+        var sr = evalSetPool(qData.setPools[si], false);
+        ok += sr.ok; total += sr.total;
+      }
+    }
+    if (qData.fields) {
+      for (var fid in qData.fields) {
+        var spec = qData.fields[fid];
+        var ctrl = controls[fid];
+        if (!ctrl) continue;
+        if (spec.mode === 'open') {
+          openCount++;
+          if (ctrl.isFilled()) {
+            filledOpen++;
+            if (ctrl.setState) ctrl.setState('open');
+          }
+          continue;
+        }
+        total++;
+        if (!ctrl.isFilled()) {
+          if (ctrl.setState) ctrl.setState(spec.mode === 'words' ? 'bad' : '', spec, false);
+          continue;
+        }
+        var res = matchSpec(ctrl.get(), spec);
+        if (res === 'ok') {
+          ok++;
+          if (ctrl.setState) ctrl.setState('ok', spec, false);
+        } else {
+          if (ctrl.setState) ctrl.setState('bad', spec, spec.mode === 'words');
+        }
+      }
+    }
+
+    if (qObj.scoreEl) {
+      if (total > 0) {
+        if (ok === total) {
+          qObj.scoreEl.textContent = 'صَحِيحٌ ✓';
+          qObj.scoreEl.className = 'ex-qscore ok';
+        } else {
+          qObj.scoreEl.textContent = arN(ok) + ' / ' + arN(total) + ' صَحِيحٌ';
+          qObj.scoreEl.className = 'ex-qscore ' + (ok > 0 ? 'part' : 'bad');
+        }
+      } else if (openCount > 0) {
+        qObj.scoreEl.textContent = 'قَارِنْ بِالْإِجَابَةِ النَّمُوذَجِيَّةِ';
+        qObj.scoreEl.className = 'ex-qscore open';
+      }
+    }
+    if (!silentOpen && openCount > 0 && (total === 0 || filledOpen > 0)) {
+      setQuestionReveal(qObj, true);
+    }
+    return { ok: ok, total: total, openCount: openCount };
+  }
+
+  function renderAnswerPanel(qData) {
+    var box = document.createElement('div');
+    box.className = 'ex-ans-panel';
+    box.hidden = true;
+    var hdr = document.createElement('div');
+    hdr.className = 'ex-ans-hdr';
+    hdr.textContent = qData.note ? 'الْإِجَابَةُ النَّمُوذَجِيَّةُ' : 'الْإِجَابَةُ الصَّحِيحَةُ';
+    box.appendChild(hdr);
+
+    if (qData.display && qData.display.length) {
+      var list = document.createElement('div');
+      list.className = 'ex-ans-list';
+      for (var i = 0; i < qData.display.length; i++) {
+        var line = document.createElement('div');
+        line.className = 'ex-ans-line';
+        line.textContent = qData.display[i];
+        list.appendChild(line);
+      }
+      box.appendChild(list);
+    }
+    if (qData.table && qData.table.headers && qData.table.rows) {
+      var wrap = document.createElement('div');
+      wrap.className = 'ex-ans-tbl-wrap';
+      var tbl = document.createElement('div');
+      tbl.className = 'ex-ans-tbl';
+      var cols = qData.table.headers.length;
+      tbl.style.setProperty('--cols', String(cols));
+      var hRow = document.createElement('div');
+      hRow.className = 'ex-ans-tr ex-ans-head';
+      for (var h = 0; h < cols; h++) {
+        var hc = document.createElement('div');
+        hc.className = 'ex-ans-th';
+        hc.textContent = qData.table.headers[h];
+        hRow.appendChild(hc);
+      }
+      tbl.appendChild(hRow);
+      for (var r = 0; r < qData.table.rows.length; r++) {
+        var tr = document.createElement('div');
+        tr.className = 'ex-ans-tr';
+        var row = qData.table.rows[r];
+        for (var c = 0; c < cols; c++) {
+          var td = document.createElement('div');
+          td.className = 'ex-ans-td';
+          td.textContent = row[c] || '';
+          tr.appendChild(td);
+        }
+        tbl.appendChild(tr);
+      }
+      wrap.appendChild(tbl);
+      box.appendChild(wrap);
+    }
+    if (qData.note) {
+      var nt = document.createElement('div');
+      nt.className = 'ex-ans-note';
+      nt.textContent = qData.note;
+      box.appendChild(nt);
+    }
+    return box;
+  }
+
+  function setQuestionReveal(qObj, show) {
+    if (!qObj.panelEl) return;
+    qObj.shown = !!show;
+    qObj.panelEl.hidden = !qObj.shown;
+    if (qObj.ansBtn) {
+      qObj.ansBtn.textContent = qObj.shown ? 'إِخْفَاءُ الْإِجَابَةِ' : 'إِظْهَارُ الْإِجَابَةِ';
+      qObj.ansBtn.setAttribute('aria-expanded', qObj.shown ? 'true' : 'false');
+      qObj.ansBtn.classList.toggle('on', qObj.shown);
+    }
+    var qData = answerKey && answerKey[qObj.key];
+    if (qData && qData.fields) {
+      for (var fid in qData.fields) {
+        var c = controls[fid];
+        if (c && c.setReveal) c.setReveal(qObj.shown, qData.fields[fid]);
+      }
+    }
   }
 
   function updateSectionCount(sec) {
@@ -230,9 +664,19 @@
     ta.addEventListener('input', function () {
       fitTextarea(ta);
       ta.classList.toggle('filled', base ? ta.value.trim() !== base.trim() : ta.value.trim().length > 0);
+      clearFieldState(id);
       record(id, ta.value, false);
     });
-    ta.addEventListener('blur', function () { persistLocal(); });
+    ta.addEventListener('blur', function () { persistLocal(); liveCheckField(id); });
+    if (cls.indexOf('ex-cell') !== -1) {
+      ta.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          persistLocal();
+          liveCheckField(id);
+        }
+      });
+    }
     bindFieldFocus(ta);
     register(sec, id, {
       get: function () { return ta.value; },
@@ -242,9 +686,14 @@
         ta.classList.toggle('filled', base ? ta.value.trim() !== base.trim() : ta.value.trim().length > 0);
         fitTextarea(ta);
       },
+      setState: function (st) {
+        ta.classList.toggle('ex-ok', st === 'ok');
+        ta.classList.toggle('ex-bad', st === 'bad');
+        ta.classList.toggle('ex-open', st === 'open');
+      },
       reset: function () {
         ta.value = base;
-        ta.classList.remove('filled');
+        ta.classList.remove('filled', 'ex-ok', 'ex-bad', 'ex-open');
         fitTextarea(ta);
         record(id, '', true);
       },
@@ -267,9 +716,17 @@
     inp.addEventListener('input', function () {
       fitInput(inp);
       inp.classList.toggle('filled', inp.value.trim().length > 0);
+      clearFieldState(id);
       record(id, inp.value, false);
     });
-    inp.addEventListener('blur', function () { persistLocal(); });
+    inp.addEventListener('blur', function () { persistLocal(); liveCheckField(id); });
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        persistLocal();
+        liveCheckField(id);
+      }
+    });
     bindFieldFocus(inp);
     fitInput(inp);
     register(sec, id, {
@@ -279,9 +736,14 @@
         inp.classList.toggle('filled', inp.value.trim().length > 0);
         fitInput(inp);
       },
+      setState: function (st) {
+        inp.classList.toggle('ex-ok', st === 'ok');
+        inp.classList.toggle('ex-bad', st === 'bad');
+        inp.classList.toggle('ex-open', st === 'open');
+      },
       reset: function () {
         inp.value = '';
-        inp.classList.remove('filled');
+        inp.classList.remove('filled', 'ex-ok', 'ex-bad', 'ex-open');
         fitInput(inp);
         record(id, '', true);
       },
@@ -307,6 +769,7 @@
         val = (val === code) ? '' : code;
         render();
         record(id, val, true);
+        if (val) liveCheckField(id); else clearFieldState(id);
       });
       wrap.appendChild(b);
       return { el: b, code: code, label: label };
@@ -324,7 +787,11 @@
     register(sec, id, {
       get: function () { return val; },
       set: function (v) { val = typeof v === 'string' ? v : ''; render(); },
-      reset: function () { val = ''; render(); record(id, '', true); },
+      setState: function (st) {
+        wrap.classList.toggle('ex-ok', st === 'ok');
+        wrap.classList.toggle('ex-bad', st === 'bad');
+      },
+      reset: function () { val = ''; wrap.classList.remove('ex-ok', 'ex-bad'); render(); record(id, '', true); },
       isFilled: function () { return val !== ''; }
     });
     return wrap;
@@ -371,7 +838,9 @@
             var on = !el.classList.contains('on');
             el.classList.toggle('on', on);
             el.setAttribute('aria-pressed', on ? 'true' : 'false');
+            clearFieldState(id);
             record(id, selectedIndices(), true);
+            liveCheckField(id);
           };
           el.addEventListener('click', toggle);
           el.addEventListener('keydown', function (e) {
@@ -454,9 +923,40 @@
           spans[j].setAttribute('aria-pressed', on ? 'true' : 'false');
         }
       },
+      setState: function (st, spec, showMissed) {
+        for (var j = 0; j < spans.length; j++) {
+          spans[j].classList.remove('ex-w-ok', 'ex-w-bad', 'ex-w-miss');
+        }
+        if (!st || !spec) return;
+        var tgt = spec.idx || [];
+        if (st === 'ok' && spec.alt) {
+          var sel = selectedIndices();
+          if (!setsEqual(sel, tgt)) {
+            for (var ai = 0; ai < spec.alt.length; ai++) {
+              if (setsEqual(sel, spec.alt[ai])) { tgt = spec.alt[ai]; break; }
+            }
+          }
+        }
+        var tset = {};
+        for (var ti = 0; ti < tgt.length; ti++) tset[tgt[ti]] = 1;
+        for (var k = 0; k < spans.length; k++) {
+          var on = spans[k].classList.contains('on');
+          if (on) spans[k].classList.add(tset[k] ? 'ex-w-ok' : 'ex-w-bad');
+          else if (showMissed && tset[k]) spans[k].classList.add('ex-w-miss');
+        }
+      },
+      setReveal: function (show, spec) {
+        var tset = {};
+        if (show && spec && spec.idx) {
+          for (var ti = 0; ti < spec.idx.length; ti++) tset[spec.idx[ti]] = 1;
+        }
+        for (var k = 0; k < spans.length; k++) {
+          spans[k].classList.toggle('ex-w-ans', !!(show && tset[k]));
+        }
+      },
       reset: function () {
         for (var j = 0; j < spans.length; j++) {
-          spans[j].classList.remove('on');
+          spans[j].classList.remove('on', 'ex-w-ok', 'ex-w-bad', 'ex-w-miss');
           spans[j].setAttribute('aria-pressed', 'false');
         }
         record(id, [], true);
@@ -537,6 +1037,17 @@
   function enhanceSub(sec, sIdx, qIdx, sub) {
     var els = sub.els;
     if (!els.length) return;
+    var qKey = 's' + sIdx + '_q' + qIdx;
+    var qObj = { key: qKey, fields: [], anchorEl: els[els.length - 1], sec: sec, barEl: null, scoreEl: null, ansBtn: null, panelEl: null, shown: false };
+    sec.questions.push(qObj);
+    qByKey[qKey] = qObj;
+    curQ = qObj;
+    enhanceSubBody(sec, sIdx, qIdx, sub, qObj);
+    curQ = null;
+  }
+
+  function enhanceSubBody(sec, sIdx, qIdx, sub, qObj) {
+    var els = sub.els;
     if (sub.h2) sub.h2.classList.add('ex-sub');
 
     var promptEl = els[0] && els[0].tagName === 'P' ? els[0] : null;
@@ -712,6 +1223,7 @@
               curOpt = (curOpt === String(idx)) ? '' : String(idx);
               syncOpts();
               record(optId, curOpt, true);
+              if (curOpt !== '') liveCheckField(optId); else clearFieldState(optId);
             };
             op.addEventListener('click', pick);
             op.addEventListener('keydown', function (e) {
@@ -722,7 +1234,25 @@
         register(sec, optId, {
           get: function () { return curOpt; },
           set: function (v) { curOpt = typeof v === 'string' ? v : ''; syncOpts(); },
-          reset: function () { curOpt = ''; syncOpts(); record(optId, '', true); },
+          setState: function (st) {
+            for (var oi = 0; oi < optPs.length; oi++) {
+              optPs[oi].classList.remove('ex-ok', 'ex-bad');
+            }
+            if ((st === 'ok' || st === 'bad') && curOpt !== '' && optPs[+curOpt]) {
+              optPs[+curOpt].classList.add(st === 'ok' ? 'ex-ok' : 'ex-bad');
+            }
+          },
+          setReveal: function (show, spec) {
+            for (var oi = 0; oi < optPs.length; oi++) {
+              optPs[oi].classList.toggle('ex-opt-ans', !!(show && spec && String(oi) === String(spec.a)));
+            }
+          },
+          reset: function () {
+            curOpt = '';
+            for (var oi = 0; oi < optPs.length; oi++) optPs[oi].classList.remove('ex-ok', 'ex-bad');
+            syncOpts();
+            record(optId, '', true);
+          },
           isFilled: function () { return curOpt !== ''; }
         });
         var rBox = document.createElement('div');
@@ -730,6 +1260,7 @@
         rBox.appendChild(makeTextarea(sec, prefix + 'rs', 'ex-area', 2, 'السَّبَبُ…'));
         var lastOpt = optPs[optPs.length - 1];
         lastOpt.parentNode.insertBefore(rBox, lastOpt.nextSibling);
+        qObj.anchorEl = rBox;
         return;
       }
     }
@@ -743,6 +1274,7 @@
       vBox.appendChild(makeTextarea(sec, prefix + 'vow', 'ex-area ex-vow', 2, '', origBayt));
       baytP.classList.add('ex-vow-src');
       baytP.parentNode.insertBefore(vBox, baytP.nextSibling);
+      if (qObj.anchorEl === baytP) qObj.anchorEl = vBox;
     }
 
     // 9. Dot-blanks (standalone «الجواب: ..........», multi-blank rows, and inline blanks)
@@ -814,6 +1346,7 @@
       box.appendChild(makeTextarea(sec, prefix + 'open', 'ex-area', 2, 'الْجَوَابُ…'));
       var lastEl = els[els.length - 1];
       lastEl.parentNode.insertBefore(box, lastEl.nextSibling);
+      qObj.anchorEl = box;
     }
   }
 
@@ -824,18 +1357,28 @@
 
     var bar = document.createElement('div');
     bar.className = 'ex-bar';
+    var meta = document.createElement('span');
+    meta.className = 'ex-bar-meta';
     var cnt = document.createElement('span');
     cnt.className = 'ex-cnt';
+    var sScore = document.createElement('span');
+    sScore.className = 'ex-sscore';
+    meta.appendChild(cnt);
+    meta.appendChild(sScore);
+
+    var acts = document.createElement('span');
+    acts.className = 'ex-bar-acts';
     var clr = document.createElement('button');
     clr.type = 'button';
     clr.className = 'ex-clr';
     clr.textContent = 'مسح الإجابات';
     clr.hidden = true;
-    bar.appendChild(cnt);
-    bar.appendChild(clr);
+    acts.appendChild(clr);
+    bar.appendChild(meta);
+    bar.appendChild(acts);
     rs.h2.parentNode.insertBefore(bar, rs.h2.nextSibling);
 
-    var sec = { fields: [], countEl: cnt, clearBtn: clr };
+    var sec = { fields: [], questions: [], countEl: cnt, scoreEl: sScore, clearBtn: clr, actsEl: acts, barEl: bar };
     sections.push(sec);
 
     (function (sObj, btn) {
@@ -858,6 +1401,11 @@
           var c = controls[sObj.fields[fi]];
           if (c) c.reset();
         }
+        for (var qi2 = 0; qi2 < sObj.questions.length; qi2++) {
+          var qo = sObj.questions[qi2];
+          if (qo.scoreEl) { qo.scoreEl.textContent = ''; qo.scoreEl.className = 'ex-qscore'; }
+        }
+        if (sObj.scoreEl) { sObj.scoreEl.textContent = ''; sObj.scoreEl.className = 'ex-sscore'; }
         updateSectionCount(sObj);
       });
     })(sec, clr);
@@ -867,6 +1415,115 @@
     }
     updateSectionCount(sec);
   }
+
+  // ---- Mount answer-checking and show-answer controls once answer key loads ----
+  function mountAnswerUI() {
+    if (!answerKey) return;
+    for (var si = 0; si < sections.length; si++) {
+      var sec = sections[si];
+      var secHasKey = false;
+      for (var qi = 0; qi < sec.questions.length; qi++) {
+        var qObj = sec.questions[qi];
+        var qData = answerKey[qObj.key];
+        if (!qData || !qObj.anchorEl) continue;
+        secHasKey = true;
+
+        var qBar = document.createElement('div');
+        qBar.className = 'ex-qbar';
+
+        var chkBtn = document.createElement('button');
+        chkBtn.type = 'button';
+        chkBtn.className = 'ex-qbtn ex-chk';
+        chkBtn.textContent = 'تَحَقَّقْ';
+
+        var ansBtn = document.createElement('button');
+        ansBtn.type = 'button';
+        ansBtn.className = 'ex-qbtn ex-rev';
+        ansBtn.textContent = 'إِظْهَارُ الْإِجَابَةِ';
+        ansBtn.setAttribute('aria-expanded', 'false');
+
+        var qScore = document.createElement('span');
+        qScore.className = 'ex-qscore';
+
+        qBar.appendChild(chkBtn);
+        qBar.appendChild(ansBtn);
+        qBar.appendChild(qScore);
+
+        var panel = renderAnswerPanel(qData);
+
+        qObj.barEl = qBar;
+        qObj.scoreEl = qScore;
+        qObj.ansBtn = ansBtn;
+        qObj.panelEl = panel;
+
+        var par = qObj.anchorEl.parentNode;
+        var next = qObj.anchorEl.nextSibling;
+        par.insertBefore(qBar, next);
+        par.insertBefore(panel, qBar.nextSibling);
+
+        (function (qo) {
+          chkBtn.addEventListener('click', function () { checkQuestion(qo, false); });
+          ansBtn.addEventListener('click', function () { setQuestionReveal(qo, !qo.shown); });
+        })(qObj);
+      }
+
+      if (secHasKey) {
+        sec.barEl.classList.add('has-key');
+        (function (sObj) {
+          var sChk = document.createElement('button');
+          sChk.type = 'button';
+          sChk.className = 'ex-clr ex-schk';
+          sChk.textContent = 'تَحَقَّقْ مِنَ الْكُلِّ';
+          sChk.addEventListener('click', function () {
+            var ok = 0, total = 0;
+            for (var i = 0; i < sObj.questions.length; i++) {
+              var r = checkQuestion(sObj.questions[i], true);
+              if (r) { ok += r.ok; total += r.total; }
+            }
+            if (total > 0) {
+              sObj.scoreEl.textContent = ok === total ? 'الْكُلُّ صَحِيحٌ ✓' : (arN(ok) + ' / ' + arN(total) + ' صَحِيحٌ');
+              sObj.scoreEl.className = 'ex-sscore ' + (ok === total ? 'ok' : (ok > 0 ? 'part' : 'bad'));
+            }
+          });
+
+          var sRev = document.createElement('button');
+          sRev.type = 'button';
+          sRev.className = 'ex-clr ex-srev';
+          sRev.textContent = 'إِظْهَارُ الْإِجَابَاتِ';
+          var allShown = false;
+          sRev.addEventListener('click', function () {
+            allShown = !allShown;
+            for (var i = 0; i < sObj.questions.length; i++) {
+              setQuestionReveal(sObj.questions[i], allShown);
+            }
+            sRev.textContent = allShown ? 'إِخْفَاءُ الْإِجَابَاتِ' : 'إِظْهَارُ الْإِجَابَاتِ';
+            sRev.classList.toggle('on', allShown);
+          });
+
+          sObj.actsEl.insertBefore(sRev, sObj.clearBtn);
+          sObj.actsEl.insertBefore(sChk, sRev);
+        })(sec);
+      }
+    }
+  }
+
+  function loadAnswerKey() {
+    var sc = document.querySelector('script[src*="exercises.js"]');
+    var ver = '';
+    if (sc) {
+      var vm = sc.getAttribute('src').match(/\?v=([a-zA-Z0-9_-]+)/);
+      if (vm) ver = '?v=' + vm[1];
+    }
+    fetch('../exercises/' + encodeURIComponent(slug) + '.json' + ver)
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.questions) return;
+        answerKey = d.questions;
+        mountAnswerUI();
+      })
+      .catch(function () {});
+  }
+  loadAnswerKey();
 
   // ---- Lifecycle sync hooks ----
   pullSync();
