@@ -3,7 +3,7 @@
 write one reading page per book (public/<slug>/index.html, text taken from media-harakat-books
 books/<slug>/index.html) and regenerate public/index.html and one page per author (public/<author_slugs>/index.html). Read-only on media-harakat-books.
 Look: public/site.css + public/theme.js (hand-edited)."""
-import json, os, re, shutil, html, subprocess, time
+import filecmp, hashlib, json, os, re, shutil, html, subprocess, time
 from pypdf import PdfReader
 from years import years_to_words
 
@@ -17,6 +17,15 @@ data = json.load(open(os.path.join(ROOT, 'books.json'), encoding='utf8'))
 SCI = json.load(open(os.path.join(ROOT, 'sciences.json'), encoding='utf8'))
 OTHER = 'أخرى'
 os.makedirs(os.path.join(PUB, 'pdf'), exist_ok=True)
+
+
+# Short content hash for static CSS/JS files so browsers never hold stale assets after a deploy.
+_VER = {}
+def asset(up, name):
+    if name not in _VER:
+        p = os.path.join(PUB, name)
+        _VER[name] = hashlib.sha256(open(p, 'rb').read()).hexdigest()[:8] if os.path.exists(p) else '1'
+    return f'{up}{name}?v={_VER[name]}'
 
 
 # «أُضيفت حديثًا» / «شُكِّلت حديثًا» on the home page: when each book entered books.json, and when its
@@ -94,11 +103,11 @@ def head(title, up='', path='', desc='', ld=None):
 <meta property="og:url" content="{url}">
 <meta property="og:type" content="{'book' if ld else 'website'}">
 <meta property="og:locale" content="ar_AR">
-{GOOGLE if not path else ''}{ld}<script src="{up}theme.js"></script>
-<script src="{up}account.js" defer></script>
+{GOOGLE if not path else ''}{ld}<script src="{asset(up, 'theme.js')}"></script>
+<script src="{asset(up, 'account.js')}" defer></script>
 <link rel="icon" href="data:,">
 <link rel="preload" href="{up}fonts/Amiri-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="{up}site.css">
+<link rel="stylesheet" href="{asset(up, 'site.css')}">
 </head>
 '''
 
@@ -139,8 +148,8 @@ def grouped(entries, cls):
     for k, label in LABELS.items():
         lis = [li for kk, li in entries if kk == k]
         gid = f' id="k-{k}"' if cls == 'top' else ''
-        h3 = f'    <h3 class="kind">{esc(label)} <span>({ar(len(lis))})</span></h3>\n' if label else ''
-        if lis: out.append(f'  <div class="group {cls}"{gid}>\n{h3}    <ul>\n' + '\n'.join(lis) + '\n    </ul>\n  </div>')
+        h3 = f'<h3 class="kind">{esc(label)} <span>({ar(len(lis))})</span></h3>\n' if label else ''
+        if lis: out.append(f'<div class="group {cls}"{gid}>\n{h3}<ul>\n' + '\n'.join(lis) + '\n</ul>\n</div>')
     return '\n'.join(out)
 
 
@@ -174,8 +183,6 @@ REPORT = '''  <div class="report" hidden>
     <p class="msg fail" hidden>تعذر الإرسال</p>
   </div>'''
 
-NOTES_JS = '<script src="../notes.js" defer></script>\n'
-
 
 def write_book_page(b, pages, urls, fname, aslug):
     sub, body = book_text(b)
@@ -207,9 +214,11 @@ def write_book_page(b, pages, urls, fname, aslug):
   </article>
 {REPORT}
 </main>
-{NOTES_JS}<script src="../progress.js" defer></script>
-<script src="../report.js" defer></script>
-<script src="../toc.js" defer></script>
+<script src="{asset('../', 'notes.js')}" defer></script>
+<script src="{asset('../', 'progress.js')}" defer></script>
+<script src="{asset('../', 'report.js')}" defer></script>
+<script src="{asset('../', 'toc.js')}" defer></script>
+<script src="{asset('../', 'reader.js')}" defer></script>
 </body>
 </html>
 '''
@@ -219,50 +228,133 @@ def write_book_page(b, pages, urls, fname, aslug):
 
 SEARCH = """<script>
 const norm = t => t.replace(/[\\u064B-\\u065F\\u0670\\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
-// read the list on every run: account.js adds «متابعة القراءة» copies after this script
-const T = new WeakMap(), tx = li => T.get(li) ?? (T.set(li, norm(li.querySelector('.info h3').textContent)), T.get(li));
-const books = () => [...document.querySelectorAll('.book')].map(li => [li, tx(li), li.classList.contains('nh')]);
-const q = document.getElementById('q'), hb = [...document.querySelectorAll('.harakat button')];
+const arN = n => '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
+const count = (el, n) => { const s = el && el.querySelector(':scope > span'); if (s) s.textContent = arN(n); };
+// Cache normalized title + author text per li.book (account.js adds «متابعة القراءة» copies dynamically).
+const T = new WeakMap();
+const tx = li => {
+  let v = T.get(li);
+  if (v !== undefined) return v;
+  const h = li.querySelector('.info h3');
+  const sec = li.closest('section.v-author'), grp = li.closest('section.v-science .group'), meta = li.querySelector('.meta');
+  const who = sec ? (sec.querySelector('h2')?.textContent || '') : grp ? (grp.querySelector('h3.kind')?.textContent || '') : (meta ? meta.textContent : '');
+  v = norm((h ? h.textContent : '') + ' ' + who);
+  T.set(li, v);
+  return v;
+};
+// Lazy-build the «حسب العلم» view from .v-author books so index.html doesn't ship 1,557 duplicate DOM subtrees.
+let sciBuilt = false;
+function buildScience() {
+  if (sciBuilt) return;
+  const el = document.getElementById('sci-data');
+  if (!el) { sciBuilt = true; return; }
+  sciBuilt = true;
+  const map = new Map();
+  for (const li of document.querySelectorAll('section.v-author li.book')) {
+    const a = li.querySelector('.info h3 a'), m = a && a.getAttribute('href').match(/([a-z0-9-]+)\\/$/);
+    if (m) map.set(m[1], li);
+  }
+  const sci = JSON.parse(el.textContent);
+  for (const [sid, groups] of Object.entries(sci)) {
+    const sec = document.getElementById(sid);
+    if (!sec) continue;
+    const frag = document.createDocumentFragment();
+    for (const [author, slugs] of groups) {
+      const div = document.createElement('div'); div.className = 'group sub';
+      const h3 = document.createElement('h3'); h3.className = 'kind';
+      h3.append(author + ' ');
+      const sp = document.createElement('span'); sp.textContent = arN(slugs.length);
+      h3.appendChild(sp);
+      const ul = document.createElement('ul');
+      for (const s of slugs) {
+        const src = map.get(s);
+        if (src) { const c = src.cloneNode(true); c.hidden = false; ul.appendChild(c); }
+      }
+      if (ul.children.length) { div.append(h3, ul); frag.appendChild(div); }
+    }
+    sec.appendChild(frag);
+  }
+  if (window.KM && window.KM.render) window.KM.render(); else apply();
+}
+const q = document.getElementById('q'), clr = document.getElementById('q-clear'), hb = [...document.querySelectorAll('.harakat button')];
 // harakat filter («الكل» / «مشكولة» / «غير مشكولة»), remembered in this browser; li.nh = book without harakat
 let hv = 'all';
 try { if (hb.length) hv = localStorage.getItem('harakat') || 'all'; } catch (e) {}
 const okH = nh => hv === 'all' || (hv === '1') !== nh;
-const arN = n => '(' + String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) + ')';
-const count = (el, n) => { const s = el && el.querySelector(':scope > span'); if (s) s.textContent = arN(n); };
 function apply() {
-  const words = norm(q.value).split(/\\s+/).filter(Boolean);
-  for (const [li, t, nh] of books()) li.hidden = !okH(nh) || !words.every(w => t.includes(w));
+  const raw = q.value, words = norm(raw).split(/\\s+/).filter(Boolean), searching = words.length > 0;
+  if (clr) clr.hidden = !raw;
+  for (const li of document.querySelectorAll('.book')) {
+    li.hidden = !okH(li.classList.contains('nh')) || (searching && !words.every(w => tx(li).includes(w)));
+  }
   for (const g of document.querySelectorAll('section:not(#soon) .group')) {
     const n = g.querySelectorAll('.book:not([hidden])').length;
     g.hidden = !n; count(g.querySelector('h3.kind'), n);
   }
   let any = false;
+  const sciMode = document.documentElement.dataset.view === 'science';
   for (const sec of document.querySelectorAll('section')) {
-    if (sec.id === 'soon' || !sec.querySelector('.book')) { sec.hidden = words.length > 0 || hv !== 'all'; continue; }
+    if (sec.id === 'soon' || (!sec.classList.contains('v-science') && !sec.querySelector('.book'))) {
+      sec.hidden = searching || hv !== 'all'; continue;
+    }
+    if (sec.classList.contains('v-science') && !sciBuilt) continue;
     const shown = sec.querySelector('.book:not([hidden])');
-    sec.hidden = !shown; any ||= !!shown;
+    sec.hidden = !shown;
+    if (shown && !sec.classList.contains('recent') && (sciMode ? !sec.classList.contains('v-author') : !sec.classList.contains('v-science'))) any = true;
+    else if (shown && !document.querySelector('.views [data-view]')) any = true;
     if (sec.classList.contains('recent')) count(sec.querySelector('h2'), sec.querySelectorAll('.book:not([hidden])').length);
   }
   for (const a of document.querySelectorAll('nav.authors a[data-s]')) {
-    const n = [...document.querySelectorAll('#' + a.dataset.s + ' .book')].filter(li => okH(li.classList.contains('nh'))).length;
+    if (a.classList.contains('v-science') && !sciBuilt) continue;
+    const target = document.getElementById(a.dataset.s);
+    const n = target ? target.querySelectorAll('.book:not([hidden])').length : 0;
     a.hidden = !n; count(a, n);
   }
-  for (const a of document.querySelectorAll('nav.authors a:not([data-s])')) a.hidden = hv !== 'all';  // «قريبًا» and authors still to come
+  for (const a of document.querySelectorAll('nav.authors a:not([data-s])')) a.hidden = searching || hv !== 'all';  // «قريبًا» and authors still to come
   for (const b of hb) b.setAttribute('aria-pressed', b.dataset.h === hv);
   document.getElementById('none').hidden = any;
 }
-q.addEventListener('input', apply);
+let qTimer = null;
+q.addEventListener('input', () => {
+  clearTimeout(qTimer);
+  if (clr) clr.hidden = !q.value;
+  if (!q.value) { apply(); return; }
+  qTimer = setTimeout(apply, 75);
+});
+if (clr) clr.addEventListener('click', () => { q.value = ''; clearTimeout(qTimer); apply(); q.focus(); });
+q.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (q.value) { q.value = ''; clearTimeout(qTimer); apply(); } else q.blur();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const t = document.activeElement, tag = t && t.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return;
+    e.preventDefault(); q.focus(); q.select();
+  }
+});
 for (const b of hb) b.addEventListener('click', () => {
   hv = b.dataset.h;
   try { if (hv === 'all') localStorage.removeItem('harakat'); else localStorage.setItem('harakat', hv); } catch (e) {}
   apply();
 });
+document.addEventListener('km:view', e => { if (e.detail === 'science') buildScience(); else apply(); });
+if (document.documentElement.dataset.view === 'science') buildScience();
 if (hb.length) apply();
 window.applyFilter = apply;
-// sections far from the screen are laid out lazily (site.css content-visibility), so a jump to #id lands short: repeat it for a few frames
+// sections far from the screen are laid out lazily (site.css content-visibility), so a jump to #id lands short: repeat it for a few frames unless the user scrolls
+let settleCancel = null;
 function settle(id) {
+  if (settleCancel) settleCancel();
   const t = document.getElementById(id); if (!t) return;
-  let n = 0; const go = () => { t.scrollIntoView(); if (++n < 12) requestAnimationFrame(go); }; go();
+  if (t.classList.contains('v-science')) buildScience();
+  let n = 0, raf = 0, stopped = false;
+  const stop = () => { stopped = true; cancelAnimationFrame(raf); for (const ev of ['wheel','touchstart','pointerdown','keydown']) removeEventListener(ev, stop); settleCancel = null; };
+  settleCancel = stop;
+  for (const ev of ['wheel','touchstart','pointerdown','keydown']) addEventListener(ev, stop, { passive: true });
+  const go = () => { if (stopped) return; t.scrollIntoView(); if (++n < 10) raf = requestAnimationFrame(go); else stop(); };
+  go();
 }
 document.addEventListener('click', e => {
   const a = e.target.closest('a[href^="#"]');
@@ -274,7 +366,8 @@ document.addEventListener('click', e => {
 if (location.hash) addEventListener('load', () => settle(decodeURIComponent(location.hash.slice(1))));
 </script>"""
 FILTER = '<div class="views harakat" role="group"><button type="button" data-h="all">الكل</button><button type="button" data-h="1">مشكولة</button><button type="button" data-h="0">غير مشكولة</button></div>'
-BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"></div>'
+BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب أو مؤلف" aria-label="ابحث عن كتاب أو مؤلف" autocomplete="off"><button id="q-clear" type="button" hidden aria-label="مسح" title="مسح">×</button></div>'
+BAR_AUTHOR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"><button id="q-clear" type="button" hidden aria-label="مسح" title="مسح">×</button></div>'
 
 
 def author_slug(i, author):
@@ -286,15 +379,12 @@ def book_item(b, pages, fname, urls, up='', who=False):
     links = ' '.join(f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                      for n, u in enumerate(urls, 1))
     nh = ' nh' if b.get('harakat') is False else ''
-    return f'''    <li class="book{nh}">
-      <div class="info"><h3><a href="{up}{b['slug']}/">{esc(b['title'])}</a></h3><span class="meta">{esc(b['author']) + ' · ' if who else ''}{ar(pages)} صفحة · {links}</span></div>
-      <a class="btn" href="{up}pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
-    </li>'''
+    return f'<li class="book{nh}"><div class="info"><h3><a href="{up}{b["slug"]}/">{esc(b["title"])}</a></h3><span class="meta">{esc(b["author"]) + " · " if who else ""}{ar(pages)} صفحة · {links}</span></div><a class="btn" href="{up}pdf/{b["slug"]}.pdf" download="{fname}">تحميل PDF</a></li>'
 
 
 sections, nav = [], []
 INFO = {}  # slug → (pages, PDF file name, source links), for the «بماذا يبدأ طالب العلم؟» page
-by_sci = {}  # subject → [(author, li)]
+by_sci = {}  # subject → [(author, slug)]
 recent = {'a': [], 'v': []}  # (time, li) for «أُضيفت حديثًا» / «شُكِّلت حديثًا»
 for i, author in enumerate(data['authors']):
     aslug = author_slug(i, author)
@@ -302,8 +392,10 @@ for i, author in enumerate(data['authors']):
     mine_b = []
     for b in data['books']:
         if b['author'] != author: continue
+        src_pdf = os.path.join(SRC, b['pdf'])
         dst = os.path.join(PUB, 'pdf', b['slug'] + '.pdf')
-        shutil.copyfile(os.path.join(SRC, b['pdf']), dst)
+        if not os.path.exists(dst) or not filecmp.cmp(src_pdf, dst, shallow=False):
+            shutil.copyfile(src_pdf, dst)
         mine_b.append((len(PdfReader(dst).pages), b))
     mine_b.sort(key=lambda x: (FIRST_POS.get((author, x[1]['slug']), 1e9), x[0]))  # "first" groups in their order, the rest shortest to longest
     for pages, b in mine_b:
@@ -320,7 +412,7 @@ for i, author in enumerate(data['authors']):
         sci = SCI['books'].get(b['slug'])
         if sci not in SCI['order']:
             print(f"warning: {b['slug']} has no subject in sciences.json: listed under «{OTHER}»"); sci = OTHER
-        by_sci.setdefault(sci, []).append((author, items[-1][1]))
+        by_sci.setdefault(sci, []).append((author, b['slug']))
     if items:
         sid = f'a{i + 1}'
         nav.append(f'<a class="v-author" data-s="{sid}" href="{aslug}/">{esc(author)} <span>({ar(len(items))})</span></a>')
@@ -335,7 +427,7 @@ for i, author in enumerate(data['authors']):
   <h1>{esc(author)}</h1>
   </header>
   {FILTER if len({b.get('harakat') is False for b in data['books'] if b['author'] == author}) > 1 else ''}
-  {BAR}
+  {BAR_AUTHOR}
   {jump}
   <section>
 ''' + grouped(sub_items, 'top') + f'''
@@ -349,15 +441,17 @@ for i, author in enumerate(data['authors']):
         os.makedirs(os.path.join(PUB, aslug), exist_ok=True)
         open(os.path.join(PUB, aslug, 'index.html'), 'w', encoding='utf8').write(apage)
 
+sci_data = {}
 for j, sci in enumerate(SCI['order'] + [OTHER]):
     if sci not in by_sci and sci == OTHER: continue
-    sid, lis = f's{j + 1}', by_sci.get(sci, [])
-    nav.append(f'<a class="v-science" data-s="{sid}" href="#{sid}">{esc(sci)} <span>({ar(len(lis))})</span></a>')
+    sid, pairs = f's{j + 1}', by_sci.get(sci, [])
+    nav.append(f'<a class="v-science" data-s="{sid}" href="#{sid}">{esc(sci)} <span>({ar(len(pairs))})</span></a>')
     groups = []
     for author in data['authors']:
-        mine = [li for a, li in lis if a == author]
-        if mine: groups.append(f'  <div class="group sub">\n    <h3 class="kind">{esc(author)} <span>({ar(len(mine))})</span></h3>\n    <ul>\n' + '\n'.join(mine) + '\n    </ul>\n  </div>')
-    sections.append(f'  <section class="v-science" id="{sid}" style="--n:{len(lis)}">\n    <h2>{esc(sci)}</h2>\n' + '\n'.join(groups) + '\n  </section>')
+        mine = [slug for a, slug in pairs if a == author]
+        if mine: groups.append([author, mine])
+    sci_data[sid] = groups
+    sections.append(f'  <section class="v-science" id="{sid}" style="--n:{len(pairs)}">\n    <h2>{esc(sci)}</h2>\n  </section>')
 # «قريبًا»: books and authors on the way (coming.json, hand-edited; drop an entry once its book is live)
 COMING = json.load(open(os.path.join(ROOT, 'coming.json'), encoding='utf8'))
 live = {bare(plain(b['title'])) for b in data['books']}
@@ -387,7 +481,6 @@ for k, a in enumerate(_extra):
     mine = [c for c in soon if c['author'] == a]
     lis = '\n'.join(f'    <li class="soon-book"><span class="t">{esc(c["title"])}</span></li>' for c in mine)
     body = f'\n    <ul>\n{lis}\n    </ul>' if mine else ''
-    nav.insert(0, f'<a class="v-author" href="#x{k + 1}">{esc(a)}</a>') if False else None
     nav.insert(_base + k, f'<a class="v-author" href="#x{k + 1}">{esc(a)}</a>')
     sections.insert(_base + k, f'  <section class="v-author" id="x{k + 1}">\n    <h2>{esc(a)}</h2>{body}\n  </section>')
 # newest first, above the author buttons (shown in both views)
@@ -459,6 +552,7 @@ def start_page():
     open(os.path.join(PUB, START, 'index.html'), 'w', encoding='utf8').write(page)
 start_page()
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
+SCI_JSON = f'<script id="sci-data" type="application/json">{json.dumps(sci_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")}</script>\n'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
 <main>
@@ -474,7 +568,7 @@ page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if
 {chr(10).join(sections)}
   <p id="none" hidden>لا توجد نتائج</p>
 </main>
-{RECENT}{SEARCH}
+{SCI_JSON}{RECENT}{SEARCH}
 </body>
 </html>
 '''

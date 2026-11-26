@@ -2,7 +2,7 @@
 // Secret GITHUB_TOKEN (Cloudflare Pages, production): fine-grained, this repo only, Issues read/write;
 // set with scripts/set-report-token.sh. Without it, GET says ready:false and the pages hide the button.
 const REPO = 'samycc777/site-harakat-books';
-const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json' } });
+const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
 
 export const onRequestGet = ({ env }) => json({ ready: !!env.GITHUB_TOKEN });
 

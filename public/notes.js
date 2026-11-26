@@ -1,26 +1,31 @@
 // Footnotes as pop-ups: each «(n)» or «(٭)» in the text becomes a small button; tapping it opens
 // that page's note in a box under the marker (close with ×, a tap outside, or Esc).
 // Works on the .fn blocks sync.py writes after each page's text; notes it can't pair stay as they are.
+// Runs immediately when loaded with defer (before progress.js) so removed .fn blocks never shift restored scroll.
 (function () {
   var NUM = /\(([٠-٩0-9]+|[٭*]+)\)/g, LEAD = /^\s*\(([٠-٩0-9]+|[٭*]+)\)\s*/;
   var SOLO = /^\s*\([٠-٩0-9]+\)\s*$/;
   var pop, cur, carry = null;  // carry = last note of the previous page (a note can run onto the next page)
 
-  function close() {
+  function close(focusCur) {
     if (!pop || pop.hidden) return;
+    var wasInside = pop.contains(document.activeElement);
     pop.hidden = true;
+    var prev = cur;
     if (cur) cur.setAttribute('aria-expanded', 'false');
     cur = null;
+    if ((focusCur || wasInside) && prev) prev.focus();
   }
 
   function open(btn) {
-    if (cur === btn) { close(); return; }
-    close();
+    if (cur === btn) { close(false); return; }
+    close(false);
+    document.dispatchEvent(new CustomEvent('km:pop', { detail: 'note' }));
     if (!pop) {
       pop = document.createElement('div');
-      pop.className = 'note-pop'; pop.setAttribute('role', 'dialog'); pop.hidden = true;
-      pop.innerHTML = '<button type="button" class="x" aria-label="إغلاق">×</button><div class="body"></div>';
-      pop.querySelector('.x').addEventListener('click', close);
+      pop.className = 'note-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'الحاشية'); pop.hidden = true;
+      pop.innerHTML = '<button type="button" class="x" aria-label="إغلاق" title="إغلاق">×</button><div class="body"></div>';
+      pop.querySelector('.x').addEventListener('click', function () { close(true); });
       document.body.appendChild(pop);
     }
     pop.querySelector('.body').innerHTML = '<span class="n">(' + btn.textContent + ')</span> ' + btn._note.html;
@@ -30,7 +35,7 @@
   }
 
   function place() {
-    if (!cur) return;
+    if (!cur || !pop || pop.hidden) return;
     var r = cur.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
     var w = pop.offsetWidth, h = pop.offsetHeight, mid = r.left + r.width / 2;
     var left = Math.max(8, Math.min(mid - w / 2, vw - w - 8));
@@ -89,7 +94,7 @@
     if (!fn.querySelector('p')) fn.remove();
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function init() {
     var text = document.querySelector('.text');
     if (!text) return;
     // Collect each .fn's page slice before any .fn is removed, so removing one never widens the next scan.
@@ -105,9 +110,12 @@
       if (b) { e.stopPropagation(); open(b); }
     });
     document.addEventListener('click', function (e) {
-      if (pop && !pop.hidden && !pop.contains(e.target)) close();
+      if (pop && !pop.hidden && !pop.contains(e.target)) close(false);
     });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    document.addEventListener('km:pop', function (e) { if (e.detail !== 'note') close(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(true); });
     window.addEventListener('resize', place);
-  });
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', place);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

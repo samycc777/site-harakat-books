@@ -1,5 +1,5 @@
 // Dark and other colours are opt-in through the moon button, remembered in this browser; the site opens light.
-// Loaded in <head> without defer so the saved look applies before the page paints.
+// Loaded in <head> without defer so the saved look, theme, view and font scale apply before the page paints.
 // Two looks: "paper" (everyone: white page in a red frame, like the المقالات الواضحات videos) and
 // "classic" (Bilal only): opening any page with ?look=classic remembers it in this browser, ?look=paper undoes it.
 (function () {
@@ -11,6 +11,11 @@
       history.replaceState(null, '', location.pathname + location.hash);
     }
     if (localStorage.getItem('look') === 'classic') root.dataset.look = 'classic';
+  } catch (e) {}
+  // Saved reading font scale (reader.js): applied before paint so there is no layout jump.
+  try {
+    var fs = parseFloat(localStorage.getItem('fs'));
+    if (fs >= 0.8 && fs <= 1.5) root.style.setProperty('--fs', String(fs));
   } catch (e) {}
   // Colours: the moon button opens a row of colour circles. "light"/"dark" are the first two looks;
   // the others set data-palette (CSS at the end of site.css), and the dark ones also data-theme=dark.
@@ -36,6 +41,7 @@
       if (v === 'science') root.dataset.view = 'science'; else delete root.dataset.view;
       try { if (v === 'science') localStorage.setItem('view', 'science'); else localStorage.removeItem('view'); } catch (e) {}
       mark();
+      document.dispatchEvent(new CustomEvent('km:view', { detail: v }));
     });
     if (views.length) mark();
     var btn = document.getElementById('theme');
@@ -56,10 +62,12 @@
     btn.setAttribute('aria-expanded', 'false');
     var pop = null;
     var close = function () { if (pop) { pop.remove(); pop = null; btn.setAttribute('aria-expanded', 'false'); } };
+    document.addEventListener('km:pop', function (e) { if (e.detail !== 'theme') close(); });
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       if (pop) return close();
-      pop = document.createElement('div'); pop.id = 'theme-pop';
+      document.dispatchEvent(new CustomEvent('km:pop', { detail: 'theme' }));
+      pop = document.createElement('div'); pop.id = 'theme-pop'; pop.setAttribute('role', 'group'); pop.setAttribute('aria-label', 'الألوان');
       var cur = saved();
       T.forEach(function (t) {
         var b = document.createElement('button');
@@ -78,7 +86,8 @@
       });
       btn.parentNode.appendChild(pop);
       btn.setAttribute('aria-expanded', 'true');
-      pop.querySelector('[aria-pressed=true]').focus();
+      var active = pop.querySelector('[aria-pressed=true]') || pop.firstChild;
+      if (active) active.focus();
     });
     document.addEventListener('click', function (e) { if (pop && !pop.contains(e.target)) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pop) { close(); btn.focus(); } });

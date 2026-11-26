@@ -13,6 +13,7 @@
 
   var line = document.createElement('div');
   line.id = 'readbar';
+  line.setAttribute('aria-hidden', 'true');
   line.innerHTML = '<i></i>';
   document.body.appendChild(line);
 

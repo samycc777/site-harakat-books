@@ -46,6 +46,16 @@
     if (n) post(items, keepalive).catch(function () {});
   }
 
+  function ensureFab() {
+    var f = document.getElementById('fab');
+    if (!f) {
+      f = document.createElement('div');
+      f.id = 'fab';
+      document.body.appendChild(f);
+    }
+    return f;
+  }
+
   var KM = window.KM = {
     get: function (slug) { return store[slug] || null; },
     all: function () { return store; },
@@ -55,7 +65,9 @@
       if (user) { dirty[slug] = 1; if (!timer) timer = setTimeout(flush, 15000); }
     },
     flush: flush,
-    signedIn: function () { return !!user; }
+    signedIn: function () { return !!user; },
+    render: render,
+    fab: ensureFab
   };
   addEventListener('pagehide', function () { flush(true); });
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flush(true); });
@@ -104,7 +116,7 @@
       var li = lis[i], slug = slugOf(li), old = li.querySelector('.prog');
       if (old) old.remove();
       if (!slug) continue;
-      if (!first[slug] && !li.closest('#reading')) first[slug] = li;
+      if (!li.closest('#reading') && (!first[slug] || li.closest('section.v-author'))) first[slug] = li;
       var e = store[slug];
       if (started(e) && e.p != null) li.querySelector('.info').appendChild(bar(e));
     }
@@ -152,10 +164,28 @@
   }
   function drawButton() {
     if (!btn) return;
-    btn.innerHTML = user && user.pic ? '<img alt="" referrerpolicy="no-referrer" src="' + user.pic.replace(/"/g, '') + '">' : PERSON;
+    btn.textContent = '';
+    if (user && user.pic && /^https?:\/\//.test(user.pic)) {
+      var img = document.createElement('img');
+      img.alt = '';
+      img.referrerPolicy = 'no-referrer';
+      img.src = user.pic;
+      img.onerror = function () { btn.innerHTML = PERSON; };
+      btn.appendChild(img);
+    } else {
+      btn.innerHTML = PERSON;
+    }
     var l = user ? (user.name || 'الحساب') : 'تسجيل الدخول';
     btn.setAttribute('aria-label', l); btn.title = l;
     btn.classList.toggle('in', !!user);
+  }
+  function closePop(focusBtn) {
+    if (!pop || pop.hidden) return;
+    pop.hidden = true;
+    if (btn) {
+      btn.setAttribute('aria-expanded', 'false');
+      if (focusBtn) btn.focus();
+    }
   }
   function drawPop() {
     pop.textContent = '';
@@ -167,7 +197,7 @@
       out.type = 'button'; out.className = 'btn light'; out.textContent = 'تسجيل الخروج';
       out.onclick = function () {
         flush();
-        fetch('/api/auth', { method: 'DELETE', credentials: 'same-origin' }).finally(function () { setUser(null); pop.hidden = true; });
+        fetch('/api/auth', { method: 'DELETE', credentials: 'same-origin' }).finally(function () { setUser(null); closePop(true); });
       };
       pop.appendChild(who); pop.appendChild(out);
     } else {
@@ -198,25 +228,30 @@
       .then(function (x) { return x.json(); })
       .then(function (d) {
         if (!d.ok) return;
-        setUser(d.user); pop.hidden = true;
+        setUser(d.user); closePop(false);
         sync();
       }).catch(function () {});
   }
   function setupButton() {
     btn = document.getElementById('acct');
     if (!btn) return;
+    btn.setAttribute('aria-expanded', 'false');
     if (ls.get(READY) === '1') btn.hidden = false;
     drawButton();
     pop = document.createElement('div');
     pop.id = 'acct-pop'; pop.hidden = true;
     btn.parentNode.appendChild(pop);
+    document.addEventListener('km:pop', function (ev) { if (ev.detail !== 'acct') closePop(false); });
     btn.addEventListener('click', function (ev) {
       ev.stopPropagation();
-      pop.hidden = !pop.hidden;
-      if (!pop.hidden) drawPop();
+      if (!pop.hidden) return closePop(false);
+      document.dispatchEvent(new CustomEvent('km:pop', { detail: 'acct' }));
+      pop.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+      drawPop();
     });
-    document.addEventListener('click', function (ev) { if (!pop.hidden && !pop.contains(ev.target)) pop.hidden = true; });
-    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') pop.hidden = true; });
+    document.addEventListener('click', function (ev) { if (!pop.hidden && !pop.contains(ev.target)) closePop(false); });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !pop.hidden) closePop(true); });
     fetch('/api/auth', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (d) {
       if (!d.ready) { btn.hidden = true; ls.del(READY); if (user) setUser(null); return; }
       clientId = d.clientId; ls.set(READY, '1'); btn.hidden = false;
@@ -225,19 +260,20 @@
     }).catch(function () {});
   }
 
-  // round ↑ button on the long book lists, shown after scrolling down a few screens
+  // round ↑ button on long pages (lists, books, ibtida), shown after scrolling down
   function toTop() {
-    if (!document.querySelector('.bar')) return;
     var b = document.createElement('button');
     b.id = 'totop'; b.type = 'button'; b.setAttribute('aria-label', 'أعلى الصفحة'); b.title = 'أعلى الصفحة';
     b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
     b.onclick = function () { scrollTo({ top: 0, behavior: 'smooth' }); };
-    document.body.appendChild(b);
+    ensureFab().appendChild(b);
     var on = false;
-    addEventListener('scroll', function () {
-      var v = scrollY > innerHeight * 2;
+    function vis() {
+      var v = scrollY > innerHeight * 1.5;
       if (v !== on) { on = v; b.classList.toggle('on', v); }
-    }, { passive: true });
+    }
+    addEventListener('scroll', vis, { passive: true });
+    vis();
   }
 
   function start() {

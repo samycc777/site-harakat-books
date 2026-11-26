@@ -17,11 +17,12 @@ h2{font-size:1.6rem;margin:2.5rem 0 .8rem;padding-bottom:.3rem;border-bottom:2px
 ul{list-style:none;margin:0;padding:0}
 [hidden]{display:none!important}
 .btn{flex:none;background:var(--btn);color:var(--btn-ink);text-decoration:none;padding:.5rem 1.2rem;border-radius:.5rem;font-weight:700;font-size:1.1rem;line-height:1.8}
-.btn:hover,.btn:focus{background:var(--btn2)}
+.btn:hover,.btn:focus-visible{background:var(--btn2)}
 .btn.light{background:var(--card);color:var(--brown);border:1px solid var(--edge)}
-.btn.light:hover,.btn.light:focus{background:var(--hover)}
+.btn.light:hover,.btn.light:focus-visible{background:var(--hover)}
 .src{color:var(--brown)}
-.src:hover,.src:focus{color:var(--brown2)}
+.src:hover,.src:focus-visible{color:var(--brown2)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* list page */
 .book{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--line)}
@@ -44,8 +45,11 @@ nav.authors span{color:var(--muted)}
 .views button[aria-pressed=true]{background:var(--btn);color:var(--btn-ink);font-weight:700}
 :root[data-view=science] .v-author,:root:not([data-view=science]) .v-science{display:none!important}
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:.6rem 0;border-bottom:1px solid var(--line)}
-.bar input{width:100%;font:inherit;font-size:1.15rem;padding:.4rem .9rem;border:1px solid var(--edge);border-radius:.5rem;background:var(--card);color:inherit}
+.bar input{width:100%;font:inherit;font-size:1.15rem;padding:.4rem .9rem .4rem 2.5rem;border:1px solid var(--edge);border-radius:.5rem;background:var(--card);color:inherit}
+.bar input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
 .bar input:focus{outline:2px solid var(--accent);outline-offset:0}
+#q-clear{position:absolute;top:50%;left:.45rem;transform:translateY(-50%);width:2rem;height:2rem;border:0;border-radius:50%;background:none;color:var(--muted);font-size:1.45rem;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+#q-clear:hover,#q-clear:focus-visible{background:var(--hover);color:var(--ink)}
 section{scroll-margin-top:4.5rem}
 #none{text-align:center;color:var(--muted);margin:2rem 0}
 
@@ -56,7 +60,7 @@ section{scroll-margin-top:4.5rem}
 .read .sub{text-align:center;color:var(--muted);margin:0 0 1.2rem}
 .actions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;align-items:center;margin:0 0 1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}
 .actions .meta{width:100%;text-align:center}
-.text{font-size:1.35rem;line-height:2.25}
+.text{font-size:calc(1.35rem * var(--fs,1));line-height:2.25;overflow-wrap:break-word}
 .text p{margin:.5em 0;text-align:justify}
 .text h2{font-size:1.25em;margin:1.4em 0 .5em;border-bottom-width:1px}
 .text h2.basmala{text-align:center;border:0}
@@ -64,7 +68,7 @@ section{scroll-margin-top:4.5rem}
 .text .quran{color:var(--quran)}
 .text .fn{color:var(--muted);font-size:.82em;border-top:1px solid var(--line);margin:1em 0 1.4em;padding-top:.4em}
 .text .fn p{margin:.2em 0}
-.text .tbl{border-collapse:collapse;margin:1em auto;font-size:.9em}
+.text .tbl{border-collapse:collapse;margin:1em auto;font-size:.9em;max-width:100%;display:block;width:fit-content;overflow-x:auto}
 .text .tbl td,.text .tbl th{border:1px solid var(--line);padding:.15em .6em;text-align:center}
 .text .tree{list-style:none;margin:1em 0;padding:0;font-size:.92em;line-height:1.85}
 .text .tree ul{list-style:none;margin:0;padding:.25em 0 0;padding-inline-start:1.5em}
@@ -85,7 +89,7 @@ section{scroll-margin-top:4.5rem}
 }
 .text .sig{text-align:left;color:var(--brown)}
 /* large reading text on laptops; phones keep their size */
-@media(min-width:700px){.text{font-size:2rem}.read h1{font-size:2.6rem}}
+@media(min-width:700px){.text{font-size:calc(2rem * var(--fs,1))}.read h1{font-size:2.6rem}}
 
 @media(max-width:560px){
  body{font-size:1.2rem}
@@ -150,11 +154,11 @@ h2 a:hover,h2 a:focus{text-decoration:underline;text-decoration-thickness:1px;te
 :root:not([data-look=classic]) #theme{top:0;background:var(--page);color:var(--accent)}
 :root:not([data-look=classic]) .bar{background:var(--page)}
 :root:not([data-look=classic]) h3 a:hover,:root:not([data-look=classic]) h3 a:focus{color:var(--accent)}
-:root:not([data-look=classic]) .text{font-size:1.3rem;line-height:2.2}
+:root:not([data-look=classic]) .text{font-size:calc(1.3rem * var(--fs,1));line-height:2.2}
 :root:not([data-look=classic]) .text .fn{border-top-color:var(--edge)}
 :root:not([data-look=classic]) .note-pop{font-family:"Amiri",serif}
 :root:not([data-look=classic]) .nref{font-family:"Amiri",serif}
-@media(min-width:700px){:root:not([data-look=classic]) .text{font-size:1.8rem}:root:not([data-look=classic]) .read h1{font-size:3.8rem}}
+@media(min-width:700px){:root:not([data-look=classic]) .text{font-size:calc(1.8rem * var(--fs,1))}:root:not([data-look=classic]) .read h1{font-size:3.8rem}}
 @media(max-width:560px){
  :root:not([data-look=classic]) main{margin:.35rem;padding:1.9rem 1.4rem 2.2rem}
  :root:not([data-look=classic]) main::before{inset:7px;border-width:4px;box-shadow:inset 0 0 0 3px var(--page),inset 0 0 0 4px var(--accent)}
@@ -198,11 +202,15 @@ section.recent details:not([open]) summary h2::after{transform:rotate(90deg)}
 /* book page: how far through the book, top of the screen (progress.js) */
 #readbar{position:fixed;top:0;right:0;left:0;height:4px;z-index:30;pointer-events:none}
 #readbar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s linear}
-/* back to the top of long lists (account.js) */
-#totop{position:fixed;bottom:1.2rem;left:1.2rem;z-index:15;width:2.8rem;height:2.8rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--accent);cursor:pointer;display:grid;place-items:center;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.2);opacity:0;transform:translateY(.6rem);transition:opacity .2s,transform .2s;pointer-events:none}
-#totop.on{opacity:1;transform:none;pointer-events:auto}
-#totop:hover,#totop:focus-visible{background:var(--hover)}
-#totop svg{width:1.3rem;height:1.3rem}
+/* floating action buttons bottom-left (#tocbtn, #findbtn, #totop) */
+#fab{position:fixed;bottom:1.1rem;left:1.1rem;z-index:15;display:flex;align-items:center;pointer-events:none}
+#fab button{width:2.75rem;height:2.75rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--accent);cursor:pointer;display:grid;place-items:center;padding:0;margin-left:.5rem;box-shadow:0 3px 12px rgba(0,0,0,.22);opacity:0;transform:translateY(.6rem);transition:opacity .2s,transform .2s,background .15s;pointer-events:none}
+#fab button.on,#fab button[aria-expanded=true]{opacity:1;transform:none;pointer-events:auto}
+#fab button:not(.on):not([aria-expanded=true]){width:0;border-width:0;margin:0;overflow:hidden;box-shadow:none}
+#fab button:not(.on):not([aria-expanded=true]) svg{width:0}
+#fab button:hover,#fab button:focus-visible{background:var(--hover)}
+#fab button svg{width:1.3rem;height:1.3rem}
+:root:not([data-look=classic]) #fab button{background:var(--page)}
 /* phones: the PDF button sits small beside the title instead of a full-width bar under every book */
 @media(max-width:560px){
  .book{flex-direction:row;align-items:center;gap:.7rem}
@@ -263,17 +271,39 @@ section.v-author,section.v-science{content-visibility:auto;contain-intrinsic-siz
 .group{scroll-margin-top:4.5rem}
 nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:visible;margin:.8rem 0 0;padding:0}
 /* book pages: list of the book's headings (toc.js) */
-#tocbtn{position:fixed;bottom:1.2rem;left:1.2rem;z-index:15;width:2.8rem;height:2.8rem;border-radius:50%;border:1px solid var(--edge);background:var(--card);color:var(--accent);cursor:pointer;display:grid;place-items:center;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.2);opacity:0;transform:translateY(.6rem);transition:opacity .2s,transform .2s;pointer-events:none}
-#tocbtn.on,#tocbtn[aria-expanded=true]{opacity:1;transform:none;pointer-events:auto}
-#tocbtn:hover,#tocbtn:focus-visible{background:var(--hover)}
-#tocbtn svg{width:1.3rem;height:1.3rem}
 #toc-back{position:fixed;inset:0;z-index:16;background:rgba(0,0,0,.35)}
-#toc{position:fixed;z-index:17;bottom:4.6rem;left:1.2rem;width:min(26rem,calc(100vw - 2.4rem));max-height:min(70vh,40rem);overflow-y:auto;overscroll-behavior:contain;background:var(--card);border:1px solid var(--edge);border-radius:1rem;box-shadow:0 8px 30px rgba(0,0,0,.35);padding:.4rem}
+#toc{position:fixed;z-index:17;bottom:4.5rem;left:1.1rem;width:min(26rem,calc(100vw - 2.2rem));max-height:min(70vh,40rem);overflow-y:auto;overscroll-behavior:contain;background:var(--card);border:1px solid var(--edge);border-radius:1rem;box-shadow:0 8px 30px rgba(0,0,0,.35);padding:.45rem}
 #toc ol{list-style:none;margin:0;padding:0}
-#toc button{display:block;width:100%;text-align:start;font:inherit;font-size:1.1rem;line-height:1.7;color:var(--ink);background:none;border:0;border-radius:.6rem;padding:.35rem .8rem;cursor:pointer}
+#toc button{display:block;width:100%;text-align:start;font:inherit;font-size:1.08rem;line-height:1.75;color:var(--ink);background:none;border:0;border-inline-start:3px solid transparent;border-radius:.55rem;padding:.38rem .75rem;cursor:pointer}
 #toc button:hover,#toc button:focus-visible{background:var(--hover)}
-#toc button[aria-current]{color:var(--accent);font-weight:700;background:var(--hover)}
-:root:not([data-look=classic]) #tocbtn,:root:not([data-look=classic]) #toc{background:var(--page)}
+#toc button[aria-current]{color:var(--accent);font-weight:700;background:var(--hover);border-inline-start-color:var(--accent)}
+:root:not([data-look=classic]) #toc{background:var(--page)}
+
+/* book pages: reading tools (font size + in-book search, reader.js) */
+.read-tools{display:inline-flex;align-items:stretch}
+.read-tools .tool-btn{font:inherit;font-weight:700;font-size:1rem;line-height:1.8;min-width:2.6rem;padding:.32rem .75rem;border:1px solid var(--edge);background:var(--card);color:var(--brown);cursor:pointer;display:inline-grid;place-items:center}
+.read-tools .tool-btn:first-child{border-radius:0 .5rem .5rem 0}
+.read-tools .tool-btn:last-child{border-radius:.5rem 0 0 .5rem}
+.read-tools .tool-btn:not(:first-child){border-right:0}
+.read-tools .tool-btn:hover:not(:disabled),.read-tools .tool-btn:focus-visible{background:var(--hover)}
+.read-tools .tool-btn:disabled{opacity:.42;cursor:default}
+.read-tools .tool-btn svg{width:1.15rem;height:1.15rem}
+:root:not([data-look=classic]) .read-tools .tool-btn{background:var(--page)}
+
+/* book pages: sticky harakat-insensitive search bar (reader.js) */
+#findbar{position:fixed;top:.75rem;left:50%;transform:translateX(-50%);z-index:25;width:min(34rem,calc(100vw - 1.2rem));display:flex;align-items:center;gap:.35rem;background:var(--card);border:1px solid var(--edge);border-radius:.8rem;box-shadow:0 6px 26px rgba(0,0,0,.28);padding:.35rem .5rem}
+:root:not([data-look=classic]) #findbar{background:var(--page)}
+#findbar input{flex:1;min-width:0;font:inherit;font-size:1.08rem;line-height:1.6;padding:.25rem .6rem;border:1px solid var(--line);border-radius:.45rem;background:var(--card);color:var(--ink)}
+#findbar input:focus{outline:2px solid var(--accent);outline-offset:0}
+#findbar .cnt{font-size:.95rem;color:var(--muted);white-space:nowrap;padding:0 .25rem;min-width:2.5rem;text-align:center}
+#findbar button{flex:none;width:2rem;height:2rem;border:1px solid var(--line);border-radius:.45rem;background:none;color:var(--brown);font:inherit;font-size:.9rem;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+#findbar button.x{border:0;font-size:1.45rem;color:var(--muted)}
+#findbar button:hover:not(:disabled),#findbar button:focus-visible{background:var(--hover);color:var(--ink)}
+#findbar button:disabled{opacity:.38;cursor:default}
+.text mark.hit{background:rgba(245,190,40,.38);color:inherit;border-radius:.2em;padding:0 .05em}
+.text mark.hit.cur{background:#f5b726;color:#111;outline:2px solid var(--accent);outline-offset:1px}
+:root[data-theme=dark] .text mark.hit{background:rgba(245,190,40,.28)}
+:root[data-theme=dark] .text mark.hit.cur{background:#f5c542;color:#111}
 
 /* Next.js theme (like nextjs.org: black, white text, thin grey lines, white buttons) */
 :root[data-look=classic][data-palette=nextjs]{--bg:#000;--card:#0a0a0a;--ink:#ededed;--brown:#fff;--brown2:#d4d4d4;--muted:#a1a1a1;--line:#1f1f1f;--edge:#333;--accent:#ededed;--hover:#1a1a1a;--btn:#ededed;--btn2:#fff;--btn-ink:#000}
@@ -288,4 +318,31 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
 /* Charcoal Gold theme (deep charcoal #15161b, warm gold #d9b46d headings, cool grey subtitles, crisp off-white text) */
 :root[data-look=classic][data-palette=charcoal]{--bg:#15161b;--card:#1c1d24;--ink:#e6e6e6;--brown:#d9b46d;--brown2:#ebd096;--muted:#a4a4a6;--line:#252730;--edge:#383a46;--accent:#d9b46d;--hover:#20222b;--btn:#d9b46d;--btn2:#ebd096;--btn-ink:#15161b}
 :root[data-palette=charcoal]:not([data-look=classic]){--bg:#0e0f13;--page:#15161b;--card:#15161b;--ink:#e6e6e6;--brown:#d9b46d;--brown2:#ebd096;--muted:#a4a4a6;--line:#252730;--edge:#383a46;--accent:#d9b46d;--hover:#20222b;--btn:#d9b46d;--btn2:#ebd096;--btn-ink:#15161b}
-@media(max-width:560px){#theme-pop{display:grid;grid-template-columns:repeat(3,2.2rem);border-radius:1.2rem}}
+@media(max-width:560px){
+ #theme-pop{display:grid;grid-template-columns:repeat(3,2.2rem);border-radius:1.2rem}
+ .controls{gap:.5rem .6rem}
+ .views button{padding:.22rem .9rem;font-size:1rem}
+ .views.harakat button{padding:.18rem .8rem;font-size:.95rem}
+ .actions{gap:.45rem}
+ .actions .btn{padding:.4rem .9rem;font-size:1rem}
+ .read-tools .tool-btn{padding:.26rem .65rem;font-size:.95rem;min-width:2.35rem}
+ .note-pop{font-size:1.15rem;line-height:1.95;padding:.65rem .85rem .75rem 2.3rem}
+ #fab{bottom:.85rem;left:.85rem;gap:.45rem}
+ #fab button{width:2.6rem;height:2.6rem}
+ #toc{bottom:4.1rem;left:.85rem;width:calc(100vw - 1.7rem);max-height:65vh}
+ #findbar{top:.5rem;padding:.3rem .4rem;gap:.25rem}
+ #findbar input{font-size:1rem}
+}
+
+/* clean print output for book pages and lists */
+@media print{
+ #theme,#acct,#theme-pop,#acct-pop,#readbar,#fab,#toc,#toc-back,#findbar,.report,.read-tools,.actions .btn,.home,.bar,.controls,nav.authors,.prog{display:none!important}
+ body,main{background:#fff!important;color:#000!important;margin:0!important;padding:0!important;max-width:none!important;font-size:12pt!important;line-height:1.9!important}
+ main::before{display:none!important}
+ h1,h2,h3,.text b,.text .ref{color:#000!important;break-after:avoid}
+ .text{font-size:12pt!important;line-height:2!important}
+ .text .quran{color:#1b4d2e!important}
+ .actions{border-bottom:1px solid #bbb;padding-bottom:.6rem;margin-bottom:1rem}
+ section.v-author,section.v-science{content-visibility:visible!important}
+ .nref{border-color:#999!important;background:none!important;color:#000!important}
+}
