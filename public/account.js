@@ -157,10 +157,12 @@
   var PERSON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.4-6 8-6s6.8 2 8 6"/></svg>';
   var btn, pop, clientId = null, gisLoading = false;
   function setUser(u) {
+    var was = !!user;
     user = u;
     if (u) ls.set(ACCT, JSON.stringify(u)); else ls.del(ACCT);
     drawButton();
     if (pop && !pop.hidden) drawPop();
+    if (was !== !!u) document.dispatchEvent(new CustomEvent('km:auth', { detail: { signedIn: !!u } }));
   }
   function drawButton() {
     if (!btn) return;

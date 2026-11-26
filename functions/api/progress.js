@@ -4,6 +4,7 @@
 // GET → {items}. POST {items} (text body, also from keepalive on page close) → merged into the row.
 // DELETE → the reader's row is removed (button on the hidden /privacy/ page).
 import { json, readUser } from '../lib/session.js';
+import { ensureExercisesTable } from './exercises.js';
 
 let made = false;  // table made on first use (scripts/progress-schema.sql), once per worker
 async function table(env) {
@@ -50,6 +51,8 @@ export async function onRequestDelete({ request, env }) {
   const u = await readUser(request, env);
   if (!u) return json({ ok: false }, 401);
   await table(env);
+  await ensureExercisesTable(env);
   await env.DB.prepare('DELETE FROM reading WHERE sub = ?').bind(u.sub).run();
+  await env.DB.prepare('DELETE FROM exercises WHERE sub = ?').bind(u.sub).run();
   return json({ ok: true });
 }

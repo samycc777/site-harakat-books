@@ -196,6 +196,7 @@ def write_book_page(b, pages, urls, fname, aslug):
           'workExample': {'@type': 'Book', 'bookFormat': 'https://schema.org/EBook', 'encodingFormat': 'application/pdf',
                           'url': f"{SITE}/pdf/{b['slug']}.pdf"}}
     desc = '، '.join(x for x in (b['title'], b['author'], plain(sub)) if x)
+    ex_js = f'<script src="{asset("../", "exercises.js")}" defer></script>\n' if b.get('exercises') else ''
     page = head(f"{b['title']} — {b['author']} | {NAME}", '../', b['slug'], desc, ld) + f'''<body>
 <main class="read">
   <header>
@@ -215,7 +216,7 @@ def write_book_page(b, pages, urls, fname, aslug):
 {REPORT}
 </main>
 <script src="{asset('../', 'notes.js')}" defer></script>
-<script src="{asset('../', 'progress.js')}" defer></script>
+{ex_js}<script src="{asset('../', 'progress.js')}" defer></script>
 <script src="{asset('../', 'report.js')}" defer></script>
 <script src="{asset('../', 'toc.js')}" defer></script>
 <script src="{asset('../', 'reader.js')}" defer></script>
