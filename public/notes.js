@@ -98,8 +98,10 @@
     var text = document.querySelector('.text');
     if (!text) return;
     // Collect each .fn's page slice before any .fn is removed, so removing one never widens the next scan.
+    // Adjacent .fn blocks (e.g. long endnotes split across chunks) share the preceding body slice.
     var ranges = [].map.call(text.querySelectorAll('.fn'), function (fn) {
       var els = [], e = fn.previousElementSibling;
+      while (e && e.classList.contains('fn')) e = e.previousElementSibling;
       for (; e && !e.classList.contains('fn'); e = e.previousElementSibling) els.unshift(e);
       while (e && e.classList.contains('fn')) e = e.previousElementSibling;
       return { fn: fn, els: els, prev: e };
