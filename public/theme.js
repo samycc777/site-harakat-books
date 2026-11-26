@@ -14,7 +14,7 @@
   } catch (e) {}
   // Colours: the moon button opens a row of colour circles. "light"/"dark" are the first two looks;
   // the others set data-palette (CSS at the end of site.css), and the dark ones also data-theme=dark.
-  var DARK = { dark: 1, blue: 1, black: 1, darkgreen: 1, nextjs: 1, gruvbox: 1 };
+  var DARK = { dark: 1, blue: 1, black: 1, darkgreen: 1, nextjs: 1, gruvbox: 1, charcoal: 1 };
   var apply = function (t) {
     if (DARK[t]) root.dataset.theme = 'dark'; else delete root.dataset.theme;
     if (t === 'light' || t === 'dark') delete root.dataset.palette; else root.dataset.palette = t;
@@ -49,7 +49,8 @@
       ['black', 'أسود', ['#000', '#d4b06a']],
       ['darkgreen', 'أخضر ليلي', ['#141b16', '#9fd0a8']],
       ['nextjs', 'Next.js', ['#000', '#ededed']],
-      ['gruvbox', 'Gruvbox', ['#282828', '#fe8019']]
+      ['gruvbox', 'Gruvbox', ['#282828', '#fe8019']],
+      ['charcoal', 'فحمي ذهبي', ['#15161b', '#d9b46d']]
     ];
     btn.setAttribute('aria-label', 'الألوان'); btn.title = 'الألوان';
     btn.setAttribute('aria-expanded', 'false');

@@ -284,4 +284,8 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
 /* Gruvbox Dark theme */
 :root[data-look=classic][data-palette=gruvbox]{--bg:#282828;--card:#32302f;--ink:#ebdbb2;--brown:#fabd2f;--brown2:#fcd46b;--muted:#a89984;--line:#3c3836;--edge:#504945;--accent:#fe8019;--hover:#3c3836;--btn:#b8bb26;--btn2:#cdd03a;--btn-ink:#282828;--quran:#8ec07c}
 :root[data-palette=gruvbox]:not([data-look=classic]){--bg:#1d2021;--page:#282828;--card:#282828;--ink:#ebdbb2;--brown:#fabd2f;--brown2:#fcd46b;--muted:#a89984;--line:#3c3836;--edge:#504945;--accent:#fe8019;--hover:#3c3836;--btn:#b8bb26;--btn2:#cdd03a;--btn-ink:#282828;--quran:#8ec07c}
-@media(max-width:560px){#theme-pop{display:grid;grid-template-columns:repeat(4,2.2rem);border-radius:1.2rem}}
+
+/* Charcoal Gold theme (deep charcoal #15161b, warm gold #d9b46d headings, cool grey subtitles, crisp off-white text) */
+:root[data-look=classic][data-palette=charcoal]{--bg:#15161b;--card:#1c1d24;--ink:#e6e6e6;--brown:#d9b46d;--brown2:#ebd096;--muted:#a4a4a6;--line:#252730;--edge:#383a46;--accent:#d9b46d;--hover:#20222b;--btn:#d9b46d;--btn2:#ebd096;--btn-ink:#15161b}
+:root[data-palette=charcoal]:not([data-look=classic]){--bg:#0e0f13;--page:#15161b;--card:#15161b;--ink:#e6e6e6;--brown:#d9b46d;--brown2:#ebd096;--muted:#a4a4a6;--line:#252730;--edge:#383a46;--accent:#d9b46d;--hover:#20222b;--btn:#d9b46d;--btn2:#ebd096;--btn-ink:#15161b}
+@media(max-width:560px){#theme-pop{display:grid;grid-template-columns:repeat(3,2.2rem);border-radius:1.2rem}}
