@@ -308,6 +308,8 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
 .text mark.hit.cur{background:#f5b726;color:#111;outline:2px solid var(--accent);outline-offset:1px}
 :root[data-theme=dark] .text mark.hit{background:rgba(245,190,40,.28)}
 :root[data-theme=dark] .text mark.hit.cur{background:#f5c542;color:#111}
+.text .hl{background:rgba(245,190,40,.22);border-inline-start:3px solid var(--accent);padding-inline:.65rem;margin-inline:-.65rem;border-radius:.35rem}
+:root[data-theme=dark] .text .hl{background:rgba(245,190,40,.16)}
 
 /* Next.js theme (like nextjs.org: black, white text, thin grey lines, white buttons) */
 :root[data-look=classic][data-palette=nextjs]{--bg:#000;--card:#0a0a0a;--ink:#ededed;--brown:#fff;--brown2:#d4d4d4;--muted:#a1a1a1;--line:#1f1f1f;--edge:#333;--accent:#ededed;--hover:#1a1a1a;--btn:#ededed;--btn2:#fff;--btn-ink:#000}
@@ -423,4 +425,5 @@ nav.authors.kinds{display:flex;flex-wrap:wrap;justify-content:center;overflow:vi
  .actions{border-bottom:1px solid #bbb;padding-bottom:.6rem;margin-bottom:1rem}
  section.v-author,section.v-science{content-visibility:visible!important}
  .nref{border-color:#999!important;background:none!important;color:#000!important}
+ .text .hl{background:none!important;border:0!important;padding-inline:0!important;margin-inline:0!important}
 }
