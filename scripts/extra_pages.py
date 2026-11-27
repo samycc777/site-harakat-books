@@ -131,13 +131,13 @@ def write_print_page(root, pub, support, books_data, info, head_fn, theme_btn):
     desc_meta = 'طَبَعَاتٌ وَرَقِيَّةٌ مَشْكُولَةٌ لِكُتُبِ أَهْلِ السُّنَّةِ وَالْجَمَاعَةِ — Verified full-harakat Islamic books in print (Amazon KDP & Cairo wide-margin study editions).'
     page = head_fn(title_meta, '../', 'print', desc_meta) + f'''<body>
 <main>
-  <header>
+  <header class="topbar">
+  <a class="home" href="/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>كتب مشكولة</span></a>
   {theme_btn}
-  <a class="home" href="/">كتب مشكولة</a>
+  </header>
   <h1 class="lang-ar">الطَّبْعَةُ الْوَرَقِيَّةُ</h1>
   <h1 class="lang-en" hidden dir="ltr">Mashkula Print Editions</h1>
   <h1 class="lang-fr" hidden dir="ltr">Éditions imprimées Mashkula</h1>
-  </header>
 
   <section class="info-card">
     <p class="lang-ar">طَبَعَاتٌ وَرَقِيَّةٌ نَظِيفَةٌ وَمَضْبُوطَةٌ بِالشَّكْلِ الْكَامِلِ لِمُتُونِ أَهْلِ السُّنَّةِ وَالْجَمَاعَةِ وَكُتُبِ الْمُبْتَدِئِينَ، صُمِّمَتْ بِخَطٍّ وَاضِحٍ وَهَوَامِشَ مُرِيحَةٍ لِتَيْسِيرِ الْقِرَاءَةِ وَالدِّرَاسَةِ. تَبْقَى الْقِرَاءَةُ عَلَى الْمَوْقِعِ مَجَّانِيَّةً دَائِمًا، وَيَعُودُ رَيْعُ الطَّبَعَاتِ الْوَرَقِيَّةِ لِدَعْمِ تَشْكِيلِ مَزِيدٍ مِنَ الْكُتُبِ وَالتَّفَرُّغِ لِلْمَشْرُوعِ.</p>
@@ -351,13 +351,13 @@ def write_support_page(root, pub, support, books_data, reading_data, coming_data
 
     page = head_fn(title_meta, '../', 'support', desc_meta) + f'''<body>
 <main>
-  <header>
+  <header class="topbar">
+  <a class="home" href="/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>كتب مشكولة</span></a>
   {theme_btn}
-  <a class="home" href="/">كتب مشكولة</a>
+  </header>
   <h1 class="lang-ar">دَعْمُ الْمَشْرُوعِ وَكَفَالَةُ الْكُتُبِ</h1>
   <h1 class="lang-en" hidden dir="ltr">Support Mashkula &amp; Sponsor a Book</h1>
   <h1 class="lang-fr" hidden dir="ltr">Soutenir Mashkula &amp; Parrainer un livre</h1>
-  </header>
 
   <section class="info-card">
     <h2 class="lang-ar">هَدَفُ التَّفَرُّغِ الشَّهْرِيُّ</h2>
@@ -417,8 +417,11 @@ def write_support_page(root, pub, support, books_data, reading_data, coming_data
 
     <div id="sp-picked" class="info-card" hidden></div>
 
-    <div class="bar" style="position:static;border:0;padding:.3rem 0">
-      <input id="sp-q" type="search" placeholder="ابْحَثْ عَنْ كِتَابٍ لِكَفَالَةِ تَشْكِيلِهِ…" aria-label="Search unvocalized books" autocomplete="off">
+    <div class="bar" style="position:static;border:0;padding:.3rem 0;margin-bottom:.75rem;background:none;backdrop-filter:none">
+      <div class="search-field">
+        <svg class="q-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="sp-q" type="search" placeholder="ابْحَثْ عَنْ كِتَابٍ لِكَفَالَةِ تَشْكِيلِهِ…" aria-label="Search unvocalized books" autocomplete="off">
+      </div>
     </div>
     <div id="sp-list" class="sponsor-list"></div>
   </section>

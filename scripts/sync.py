@@ -78,13 +78,21 @@ def esc(s): return html.escape(s, quote=True)
 
 MOON = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
 SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>'
-THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
-# secondary font toggle (public/theme.js): switches between default Droid Arabic Naskh and Amiri
-THEME_BTN += '<button id="font" type="button" aria-label="الخط الأميري" title="الخط الأميري" aria-pressed="false">خط</button>'
-# UI language toggle (public/i18n.js): switches interface chrome AR / EN / FR (book texts stay 100% Arabic)
-THEME_BTN += '<button id="lang" type="button" aria-label="تغيير لغة الواجهة (AR / EN / FR)" title="تغيير لغة الواجهة (AR / EN / FR)" aria-pressed="false">ع</button>'
-# reader account (public/account.js): round button next to the theme/font/lang buttons, shown once sign-in is set up on the server
-THEME_BTN += '<button id="acct" type="button" hidden aria-label="تسجيل الدخول" title="تسجيل الدخول"></button>'
+SEARCH_ICO = '<svg class="q-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+BACK_ICO = '<svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>'
+ARROW_ICO = '<svg class="start-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>'
+THEME_BTN = (
+    '<div class="top-actions">'
+    f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
+    # secondary font toggle (public/theme.js): switches between default Droid Arabic Naskh and Amiri
+    '<button id="font" type="button" aria-label="الخط الأميري" title="الخط الأميري" aria-pressed="false">خط</button>'
+    # UI language toggle (public/i18n.js): switches interface chrome AR / EN / FR (book texts stay 100% Arabic)
+    '<button id="lang" type="button" aria-label="تغيير لغة الواجهة (AR / EN / FR)" title="تغيير لغة الواجهة (AR / EN / FR)" aria-pressed="false">ع</button>'
+    # reader account (public/account.js): round button next to the theme/font/lang buttons, shown once sign-in is set up on the server
+    '<button id="acct" type="button" hidden aria-label="تسجيل الدخول" title="تسجيل الدخول"></button>'
+    '</div>'
+)
+HOME_LINK = f'<a class="home" href="../">{BACK_ICO}<span>كتب مشكولة</span></a>'
 
 
 SITE = 'https://mashkula.com'
@@ -228,9 +236,9 @@ def write_book_page(b, pages, urls, fname, aslug):
     ex_js = f'<script src="{asset("../", "exercises.js")}" defer></script>\n' if b.get('exercises') else ''
     page = head(f"{b['title']} — {b['author']} | {NAME}", '../', b['slug'], desc, ld) + f'''<body>
 <main class="read">
-  <header>
+  <header class="topbar">
+  {HOME_LINK}
   {THEME_BTN}
-  <a class="home" href="../">كتب مشكولة</a>
   </header>
   <h1>{esc(b['title'])}</h1>
   <p class="sub">{sub}</p>
@@ -397,8 +405,8 @@ document.addEventListener('click', e => {
 if (location.hash) addEventListener('load', () => settle(decodeURIComponent(location.hash.slice(1))));
 </script>"""
 FILTER = '<div class="views harakat" role="group"><button type="button" data-h="all">الكل</button><button type="button" data-h="1">مشكولة</button><button type="button" data-h="0">غير مشكولة</button></div>'
-BAR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب أو مؤلف" aria-label="ابحث عن كتاب أو مؤلف" autocomplete="off"><button id="q-clear" type="button" hidden aria-label="مسح" title="مسح">×</button></div>'
-BAR_AUTHOR = '<div class="bar"><input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"><button id="q-clear" type="button" hidden aria-label="مسح" title="مسح">×</button></div>'
+BAR = f'<div class="bar"><div class="search-field">{SEARCH_ICO}<input id="q" type="search" placeholder="ابحث عن كتاب أو مؤلف" aria-label="ابحث عن كتاب أو مؤلف" autocomplete="off"><button id="q-clear" type="button" hidden aria-label="مسح" title="مسح">×</button></div></div>'
+BAR_AUTHOR = f'<div class="bar"><div class="search-field">{SEARCH_ICO}<input id="q" type="search" placeholder="ابحث عن كتاب" aria-label="ابحث عن كتاب" autocomplete="off"><button id="q-clear" type="button" hidden aria-label="مسح" title="مسح">×</button></div></div>'
 
 
 def author_slug(i, author):
@@ -455,11 +463,11 @@ for i, author in enumerate(data['authors']):
         jump = '<nav class="authors kinds">' + ''.join(f'<a data-s="k-{k}" href="#k-{k}">{esc(LABELS[k])} <span>({ar(sum(1 for kk, _ in sub_items if kk == k))})</span></a>' for k in kinds) + '</nav>' if len(kinds) > 1 else ''
         apage = head(f'{author} | {NAME}', '../', aslug, f"{NAME}: {author}") + f'''<body>
 <main>
-  <header>
+  <header class="topbar">
+  {HOME_LINK}
   {THEME_BTN}
-  <a class="home" href="../">كتب مشكولة</a>
-  <h1>{esc(author)}</h1>
   </header>
+  <h1>{esc(author)}</h1>
   {FILTER if len({b.get('harakat') is False for b in data['books'] if b['author'] == author}) > 1 else ''}
   {BAR_AUTHOR}
   {jump}
@@ -545,7 +553,7 @@ for (const sec of document.querySelectorAll('section.recent')) {
 READING = json.load(open(os.path.join(ROOT, 'reading.json'), encoding='utf8'))
 START, START_T = 'ibtida', 'بماذا يبدأ طالب العلم؟'
 START_LINK = f'''<div class="quick-links">
-    <a class="start" href="{START}/" data-i18n="start_pill">{START_T}</a>
+    <a class="start" href="{START}/"><span data-i18n="start_pill">{START_T}</span>{ARROW_ICO}</a>
     <a class="pill-sub" href="print/" data-i18n="print_pill">الطَّبْعَةُ الْوَرَقِيَّةُ</a>
     <a class="pill-sub" href="support/" data-i18n="support_pill">دَعْمُ الْمَشْرُوعِ</a>
   </div>'''
@@ -575,11 +583,11 @@ def start_page():
 ''' + '\n'.join(groups) + '\n  </section>')
     page = head(f'{START_T} | {NAME}', '../', START, f"{NAME}: {START_T} " + '، '.join(s['name'] for s in READING['shaykhs'])) + f'''<body>
 <main>
-  <header>
+  <header class="topbar">
+  {HOME_LINK}
   {THEME_BTN}
-  <a class="home" href="../">كتب مشكولة</a>
-  <h1>{START_T}</h1>
   </header>
+  <h1>{START_T}</h1>
   <nav class="authors">{''.join(nav)}</nav>
 {chr(10).join(secs)}
 </main>
@@ -596,12 +604,12 @@ _sci_dump = json.dumps(sci_data, ensure_ascii=False, separators=(",", ":")).repl
 SCI_JSON = f'<script id="sci-data" type="application/json">{_sci_dump}</script>\n'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
-<main>
-  <header>
+<main class="home-page">
+  <header class="hero">
   {THEME_BTN}
   <h1>كتب مشكولة</h1>
-  </header>
   {START_LINK}
+  </header>
   <div class="controls">{VIEWS}{FILTER}</div>
   {BAR}
 {chr(10).join(_rec)}
