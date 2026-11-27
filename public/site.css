@@ -123,6 +123,7 @@ main.read{max-width:none;padding:1.5rem clamp(1rem,2vw,2rem) 4rem}
 .text h2{font-size:1.25em;margin:1.45em 0 .55em;border-bottom-width:1px}
 .text h2.basmala{text-align:center;border:0}
 .text b{color:var(--brown)}
+.text u{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:.32em;text-decoration-skip-ink:none}
 .text .quran{color:var(--quran)}
 .text .fn{color:var(--muted);font-size:.82em;border-top:1px solid var(--line);margin:1em 0 1.4em;padding-top:.4em}
 .text .fn p{margin:.2em 0}
