@@ -63,7 +63,9 @@ def esc(s): return html.escape(s, quote=True)
 MOON = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>'
 SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>'
 THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
-# reader account (public/account.js): round button next to the moon, shown once sign-in is set up on the server
+# secondary font toggle (public/theme.js): switches between default Droid Arabic Naskh and Amiri
+THEME_BTN += '<button id="font" type="button" aria-label="الخط الأميري" title="الخط الأميري" aria-pressed="false">خط</button>'
+# reader account (public/account.js): round button next to the theme/font buttons, shown once sign-in is set up on the server
 THEME_BTN += '<button id="acct" type="button" hidden aria-label="تسجيل الدخول" title="تسجيل الدخول"></button>'
 
 
@@ -106,7 +108,7 @@ def head(title, up='', path='', desc='', ld=None):
 {GOOGLE if not path else ''}{ld}<script src="{asset(up, 'theme.js')}"></script>
 <script src="{asset(up, 'account.js')}" defer></script>
 <link rel="icon" href="data:,">
-<link rel="preload" href="{up}fonts/Amiri-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{up}fonts/DroidNaskh-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{asset(up, 'site.css')}">
 </head>
 '''
@@ -395,8 +397,11 @@ for i, author in enumerate(data['authors']):
         if b['author'] != author: continue
         src_pdf = os.path.join(SRC, b['pdf'])
         dst = os.path.join(PUB, 'pdf', b['slug'] + '.pdf')
-        if not os.path.exists(dst) or not filecmp.cmp(src_pdf, dst, shallow=False):
-            shutil.copyfile(src_pdf, dst)
+        if os.path.exists(src_pdf):
+            if not os.path.exists(dst) or not filecmp.cmp(src_pdf, dst, shallow=False):
+                shutil.copyfile(src_pdf, dst)
+        elif not os.path.exists(dst):
+            raise FileNotFoundError(src_pdf)
         mine_b.append((len(PdfReader(dst).pages), b))
     mine_b.sort(key=lambda x: (FIRST_POS.get((author, x[1]['slug']), 1e9), x[0]))  # "first" groups in their order, the rest shortest to longest
     for pages, b in mine_b:

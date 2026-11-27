@@ -12,10 +12,11 @@
     }
     if (localStorage.getItem('look') === 'classic') root.dataset.look = 'classic';
   } catch (e) {}
-  // Saved reading font scale (reader.js): applied before paint so there is no layout jump.
+  // Saved reading font scale (reader.js) and secondary font (Amiri): applied before paint so there is no layout jump.
   try {
     var fs = parseFloat(localStorage.getItem('fs'));
     if (fs >= 0.8 && fs <= 1.5) root.style.setProperty('--fs', String(fs));
+    if (localStorage.getItem('font') === 'amiri') root.dataset.font = 'amiri';
   } catch (e) {}
   // Colours: the moon button opens a row of colour circles. "light"/"dark" are the first two looks;
   // the others set data-palette (CSS at the end of site.css), and the dark ones also data-theme=dark.
@@ -44,6 +45,44 @@
       document.dispatchEvent(new CustomEvent('km:view', { detail: v }));
     });
     if (views.length) mark();
+    var fbtn = document.getElementById('font');
+    if (fbtn) {
+      var syncFont = function () {
+        var amiri = root.dataset.font === 'amiri';
+        var lbl = amiri ? 'الخط الرئيسي (النسخ)' : 'الخط الأميري';
+        fbtn.setAttribute('aria-pressed', String(amiri));
+        fbtn.setAttribute('aria-label', lbl);
+        fbtn.title = lbl;
+      };
+      var anchorPara = function () {
+        var art = document.querySelector('article.text');
+        if (!art || art.getBoundingClientRect().top > 0) return null;
+        var ps = art.querySelectorAll(':scope > p, :scope > h2, :scope > h3');
+        var lo = 0, hi = ps.length - 1;
+        if (hi < 0) return null;
+        while (lo < hi) {
+          var mid = (lo + hi) >> 1;
+          if (ps[mid].getBoundingClientRect().bottom > 1) hi = mid; else lo = mid + 1;
+        }
+        var r = ps[lo].getBoundingClientRect();
+        return { el: ps[lo], f: r.height ? Math.max(0, Math.min(1, -r.top / r.height)) : 0 };
+      };
+      var restoreAnchor = function (anc) {
+        if (!anc) return;
+        var r = anc.el.getBoundingClientRect();
+        window.scrollTo(0, window.scrollY + r.top + r.height * anc.f);
+      };
+      syncFont();
+      fbtn.addEventListener('click', function () {
+        var anc = anchorPara();
+        var amiri = root.dataset.font !== 'amiri';
+        if (amiri) root.dataset.font = 'amiri'; else delete root.dataset.font;
+        try { if (amiri) localStorage.setItem('font', 'amiri'); else localStorage.removeItem('font'); } catch (e) {}
+        syncFont();
+        restoreAnchor(anc);
+        if (anc && document.fonts && document.fonts.ready) document.fonts.ready.then(function () { restoreAnchor(anc); });
+      });
+    }
     var btn = document.getElementById('theme');
     if (!btn) return;
     var paper = root.dataset.look !== 'classic';
