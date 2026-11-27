@@ -1,7 +1,7 @@
 # كتب مشكولة
 
 Salafi books with full harakat (tashkeel), free to read and download as PDF:
-**https://kutub-mashkulah.pages.dev**
+**https://mashkula.com**
 
 كتب سلفية مشكولة تشكيلا كاملا، للقراءة والتحميل مجانا.
 

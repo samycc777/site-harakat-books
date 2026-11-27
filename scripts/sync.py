@@ -67,7 +67,7 @@ THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليل
 THEME_BTN += '<button id="acct" type="button" hidden aria-label="تسجيل الدخول" title="تسجيل الدخول"></button>'
 
 
-SITE = 'https://kutub-mashkulah.pages.dev'
+SITE = 'https://mashkula.com'
 NAME = 'كتب مشكولة'
 URLS = []  # every page, for sitemap.xml
 
