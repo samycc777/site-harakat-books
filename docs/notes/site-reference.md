@@ -42,3 +42,11 @@ Rules are in ../../CLAUDE.md; this file is the long reference.
 - The button shows only when the Pages secret `GITHUB_TOKEN` exists (fine-grained token: this repo only, Issues read/write). Set/renew: `bash scripts/set-report-token.sh` (asks for the token, saves it, redeploys).
 - Fix reports: `gh issue list -R samycc777/site-harakat-books --search "[بلاغ] in:title"`; fix the text in media-harakat-books, rebuild, sync here, close the issue.
 - Headless Chromium on this laptop paints blank pages after DOM changes; screenshot with Playwright's Firefox.
+
+## Print Editions, Support & Beginner Reader Tools
+- `support.json` — central config for monthly sustainability goal (`monthly_goal_eur: 400`, `monthly_current_eur`), PayPal & Wise payment details, book sponsorship tiers by page count, and `print_editions` catalog metadata.
+- `scripts/extra_pages.py` (called by `sync.py`) — builds `/print/` (Print Editions catalog with Typst-rendered PNG previews, Amazon KDP & Cairo wide-margin options) and `/support/` (monthly goal progress bar, PayPal/Wise links, and interactive searchable Sponsor-a-Book picker with `?sponsor=<slug>` deep-linking).
+- `scripts/build_print.py` — compiles press-ready white-paper PDFs from `~/dev/media-harakat-books/books/<slug>/` using Typst (`--profiles kdp,cairo,study --previews`) into gitignored `print-editions/<slug>/` and preview PNGs into `public/print/previews/`.
+- `public/i18n.js` — `#lang` header button (`ع` / `EN` / `FR`) translating UI controls and `/print/` & `/support/` prose while keeping all Arabic book texts and titles untouched.
+- `public/beginner.js` — loaded on book pages: Harakat Practice Toggle (hide vowels on prose, tap any word to peek; Qur'an `﴿...﴾` always stays vocalized), Tap-a-Word Dictionary (Almaany AR/EN/FR + Hans Wehr/Lane + localStorage My Vocab drawer with Anki TSV export), and text-selection toolbar (Copy `#pN` link + client-side Canvas vocalized Quote Card PNG).
+- `public/404.html` — trilingual 404 page using root-relative `/site.css`, `/theme.js`, `/i18n.js`.

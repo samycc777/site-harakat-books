@@ -4,8 +4,18 @@ write one reading page per book (public/<slug>/index.html, text taken from media
 books/<slug>/index.html) and regenerate public/index.html and one page per author (public/<author_slugs>/index.html). Read-only on media-harakat-books.
 Look: public/site.css + public/theme.js (hand-edited)."""
 import filecmp, hashlib, json, os, re, shutil, html, subprocess, time
-from pypdf import PdfReader
+try:
+    from pypdf import PdfReader
+except ImportError:
+    PdfReader = None
 from years import years_to_words
+from extra_pages import write_print_page, write_support_page
+
+def pdf_page_count(path):
+    if PdfReader is not None:
+        return len(PdfReader(path).pages)
+    raw = open(path, 'rb').read()
+    return max(1, len(re.findall(rb'/Type\s*/Page(?![a-zA-Z])', raw)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUB = os.path.join(ROOT, 'public')
@@ -19,13 +29,19 @@ OTHER = 'أخرى'
 os.makedirs(os.path.join(PUB, 'pdf'), exist_ok=True)
 
 
+# Support & Print Editions config (support.json: PayPal/Wise links, €400/mo goal, book sponsorship tiers, print editions).
+_SUP_PATH = os.path.join(ROOT, 'support.json')
+SUPPORT = json.load(open(_SUP_PATH, encoding='utf8')) if os.path.exists(_SUP_PATH) else {}
+PRINT_MAP = {e['slug']: e for e in SUPPORT.get('print_editions', [])}
+
 # Short content hash for static CSS/JS files so browsers never hold stale assets after a deploy.
+# Root-relative paths ensure assets load reliably from any URL depth (including /404.html).
 _VER = {}
 def asset(up, name):
     if name not in _VER:
         p = os.path.join(PUB, name)
         _VER[name] = hashlib.sha256(open(p, 'rb').read()).hexdigest()[:8] if os.path.exists(p) else '1'
-    return f'{up}{name}?v={_VER[name]}'
+    return f'/{name}?v={_VER[name]}'
 
 
 # «أُضيفت حديثًا» / «شُكِّلت حديثًا» on the home page: when each book entered books.json, and when its
@@ -65,7 +81,9 @@ SUN = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 THEME_BTN = f'<button id="theme" type="button" aria-label="الوضع الليلي" title="الوضع الليلي">{MOON}{SUN}</button>'
 # secondary font toggle (public/theme.js): switches between default Droid Arabic Naskh and Amiri
 THEME_BTN += '<button id="font" type="button" aria-label="الخط الأميري" title="الخط الأميري" aria-pressed="false">خط</button>'
-# reader account (public/account.js): round button next to the theme/font buttons, shown once sign-in is set up on the server
+# UI language toggle (public/i18n.js): switches interface chrome AR / EN / FR (book texts stay 100% Arabic)
+THEME_BTN += '<button id="lang" type="button" aria-label="تغيير لغة الواجهة (AR / EN / FR)" title="تغيير لغة الواجهة (AR / EN / FR)" aria-pressed="false">ع</button>'
+# reader account (public/account.js): round button next to the theme/font/lang buttons, shown once sign-in is set up on the server
 THEME_BTN += '<button id="acct" type="button" hidden aria-label="تسجيل الدخول" title="تسجيل الدخول"></button>'
 
 
@@ -106,9 +124,10 @@ def head(title, up='', path='', desc='', ld=None):
 <meta property="og:type" content="{'book' if ld else 'website'}">
 <meta property="og:locale" content="ar_AR">
 {GOOGLE if not path else ''}{ld}<script src="{asset(up, 'theme.js')}"></script>
+<script src="{asset(up, 'i18n.js')}" defer></script>
 <script src="{asset(up, 'account.js')}" defer></script>
 <link rel="icon" href="data:,">
-<link rel="preload" href="{up}fonts/DroidNaskh-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/DroidNaskh-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="{asset(up, 'site.css')}">
 </head>
 '''
@@ -190,8 +209,16 @@ def write_book_page(b, pages, urls, fname, aslug):
     sub, body = book_text(b)
     if b.get('harakat') is not False:  # years in words (vowelled), website only; never in an unvowelled book
         sub, body = years_to_words(sub), years_to_words(body)
-    src_links = ' '.join(f'<a class="btn light" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
+    src_links = ' '.join(f'<a class="btn light" href="{esc(u.strip())}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
+    extra_btn = ''
+    if b['slug'] in PRINT_MAP:
+        pe = PRINT_MAP[b['slug']]
+        p_href = pe.get('kdp_url') or f'/print/#{b["slug"]}'
+        p_ext = ' target="_blank" rel="noopener"' if pe.get('kdp_url') else ''
+        extra_btn = f'\n    <a class="btn light" href="{esc(p_href)}"{p_ext} data-i18n="print_btn">الطَّبْعَةُ الْوَرَقِيَّةُ</a>'
+    elif b.get('harakat') is False:
+        extra_btn = f'\n    <a class="btn light" href="/support/?sponsor={esc(b["slug"])}" data-i18n="sponsor_btn">اكْفُلْ تَشْكِيلَ هَذَا الْكِتَابِ</a>'
     ld = {'@context': 'https://schema.org', '@type': 'Book', 'name': bare(b['title']), 'alternateName': b['title'], 'inLanguage': 'ar',
           'author': {'@type': 'Person', 'name': b['author']}, 'url': f"{SITE}/{b['slug']}/",
           'numberOfPages': pages, 'isAccessibleForFree': True,
@@ -208,7 +235,7 @@ def write_book_page(b, pages, urls, fname, aslug):
   <h1>{esc(b['title'])}</h1>
   <p class="sub">{sub}</p>
   <div class="actions">
-    <a class="btn" href="../pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
+    <a class="btn" href="../pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>{extra_btn}
     {src_links}
     <span class="meta"><a class="src" href="../{aslug}/">{esc(b['author'])}</a>، {ar(pages)} صفحة</span>
   </div>
@@ -222,6 +249,7 @@ def write_book_page(b, pages, urls, fname, aslug):
 <script src="{asset('../', 'report.js')}" defer></script>
 <script src="{asset('../', 'toc.js')}" defer></script>
 <script src="{asset('../', 'reader.js')}" defer></script>
+<script src="{asset('../', 'beginner.js')}" defer></script>
 </body>
 </html>
 '''
@@ -379,7 +407,7 @@ def author_slug(i, author):
 
 
 def book_item(b, pages, fname, urls, up='', who=False):
-    links = ' '.join(f'<a class="src" href="{esc(u)}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
+    links = ' '.join(f'<a class="src" href="{esc(u.strip())}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                      for n, u in enumerate(urls, 1))
     nh = ' nh' if b.get('harakat') is False else ''
     return f'<li class="book{nh}"><div class="info"><h3><a href="{up}{b["slug"]}/">{esc(b["title"])}</a></h3><span class="meta">{esc(b["author"]) + " · " if who else ""}{ar(pages)} صفحة · {links}</span></div><a class="btn" href="{up}pdf/{b["slug"]}.pdf" download="{fname}">تحميل PDF</a></li>'
@@ -402,7 +430,7 @@ for i, author in enumerate(data['authors']):
                 shutil.copyfile(src_pdf, dst)
         elif not os.path.exists(dst):
             raise FileNotFoundError(src_pdf)
-        mine_b.append((len(PdfReader(dst).pages), b))
+        mine_b.append((pdf_page_count(dst), b))
     mine_b.sort(key=lambda x: (FIRST_POS.get((author, x[1]['slug']), 1e9), x[0]))  # "first" groups in their order, the rest shortest to longest
     for pages, b in mine_b:
         fname = esc(b['title'].replace('؟', '').replace('/', ' ') + '.pdf')
@@ -516,7 +544,11 @@ for (const sec of document.querySelectorAll('section.recent')) {
 # for a work in several volumes; else title only).
 READING = json.load(open(os.path.join(ROOT, 'reading.json'), encoding='utf8'))
 START, START_T = 'ibtida', 'بماذا يبدأ طالب العلم؟'
-START_LINK = f'<a class="start" href="{START}/">{START_T}</a>'
+START_LINK = f'''<div class="quick-links">
+    <a class="start" href="{START}/" data-i18n="start_pill">{START_T}</a>
+    <a class="pill-sub" href="print/" data-i18n="print_pill">الطَّبْعَةُ الْوَرَقِيَّةُ</a>
+    <a class="pill-sub" href="support/" data-i18n="support_pill">دَعْمُ الْمَشْرُوعِ</a>
+  </div>'''
 def start_page():
     by_slug = {b['slug']: b for b in data['books']}
     nav, secs = [], []
@@ -557,8 +589,11 @@ def start_page():
     os.makedirs(os.path.join(PUB, START), exist_ok=True)
     open(os.path.join(PUB, START, 'index.html'), 'w', encoding='utf8').write(page)
 start_page()
+write_print_page(ROOT, PUB, SUPPORT, data, INFO, head, THEME_BTN)
+write_support_page(ROOT, PUB, SUPPORT, data, READING, COMING, INFO, head, THEME_BTN)
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
-SCI_JSON = f'<script id="sci-data" type="application/json">{json.dumps(sci_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")}</script>\n'
+_sci_dump = json.dumps(sci_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+SCI_JSON = f'<script id="sci-data" type="application/json">{_sci_dump}</script>\n'
 
 page = head(NAME, '', '', f"{NAME}: " + '، '.join(a for a in data['authors'] if any(b['author'] == a for b in data['books']))) + f'''<body>
 <main>

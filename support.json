@@ -1,0 +1,75 @@
+{
+  "monthly_goal_eur": 400,
+  "monthly_current_eur": 0,
+  "payments": {
+    "paypal_url": "",
+    "paypal_handle": "",
+    "wise_url": "",
+    "wise_tag": "",
+    "wise_iban": "",
+    "contact_email": "",
+    "telegram": ""
+  },
+  "sponsor_tiers": [
+    { "max_pages": 50, "eur": 15, "label_ar": "رِسَالَةٌ قَصِيرَةٌ (حَتَّى ٥٠ صَفْحَةً)", "label_en": "Short treatise (up to 50 pages)", "label_fr": "Épître courte (jusqu'à 50 pages)" },
+    { "max_pages": 150, "eur": 35, "label_ar": "كِتَابٌ مُتَوَسِّطٌ (٥١ – ١٥٠ صَفْحَةً)", "label_en": "Medium book (51–150 pages)", "label_fr": "Livre moyen (51–150 pages)" },
+    { "max_pages": 350, "eur": 65, "label_ar": "كِتَابٌ كَبِيرٌ (١٥١ – ٣٥٠ صَفْحَةً)", "label_en": "Standard volume (151–350 pages)", "label_fr": "Volume standard (151–350 pages)" },
+    { "max_pages": 99999, "eur": 100, "label_ar": "مُجَلَّدٌ مُطَوَّلٌ (أَكْثَرُ مِنْ ٣٥٠ صَفْحَةً)", "label_en": "Large volume (350+ pages)", "label_fr": "Grand volume (350+ pages)" }
+  ],
+  "print_editions": [
+    {
+      "slug": "ibn-taymiyyah-al-aqidah-al-wasitiyyah",
+      "title_en": "Al-ʿAqīdah al-Wāsiṭiyyah",
+      "title_fr": "Al-ʿAqīdah al-Wāsiṭiyyah",
+      "author_en": "Shaykh al-Islām Ibn Taymiyyah",
+      "author_fr": "Cheikh al-Islām Ibn Taymiyyah",
+      "level": "Level 1 · Creed",
+      "level_ar": "الْمُسْتَوَى الْأَوَّلُ · الْعَقِيدَةُ",
+      "level_fr": "Niveau 1 · Croyance",
+      "desc_ar": "مَتْنُ الْعَقِيدَةِ الْوَاسِطِيَّةِ مَضْبُوطًا بِالشَّكْلِ الْكَامِلِ، مُهَيَّأٌ لِلطِّبَاعَةِ بِنُسْخَةِ الْقِرَاءَةِ الدَّوْلِيَّةِ وَنُسْخَةِ طَالِبِ الْعِلْمِ ذَاتِ الْهَامِشِ الْوَاسِعِ لِلتَّعْلِيقِ.",
+      "desc_en": "Ibn Taymiyyah's foundational creed primer with full harakat, typeset for global paperback (6×9 in) and Cairo wide-margin student note-taking (17×24 cm).",
+      "desc_fr": "Le texte fondamental de croyance d'Ibn Taymiyyah avec voyellisation complète (harakat), mis en page en format poche international (6×9 po) et édition d'étude à larges marges (17×24 cm).",
+      "kdp_url": "",
+      "kdp_price_eur": 12,
+      "cairo_price_egp": 120,
+      "preview_cover": "previews/ibn-taymiyyah-al-aqidah-al-wasitiyyah-study-p1.png",
+      "preview_spread": "previews/ibn-taymiyyah-al-aqidah-al-wasitiyyah-study-p3.png"
+    },
+    {
+      "slug": "hudhayfi-at-tawhid-al-muyassar",
+      "title_en": "At-Tawḥīd al-Muyassar",
+      "title_fr": "At-Tawḥīd al-Muyassar",
+      "author_en": "Shaykh ʿAlī al-Ḥudhayfī al-ʿAdanī",
+      "author_fr": "Cheikh ʿAlī al-Ḥudhayfī al-ʿAdanī",
+      "level": "Level 1 · Beginner Tawḥīd",
+      "level_ar": "الْمُسْتَوَى الْأَوَّلُ · التَّوْحِيدُ الْمُيَسَّرُ",
+      "level_fr": "Niveau 1 · Tawḥīd simplifié",
+      "desc_ar": "مَدْخَلٌ مُيَسَّرٌ فِي التَّوْحِيدِ مَضْبُوطٌ بِالشَّكْلِ الْكَامِلِ، مُنَاسِبٌ لِلْمُبْتَدِئِينَ فِي طَلَبِ الْعِلْمِ وَاللُّغَةِ الْعَرَبِيَّةِ، مَعَ تَنْبِيهٍ وَاضِحٍ عَلَى الْأَحَادِيثِ الضَّعِيفَةِ.",
+      "desc_en": "An accessible, clearly structured introduction to Tawḥīd with full harakat—ideal for beginners in Arabic and Islamic studies, with clear hadith grading markers.",
+      "desc_fr": "Une introduction claire et structurée au Tawḥīd avec harakat complètes, idéale pour les débutants en arabe et en sciences islamiques.",
+      "kdp_url": "",
+      "kdp_price_eur": 16,
+      "cairo_price_egp": 180,
+      "preview_cover": "previews/hudhayfi-at-tawhid-al-muyassar-study-p1.png",
+      "preview_spread": "previews/hudhayfi-at-tawhid-al-muyassar-study-p3.png"
+    },
+    {
+      "slug": "mahdhari-al-mumti-fi-sharh-al-ajurrumiyyah",
+      "title_en": "Al-Mumtiʿ fī Sharḥ al-Ājurrūmiyyah",
+      "title_fr": "Al-Mumtiʿ fī Sharḥ al-Ājurrūmiyyah",
+      "author_en": "Shaykh Mālik al-Mahdharī",
+      "author_fr": "Cheikh Mālik al-Mahdharī",
+      "level": "Level 1 · Arabic Grammar (Naḥw)",
+      "level_ar": "الْمُسْتَوَى الْأَوَّلُ · النَّحْوُ",
+      "level_fr": "Niveau 1 · Grammaire arabe (Naḥw)",
+      "desc_ar": "شَرْحٌ مُيَسَّرٌ وَمُشَجَّرٌ عَلَى الْمُقَدِّمَةِ الْآجُرُّومِيَّةِ بِالتَّشْكِيلِ الْكَامِلِ مَعَ جَدَاوِلَ وَتَشْجِيرَاتٍ نَحْوِيَّةٍ وَتَمَارِينَ تَطْبِيقِيَّةٍ لِلْمُبْتَدِئِينَ.",
+      "desc_en": "A clear, beginner-friendly commentary on al-Ājurrūmiyyah with full harakat, structured grammar tables, visual trees, and exercises.",
+      "desc_fr": "Un commentaire clair et accessible d'al-Ājurrūmiyyah avec harakat complètes, tableaux de grammaire, schémas et exercices pour débutants.",
+      "kdp_url": "",
+      "kdp_price_eur": 18,
+      "cairo_price_egp": 220,
+      "preview_cover": "previews/mahdhari-al-mumti-fi-sharh-al-ajurrumiyyah-study-p1.png",
+      "preview_spread": "previews/mahdhari-al-mumti-fi-sharh-al-ajurrumiyyah-study-p3.png"
+    }
+  ]
+}

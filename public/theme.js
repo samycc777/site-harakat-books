@@ -87,15 +87,15 @@
     if (!btn) return;
     var paper = root.dataset.look !== 'classic';
     var T = [ // name, label, circle colours
-      ['light', 'نهاري', paper ? ['#fff', '#a3222b'] : ['#fbf8f1', '#8a6d3b']],
-      ['dark', 'ليلي', paper ? ['#0f1b2d', '#f2a097'] : ['#1e1e1e', '#b8955a']],
-      ['green', 'أخضر', ['#f3f6ef', '#2c6b45']],
-      ['blue', 'أزرق ليلي', ['#0f1724', '#8cbbe6']],
-      ['black', 'أسود', ['#000', '#d4b06a']],
-      ['darkgreen', 'أخضر ليلي', ['#141b16', '#9fd0a8']],
+      ['light', 'نهاري', paper ? ['#f6f8fa', '#0f4c5c'] : ['#fbf8f1', '#8a6d3b']],
+      ['dark', 'ليلي', paper ? ['#0c1017', '#7dc4d4'] : ['#1e1e1e', '#b8955a']],
+      ['green', 'أخضر', ['#f3f7f4', '#216140']],
+      ['blue', 'أزرق ليلي', ['#0b1220', '#7fb5e6']],
+      ['black', 'أسود', ['#000', '#d6b36a']],
+      ['darkgreen', 'أخضر ليلي', ['#0d1410', '#8ec89b']],
       ['nextjs', 'Next.js', ['#000', '#ededed']],
       ['gruvbox', 'Gruvbox', ['#282828', '#fe8019']],
-      ['charcoal', 'فحمي ذهبي', ['#15161b', '#d9b46d']]
+      ['charcoal', 'فحمي ذهبي', ['#111217', '#d9b46d']]
     ];
     btn.setAttribute('aria-label', 'الألوان'); btn.title = 'الألوان';
     btn.setAttribute('aria-expanded', 'false');
