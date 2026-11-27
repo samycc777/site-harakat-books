@@ -11125,6 +11125,22 @@
    "title": "الخطب المنبرية المفرغة",
    "author": "الشيخ عبد السلام بن برجس آل عبد الكريم",
    "pdf": "الخطب المنبرية المفرغة - ابن برجس.pdf"
+  },
+  {
+   "slug": "rabee-an-nukat-ala-ibn-as-salah",
+   "title": "النُّكَتُ عَلَى كِتَابِ ابْنِ الصَّلَاحِ (الْمُجَلَّدُ الْأَوَّلُ)",
+   "author": "الشيخ ربيع بن هادي المدخلي",
+   "pdf": "النكت على كتاب ابن الصلاح 1.pdf",
+   "kind": "book",
+   "source": "https://rabee.net/book/%d8%a7%d9%84%d9%86%d9%83%d8%aa-%d8%b9%d9%84%d9%89-%d9%83%d8%aa%d8%a7%d8%a8-%d8%a7%d8%a8%d9%86-%d8%a7%d9%84%d8%b5%d9%84%d8%a7%d8%ad/"
+  },
+  {
+   "slug": "salih-al-ash-shaykh-sharh-al-waraqat",
+   "title": "شَرْحُ مَتْنِ الْوَرَقَاتِ لِلْجُوَيْنِيِّ",
+   "author": "الشيخ صالح بن عبد العزيز آل الشيخ",
+   "pdf": "شرح متن الورقات للجويني - صالح آل الشيخ.pdf",
+   "kind": "book",
+   "source": "https://saleh.af.org.sa/sites/default/files/books/024.pdf"
   }
  ]
 }
