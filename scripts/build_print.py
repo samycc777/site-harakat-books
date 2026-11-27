@@ -237,8 +237,19 @@ def weak_label(mark):
 
 
 def render_inline(s: str, fn_map: dict = None) -> str:
-    """Convert bold **...**, Quran ﴿...﴾, and paired footnote markers (١) to Typst markup."""
+    """Convert bold **...**, underline <u>...</u>, Quran ﴿...﴾, and paired footnote markers (١) to Typst markup."""
     fn_map = dict(fn_map or {})
+    def render_u(txt: str) -> str:
+        uparts = re.split(r"(<u>.+?</u>)", txt)
+        res = []
+        for up in uparts:
+            if not up:
+                continue
+            if up.startswith("<u>") and up.endswith("</u>"):
+                res.append(f"#underline(offset: 0.25em)[{t_esc(up[3:-4])}];")
+            else:
+                res.append(t_esc(up))
+        return "".join(res)
     # Split out Quran spans first so we never parse footnotes or bold inside verses
     parts = re.split(r"(﴿.+?﴾)", s)
     out = []
@@ -246,7 +257,7 @@ def render_inline(s: str, fn_map: dict = None) -> str:
         if not part:
             continue
         if part.startswith("﴿") and part.endswith("﴾"):
-            out.append(f"#quran[{t_esc(part)}];")
+            out.append(f"#quran[{render_u(part)}];")
             continue
         # Handle **bold**
         bparts = re.split(r"(\*\*.+?\*\*)", part)
@@ -262,14 +273,14 @@ def render_inline(s: str, fn_map: dict = None) -> str:
                 for m in re.finditer(r"\(([٠-٩0-9]+|[٭*]+)\)", inner):
                     k = m.group(1)
                     if k in fn_map:
-                        segs.append(t_esc(inner[last:m.start()]))
+                        segs.append(render_u(inner[last:m.start()]))
                         note_body = render_inline(fn_map.pop(k), None)
                         segs.append(f"#footnote[{note_body}];")
                         last = m.end()
-                segs.append(t_esc(inner[last:]))
+                segs.append(render_u(inner[last:]))
                 rendered = "".join(segs)
             else:
-                rendered = t_esc(inner)
+                rendered = render_u(inner)
             out.append(f"#strong[{rendered}];" if is_bold else rendered)
     return "".join(out)
 
