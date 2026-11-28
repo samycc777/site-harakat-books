@@ -14,6 +14,7 @@
       start_pill: 'بماذا يبدأ طالب العلم؟',
       print_pill: 'الطَّبْعَةُ الْوَرَقِيَّةُ',
       support_pill: 'دَعْمُ الْمَشْرُوعِ',
+      dev_pill: 'لَوْحَةُ التَّطْوِيرِ',
       back_home: 'الْعَوْدَةُ إِلَى الْمَكْتَبَةِ',
       by_author: 'حسب المؤلف',
       by_science: 'حسب العلم',
@@ -46,6 +47,7 @@
       start_pill: 'Where to Start?',
       print_pill: 'Print Editions',
       support_pill: 'Support Mashkula',
+      dev_pill: 'Dev Hub',
       back_home: 'Back to Library',
       by_author: 'By Author',
       by_science: 'By Science',
@@ -78,6 +80,7 @@
       start_pill: 'Par où commencer ?',
       print_pill: 'Éditions imprimées',
       support_pill: 'Soutenir le projet',
+      dev_pill: 'Espace Dev',
       back_home: 'Retour à la bibliothèque',
       by_author: 'Par auteur',
       by_science: 'Par science',
@@ -188,6 +191,50 @@
     set: applyLang
   };
 
+  function initDevUI() {
+    if (document.documentElement.dataset.dev !== '1') return;
+    var ql = document.querySelector('.home-page .quick-links');
+    if (ql && !ql.querySelector('[data-i18n="print_pill"]')) {
+      [
+        ['/dev/print/', 'print_pill'],
+        ['/dev/support/', 'support_pill'],
+        ['/dev/', 'dev_pill']
+      ].forEach(function (item) {
+        var a = document.createElement('a');
+        a.className = 'pill-sub';
+        a.href = item[0];
+        a.setAttribute('data-i18n', item[1]);
+        a.textContent = t(item[1]);
+        ql.appendChild(a);
+      });
+    }
+    var pdfBtn = document.querySelector('main.read .actions a.btn[download]');
+    if (pdfBtn && !document.querySelector('main.read .actions [data-dev-act]')) {
+      var slug = location.pathname.replace(/^\/|\/$/g, '');
+      if (!slug || slug.indexOf('/') !== -1) return;
+      fetch('/dev/meta.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (meta) {
+        if (!meta) return;
+        var a = document.createElement('a');
+        a.className = 'btn light';
+        a.setAttribute('data-dev-act', '1');
+        if (meta.print && Object.prototype.hasOwnProperty.call(meta.print, slug)) {
+          var kdp = meta.print[slug];
+          a.href = kdp || ('/dev/print/#' + slug);
+          if (kdp) { a.target = '_blank'; a.rel = 'noopener'; }
+          a.setAttribute('data-i18n', 'print_btn');
+          a.textContent = t('print_btn');
+        } else if (meta.unv && meta.unv.indexOf(slug) !== -1) {
+          a.href = '/dev/support/?sponsor=' + encodeURIComponent(slug);
+          a.setAttribute('data-i18n', 'sponsor_btn');
+          a.textContent = t('sponsor_btn');
+        } else {
+          return;
+        }
+        pdfBtn.insertAdjacentElement('afterend', a);
+      }).catch(function () {});
+    }
+  }
+
   function init() {
     var btn = document.getElementById('lang');
     if (btn) {
@@ -196,6 +243,7 @@
         applyLang(LANGS[idx]);
       });
     }
+    initDevUI();
     applyLang(cur);
   }
 

@@ -17,7 +17,7 @@ SITE_ROOT = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = Path.home() / "dev" / "media-harakat-books"
 BOOKS_DIR = MEDIA_ROOT / "books"
 OUT_ROOT = SITE_ROOT / "print-editions"
-PREVIEW_ROOT = SITE_ROOT / "public" / "print" / "previews"
+PREVIEW_ROOT = SITE_ROOT / "public" / "dev" / "print" / "previews"
 FONT_PATHS = [
     str(Path.home() / "Library" / "Fonts"),
     "/Library/Fonts",

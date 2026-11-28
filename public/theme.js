@@ -12,6 +12,18 @@
     }
     if (localStorage.getItem('look') === 'classic') root.dataset.look = 'classic';
   } catch (e) {}
+  // Dev preview mode (Bilal only): ?dev=1 enables /dev/ monetization UI in this browser; ?dev=0 hides it.
+  try {
+    var dm = location.search.match(/[?&]dev=(1|0)\b/);
+    if (dm) {
+      if (dm[1] === '1') localStorage.setItem('dev', '1'); else localStorage.removeItem('dev');
+      var usp = new URLSearchParams(location.search);
+      usp.delete('dev');
+      var qs = usp.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+    }
+    if (localStorage.getItem('dev') === '1') root.dataset.dev = '1';
+  } catch (e) {}
   // Saved reading font scale (reader.js) and secondary font (Amiri): applied before paint so there is no layout jump.
   try {
     var fs = parseFloat(localStorage.getItem('fs'));

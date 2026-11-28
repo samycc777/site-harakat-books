@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate /print/ (Print Editions catalog) and /support/ (Support & Sponsor-a-Book) pages
+"""Generate hidden dev monetization pages under /dev/ (/dev/, /dev/print/, /dev/support/, /dev/meta.json)
 for mashkula.com from support.json, books.json, reading.json, and coming.json.
 Called by scripts/sync.py."""
 import html, json, os, re
@@ -78,9 +78,9 @@ def write_print_page(root, pub, support, books_data, info, head_fn, theme_btn):
         spr = ed.get('preview_spread', '')
         previews_html = ''
         imgs = []
-        if cov and os.path.exists(os.path.join(pub, 'print', cov)):
+        if cov and os.path.exists(os.path.join(pub, 'dev', 'print', cov)):
             imgs.append(f'<img src="{esc(cov)}" alt="{esc(b["title"])} — cover" loading="lazy">')
-        if spr and os.path.exists(os.path.join(pub, 'print', spr)):
+        if spr and os.path.exists(os.path.join(pub, 'dev', 'print', spr)):
             imgs.append(f'<img src="{esc(spr)}" alt="{esc(b["title"])} — interior spread" loading="lazy">')
         if imgs:
             previews_html = '<div class="print-previews">' + ''.join(imgs) + '</div>'
@@ -94,9 +94,9 @@ def write_print_page(root, pub, support, books_data, info, head_fn, theme_btn):
             order_btn_en = f'<a class="btn" href="{esc(kdp_url)}" target="_blank" rel="noopener">Order Paperback on Amazon (€{eur})</a>'
             order_btn_fr = f'<a class="btn" href="{esc(kdp_url)}" target="_blank" rel="noopener">Commander sur Amazon (€{eur})</a>'
         else:
-            order_btn_ar = f'<a class="btn" href="/support/#contact">حَجْزُ الطَّبْعَةِ الْوَرَقِيَّةِ (€{eur} / {ar(egp)} ج.م)</a>'
-            order_btn_en = f'<a class="btn" href="/support/#contact">Reserve / Order Print Edition (€{eur} · Cairo {egp} EGP)</a>'
-            order_btn_fr = f'<a class="btn" href="/support/#contact">Réserver l’édition imprimée (€{eur} · Le Caire {egp} EGP)</a>'
+            order_btn_ar = f'<a class="btn" href="/dev/support/#contact">حَجْزُ الطَّبْعَةِ الْوَرَقِيَّةِ (€{eur} / {ar(egp)} ج.م)</a>'
+            order_btn_en = f'<a class="btn" href="/dev/support/#contact">Reserve / Order Print Edition (€{eur} · Cairo {egp} EGP)</a>'
+            order_btn_fr = f'<a class="btn" href="/dev/support/#contact">Réserver l’édition imprimée (€{eur} · Le Caire {egp} EGP)</a>'
 
         cards.append(f'''  <article class="print-item" id="{esc(slug)}">
     <div class="print-top">
@@ -129,10 +129,10 @@ def write_print_page(root, pub, support, books_data, info, head_fn, theme_btn):
 
     title_meta = 'الطَّبْعَةُ الْوَرَقِيَّةُ — Print Editions | كتب مشكولة'
     desc_meta = 'طَبَعَاتٌ وَرَقِيَّةٌ مَشْكُولَةٌ لِكُتُبِ أَهْلِ السُّنَّةِ وَالْجَمَاعَةِ — Verified full-harakat Islamic books in print (Amazon KDP & Cairo wide-margin study editions).'
-    page = head_fn(title_meta, '../', 'print', desc_meta) + f'''<body>
+    page = head_fn(title_meta, '../../', 'dev/print', desc_meta, noindex=True) + f'''<body>
 <main>
   <header class="topbar">
-  <a class="home" href="/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>كتب مشكولة</span></a>
+  <a class="home" href="/dev/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>لَوْحَةُ التَّطْوِيرِ</span></a>
   {theme_btn}
   </header>
   <h1 class="lang-ar">الطَّبْعَةُ الْوَرَقِيَّةُ</h1>
@@ -177,7 +177,7 @@ def write_print_page(root, pub, support, books_data, info, head_fn, theme_btn):
     <p class="lang-ar">نُجَهِّزُ نُسَخًا مَطْبُوعَةً مَضْبُوطَةً بِالشَّكْلِ الْكَامِلِ لِأَيِّ كِتَابٍ مَشْكُولٍ عَلَى الْمَوْقِعِ (بِالْهَامِشِ الْوَاسِعِ أَوِ الْحَجْمِ الْكِلَاسِيكِيِّ)، مَعَ إِمْكَانِيَّةِ الطِّبَاعَةِ الْمَحَلِّيَّةِ فِي الْقَاهِرَةِ بِتَكْلِفَةٍ مُيَسَّرَةٍ لِطُلَّابِ الْعِلْمِ.</p>
     <p class="lang-en ltr-prose" hidden>We can prepare press-ready wide-margin editions of any vocalized book on <strong>mashkula.com</strong>, including affordable short-run printing in Cairo for students at Arabic institutes and local study circles.</p>
     <p class="lang-fr ltr-prose" hidden>Nous pouvons préparer des éditions à larges marges pour n’importe quel livre voyellisé de <strong>mashkula.com</strong>, avec impression locale abordable au Caire pour les étudiants et instituts.</p>
-    <p><a class="btn" href="/support/">
+    <p><a class="btn" href="/dev/support/">
       <span class="lang-ar">دَعْمُ الْمَشْرُوعِ وَالتَّوَاصُلُ</span>
       <span class="lang-en" hidden>Support &amp; Contact</span>
       <span class="lang-fr" hidden>Soutenir &amp; Contacter</span>
@@ -187,8 +187,8 @@ def write_print_page(root, pub, support, books_data, info, head_fn, theme_btn):
 </body>
 </html>
 '''
-    os.makedirs(os.path.join(pub, 'print'), exist_ok=True)
-    open(os.path.join(pub, 'print', 'index.html'), 'w', encoding='utf8').write(page)
+    os.makedirs(os.path.join(pub, 'dev', 'print'), exist_ok=True)
+    open(os.path.join(pub, 'dev', 'print', 'index.html'), 'w', encoding='utf8').write(page)
 
 
 def write_support_page(root, pub, support, books_data, reading_data, coming_data, info, head_fn, theme_btn):
@@ -349,10 +349,10 @@ def write_support_page(root, pub, support, books_data, reading_data, coming_data
 })();
 </script>'''
 
-    page = head_fn(title_meta, '../', 'support', desc_meta) + f'''<body>
+    page = head_fn(title_meta, '../../', 'dev/support', desc_meta, noindex=True) + f'''<body>
 <main>
   <header class="topbar">
-  <a class="home" href="/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>كتب مشكولة</span></a>
+  <a class="home" href="/dev/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>لَوْحَةُ التَّطْوِيرِ</span></a>
   {theme_btn}
   </header>
   <h1 class="lang-ar">دَعْمُ الْمَشْرُوعِ وَكَفَالَةُ الْكُتُبِ</h1>
@@ -431,5 +431,161 @@ def write_support_page(root, pub, support, books_data, reading_data, coming_data
 </body>
 </html>
 '''
-    os.makedirs(os.path.join(pub, 'support'), exist_ok=True)
-    open(os.path.join(pub, 'support', 'index.html'), 'w', encoding='utf8').write(page)
+    os.makedirs(os.path.join(pub, 'dev', 'support'), exist_ok=True)
+    open(os.path.join(pub, 'dev', 'support', 'index.html'), 'w', encoding='utf8').write(page)
+
+
+def write_dev_hub(root, pub, support, books_data, head_fn, theme_btn):
+    editions = support.get('print_editions', [])
+    kdp_live = sum(1 for e in editions if (e.get('kdp_url') or '').strip())
+    pay = support.get('payments', {})
+    pay_set = any((pay.get(k) or '').strip() for k in ('paypal_url', 'paypal_handle', 'wise_url', 'wise_tag', 'wise_iban'))
+    goal = max(1, int(support.get('monthly_goal_eur', 400)))
+    cur = max(0, int(support.get('monthly_current_eur', 0)))
+    unv_count = sum(1 for b in books_data['books'] if b.get('harakat') is False)
+
+    pay_status_ar = 'مُفَعَّلَةٌ' if pay_set else 'غَيْرُ مَضْبُوطَةٍ بَعْدُ فِي support.json'
+    pay_status_en = 'Configured' if pay_set else 'Pending in support.json'
+    pay_status_fr = 'Configurés' if pay_set else 'En attente dans support.json'
+
+    dev_script = r'''<script>
+(function () {
+  var stAr = document.getElementById('dev-st-ar');
+  var stEn = document.getElementById('dev-st-en');
+  var stFr = document.getElementById('dev-st-fr');
+  var btn = document.getElementById('dev-toggle');
+  function isOn() {
+    try { return localStorage.getItem('dev') === '1'; } catch (e) { return false; }
+  }
+  function setDev(on, manual) {
+    try {
+      if (on) {
+        localStorage.setItem('dev', '1');
+        sessionStorage.removeItem('dev-manual-off');
+        document.documentElement.dataset.dev = '1';
+      } else {
+        localStorage.removeItem('dev');
+        if (manual) sessionStorage.setItem('dev-manual-off', '1');
+        delete document.documentElement.dataset.dev;
+      }
+    } catch (e) {}
+    render();
+  }
+  function render() {
+    var on = isOn();
+    if (stAr) stAr.textContent = on ? 'مُفَعَّلٌ فِي هَذَا الْمُتَصَفِّحِ' : 'مُتَوَقِّفٌ (وَضْعُ الزَّائِرِ الْعَادِيِّ)';
+    if (stEn) stEn.textContent = on ? 'Active in this browser' : 'Off (public visitor view)';
+    if (stFr) stFr.textContent = on ? 'Actif dans ce navigateur' : 'Désactivé (vue publique)';
+    if (btn) {
+      btn.querySelector('.lang-ar').textContent = on ? 'إِيقَافُ وَضْعِ التَّطْوِيرِ' : 'تَفْعِيلُ وَضْعِ التَّطْوِيرِ';
+      btn.querySelector('.lang-en').textContent = on ? 'Turn Off Dev Mode' : 'Turn On Dev Mode';
+      btn.querySelector('.lang-fr').textContent = on ? 'Désactiver le mode Dev' : 'Activer le mode Dev';
+    }
+  }
+  try {
+    if (!isOn() && sessionStorage.getItem('dev-manual-off') !== '1') {
+      setDev(true, false);
+    } else {
+      render();
+    }
+  } catch (e) { render(); }
+  if (btn) btn.addEventListener('click', function () { setDev(!isOn(), true); });
+})();
+</script>'''
+
+    page = head_fn('لَوْحَةُ التَّطْوِيرِ — Dev | كتب مشكولة', '../', 'dev', 'Dev preview hub', noindex=True) + f'''<body>
+<main>
+  <header class="topbar">
+  <a class="home" href="/"><svg class="home-ico" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg><span>كتب مشكولة</span></a>
+  {theme_btn}
+  </header>
+  <h1 class="lang-ar">لَوْحَةُ التَّطْوِيرِ وَالْمُعَايَنَةِ</h1>
+  <h1 class="lang-en" hidden dir="ltr">Mashkula Dev Preview</h1>
+  <h1 class="lang-fr" hidden dir="ltr">Aperçu Développeur Mashkula</h1>
+
+  <section class="info-card">
+    <p class="lang-ar">هَذِهِ الصَّفْحَةُ مَخْفِيَّةٌ عَنِ الزُّوَّارِ وَمُحَرِّكَاتِ الْبَحْثِ. فَتْحُهَا يُفَعِّلُ وَضْعَ التَّطْوِيرِ فِي مُتَصَفِّحِكَ فَقَطْ لِتَظْهَرَ لَكَ أَزْرَارُ الطَّبْعَةِ الْوَرَقِيَّةِ وَالدَّعْمِ وَكَفَالَةِ الْكُتُبِ عَلَى الْمَوْقِعِ، بَيْنَمَا تَبْقَى مَخْفِيَّةً عَنْ جَمِيعِ الزُّوَّارِ.</p>
+    <p class="lang-en ltr-prose" hidden>This hub is unlisted and blocked from search engines. Visiting <code>/dev/</code> enables Dev Mode in your browser only—revealing the homepage pills and book-page Print / Sponsor buttons for you while keeping them completely hidden from public visitors.</p>
+    <p class="lang-fr ltr-prose" hidden>Cette page est non répertoriée et exclue des moteurs de recherche. L’ouvrir active le mode Dev dans votre navigateur uniquement, vous affichant les boutons d’édition papier et de soutien tout en les masquant aux visiteurs.</p>
+
+    <div class="pay-row">
+      <span class="print-badge lang-ar" id="dev-st-ar">مُفَعَّلٌ فِي هَذَا الْمُتَصَفِّحِ</span>
+      <span class="print-badge lang-en" id="dev-st-en" hidden dir="ltr">Active in this browser</span>
+      <span class="print-badge lang-fr" id="dev-st-fr" hidden dir="ltr">Actif dans ce navigateur</span>
+      <button type="button" class="btn light" id="dev-toggle">
+        <span class="lang-ar">إِيقَافُ وَضْعِ التَّطْوِيرِ</span>
+        <span class="lang-en" hidden>Turn Off Dev Mode</span>
+        <span class="lang-fr" hidden>Désactiver le mode Dev</span>
+      </button>
+      <a class="btn light" href="/">
+        <span class="lang-ar">الذَّهَابُ إِلَى الصَّفْحَةِ الرَّئِيسِيَّةِ</span>
+        <span class="lang-en" hidden>Open Homepage</span>
+        <span class="lang-fr" hidden>Ouvrir l’accueil</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="print-grid">
+    <article class="print-item">
+      <div class="print-top">
+        <h3 class="lang-ar"><a href="/dev/print/">الطَّبْعَةُ الْوَرَقِيَّةُ (Print Editions)</a></h3>
+        <h3 class="lang-en" hidden dir="ltr"><a href="/dev/print/">Print Editions Catalog</a></h3>
+        <h3 class="lang-fr" hidden dir="ltr"><a href="/dev/print/">Catalogue des éditions imprimées</a></h3>
+        <span class="print-badge" dir="ltr">{len(editions)} books · {kdp_live}/{len(editions)} KDP</span>
+      </div>
+      <p class="lang-ar">كَتَالُوجُ الطَّبَعَاتِ الْوَرَقِيَّةِ (Amazon KDP وَطَبْعَةُ الْقَاهِرَةِ ذَاتُ الْهَامِشِ الْوَاسِعِ) مَعَ مُعَايَنَاتِ الْغِلَافِ وَالصَّفَحَاتِ.</p>
+      <p class="lang-en ltr-prose" hidden>Preview the Amazon KDP &amp; Cairo wide-margin print catalog with cover and interior spread previews.</p>
+      <p class="lang-fr ltr-prose" hidden>Aperçu du catalogue imprimé Amazon KDP et édition à larges marges du Caire.</p>
+      <div class="pay-row">
+        <a class="btn" href="/dev/print/">
+          <span class="lang-ar">فَتْحُ صَفْحَةِ الطَّبْعَةِ الْوَرَقِيَّةِ</span>
+          <span class="lang-en" hidden>Open /dev/print/</span>
+          <span class="lang-fr" hidden>Ouvrir /dev/print/</span>
+        </a>
+      </div>
+    </article>
+
+    <article class="print-item">
+      <div class="print-top">
+        <h3 class="lang-ar"><a href="/dev/support/">دَعْمُ الْمَشْرُوعِ وَكَفَالَةُ الْكُتُبِ (Support)</a></h3>
+        <h3 class="lang-en" hidden dir="ltr"><a href="/dev/support/">Support &amp; Sponsor-a-Book</a></h3>
+        <h3 class="lang-fr" hidden dir="ltr"><a href="/dev/support/">Soutenir &amp; Parrainer un livre</a></h3>
+        <span class="print-badge" dir="ltr">€{cur} / €{goal}</span>
+      </div>
+      <p class="lang-ar">هَدَفُ الدَّعْمِ الشَّهْرِيُّ وَرَوَابِطُ PayPal / Wise ({pay_status_ar}) وَقَائِمَةُ كَفَالَةِ الْكُتُبِ غَيْرِ الْمَشْكُولَةِ ({ar(unv_count)} كِتَابًا).</p>
+      <p class="lang-en ltr-prose" hidden>Monthly goal tracker, PayPal / Wise payment details ({pay_status_en}), and interactive book sponsorship picker ({unv_count} unvocalized books).</p>
+      <p class="lang-fr ltr-prose" hidden>Objectif mensuel, liens PayPal / Wise ({pay_status_fr}) et parrainage des livres non voyellisés ({unv_count} livres).</p>
+      <div class="pay-row">
+        <a class="btn" href="/dev/support/">
+          <span class="lang-ar">فَتْحُ صَفْحَةِ الدَّعْمِ وَالْكَفَالَةِ</span>
+          <span class="lang-en" hidden>Open /dev/support/</span>
+          <span class="lang-fr" hidden>Ouvrir /dev/support/</span>
+        </a>
+      </div>
+    </article>
+  </section>
+</main>
+{dev_script}
+</body>
+</html>
+'''
+    os.makedirs(os.path.join(pub, 'dev'), exist_ok=True)
+    open(os.path.join(pub, 'dev', 'index.html'), 'w', encoding='utf8').write(page)
+
+
+def write_dev_meta(pub, support, books_data):
+    meta = {
+        'print': {e['slug']: (e.get('kdp_url') or '').strip() for e in support.get('print_editions', [])},
+        'unv': [b['slug'] for b in books_data['books'] if b.get('harakat') is False],
+    }
+    os.makedirs(os.path.join(pub, 'dev'), exist_ok=True)
+    open(os.path.join(pub, 'dev', 'meta.json'), 'w', encoding='utf8').write(
+        json.dumps(meta, ensure_ascii=False, separators=(',', ':'))
+    )
+
+
+def write_dev_pages(root, pub, support, books_data, reading_data, coming_data, info, head_fn, theme_btn):
+    write_dev_hub(root, pub, support, books_data, head_fn, theme_btn)
+    write_print_page(root, pub, support, books_data, info, head_fn, theme_btn)
+    write_support_page(root, pub, support, books_data, reading_data, coming_data, info, head_fn, theme_btn)
+    write_dev_meta(pub, support, books_data)

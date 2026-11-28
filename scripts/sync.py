@@ -9,7 +9,7 @@ try:
 except ImportError:
     PdfReader = None
 from years import years_to_words
-from extra_pages import write_print_page, write_support_page
+from extra_pages import write_dev_pages
 
 def pdf_page_count(path):
     if PdfReader is not None:
@@ -107,22 +107,24 @@ def bare(s): return re.sub('[\u064B-\u065F\u0670]', '', s)  # no harakat: what p
 GOOGLE = '<meta name="google-site-verification" content="tHSDV-91DVQ5bg7mw8HwDJMwUipvEQ37bfjBGJ2HN_E">\n'  # Search Console ownership (home page only)
 
 
-def head(title, up='', path='', desc='', ld=None):
+def head(title, up='', path='', desc='', ld=None, noindex=False):
     """<head> shared by every page; up = '../' for the book pages; path = page folder ('' = home).
     Search engines get the canonical URL, a description (book title, author, the book's own subtitle:
     no text of ours) and, on book pages, schema.org Book data."""
     url = f'{SITE}/{path + "/" if path else ""}'
     title, desc = bare(title), bare(desc)
-    URLS.append(url)
+    if not noindex:
+        URLS.append(url)
     desc = esc(desc or title)
     ld = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>\n' if ld else ''
+    robots_meta = '<meta name="robots" content="noindex, nofollow">\n' if noindex else ''
     return f'''<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>{esc(title)}</title>
+{robots_meta}<title>{esc(title)}</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{url}">
 <meta property="og:site_name" content="{NAME}">
@@ -219,14 +221,6 @@ def write_book_page(b, pages, urls, fname, aslug):
         sub, body = years_to_words(sub), years_to_words(body)
     src_links = ' '.join(f'<a class="btn light" href="{esc(u.strip())}" target="_blank" rel="noopener">المصدر{"" if len(urls) == 1 else " " + ar(n)}</a>'
                          for n, u in enumerate(urls, 1))
-    extra_btn = ''
-    if b['slug'] in PRINT_MAP:
-        pe = PRINT_MAP[b['slug']]
-        p_href = pe.get('kdp_url') or f'/print/#{b["slug"]}'
-        p_ext = ' target="_blank" rel="noopener"' if pe.get('kdp_url') else ''
-        extra_btn = f'\n    <a class="btn light" href="{esc(p_href)}"{p_ext} data-i18n="print_btn">الطَّبْعَةُ الْوَرَقِيَّةُ</a>'
-    elif b.get('harakat') is False:
-        extra_btn = f'\n    <a class="btn light" href="/support/?sponsor={esc(b["slug"])}" data-i18n="sponsor_btn">اكْفُلْ تَشْكِيلَ هَذَا الْكِتَابِ</a>'
     ld = {'@context': 'https://schema.org', '@type': 'Book', 'name': bare(b['title']), 'alternateName': b['title'], 'inLanguage': 'ar',
           'author': {'@type': 'Person', 'name': b['author']}, 'url': f"{SITE}/{b['slug']}/",
           'numberOfPages': pages, 'isAccessibleForFree': True,
@@ -243,7 +237,7 @@ def write_book_page(b, pages, urls, fname, aslug):
   <h1>{esc(b['title'])}</h1>
   <p class="sub">{sub}</p>
   <div class="actions">
-    <a class="btn" href="../pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>{extra_btn}
+    <a class="btn" href="../pdf/{b['slug']}.pdf" download="{fname}">تحميل PDF</a>
     {src_links}
     <span class="meta"><a class="src" href="../{aslug}/">{esc(b['author'])}</a>، {ar(pages)} صفحة</span>
   </div>
@@ -554,8 +548,6 @@ READING = json.load(open(os.path.join(ROOT, 'reading.json'), encoding='utf8'))
 START, START_T = 'ibtida', 'بماذا يبدأ طالب العلم؟'
 START_LINK = f'''<div class="quick-links">
     <a class="start" href="{START}/"><span data-i18n="start_pill">{START_T}</span>{ARROW_ICO}</a>
-    <a class="pill-sub" href="print/" data-i18n="print_pill">الطَّبْعَةُ الْوَرَقِيَّةُ</a>
-    <a class="pill-sub" href="support/" data-i18n="support_pill">دَعْمُ الْمَشْرُوعِ</a>
   </div>'''
 def start_page():
     by_slug = {b['slug']: b for b in data['books']}
@@ -597,8 +589,7 @@ def start_page():
     os.makedirs(os.path.join(PUB, START), exist_ok=True)
     open(os.path.join(PUB, START, 'index.html'), 'w', encoding='utf8').write(page)
 start_page()
-write_print_page(ROOT, PUB, SUPPORT, data, INFO, head, THEME_BTN)
-write_support_page(ROOT, PUB, SUPPORT, data, READING, COMING, INFO, head, THEME_BTN)
+write_dev_pages(ROOT, PUB, SUPPORT, data, READING, COMING, INFO, head, THEME_BTN)
 VIEWS = '<div class="views" role="group"><button type="button" data-view="author">حسب المؤلف</button><button type="button" data-view="science">حسب العلم</button></div>'
 _sci_dump = json.dumps(sci_data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
 SCI_JSON = f'<script id="sci-data" type="application/json">{_sci_dump}</script>\n'
@@ -625,5 +616,5 @@ open(os.path.join(PUB, 'index.html'), 'w', encoding='utf8').write(page)
 open(os.path.join(PUB, 'sitemap.xml'), 'w', encoding='utf8').write(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + ''.join(f'<url><loc>{u}</loc></url>\n' for u in sorted(set(URLS))) + '</urlset>\n')
-open(os.path.join(PUB, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n')
+open(os.path.join(PUB, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\nDisallow: /dev/\nSitemap: {SITE}/sitemap.xml\n')
 print(len(data['books']), 'books,', len(set(URLS)), 'pages in sitemap.xml')

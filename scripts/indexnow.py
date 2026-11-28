@@ -12,7 +12,7 @@ else:
     r = subprocess.run(['git', 'diff', '--name-only', sys.argv[2], 'HEAD', '--', 'public/index.html', 'public/*/index.html'],
                        cwd=ROOT, capture_output=True, text=True)
     if r.returncode: sys.exit(f'git diff failed: {r.stderr.strip()}')  # old commit not fetched: caller falls back
-    files = r.stdout.split()
+    files = [f for f in r.stdout.split() if not f.startswith(('public/dev/', 'public/privacy/'))]
     urls = [SITE + '/' + f[len('public/'):-len('index.html')] for f in files if os.path.exists(os.path.join(ROOT, f))]
 if not urls:
     sys.exit(print('nothing changed'))
