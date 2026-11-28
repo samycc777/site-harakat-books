@@ -11141,6 +11141,13 @@
    "pdf": "شرح متن الورقات للجويني - صالح آل الشيخ.pdf",
    "kind": "book",
    "source": "https://saleh.af.org.sa/sites/default/files/books/024.pdf"
+  },
+  {
+   "slug": "ibn-barjas-ahkam-as-salam",
+   "title": "أحكام السلام",
+   "author": "الشيخ عبد السلام بن برجس آل عبد الكريم",
+   "pdf": "أحكام السلام - ابن برجس.pdf",
+   "harakat": false
   }
  ]
 }
